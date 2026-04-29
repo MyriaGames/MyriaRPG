@@ -67,11 +67,14 @@ namespace MyriaRPG.Services
             }
             return true;
         }
-        public static bool NavigateStartup(Page page)
+        public static bool NavigateStartup(Page? page)
         {
             try
             {
-                PageNavigationFrame.Navigate(page);
+                if (page is null)
+                    PageNavigationFrame.Content = null;
+                else
+                    PageNavigationFrame.Navigate(page);
             }
             catch
             {

@@ -36,9 +36,10 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Button x:Name="btn_singlePlayer" Content="{Binding btnSingle}" Grid.Row="1" Margin="0,5,0,5" FontWeight="Bold" FontSize="16" Command="{Binding SinglePlayer}" Grid.Column="1"/>
-                <Button x:Name="btn_login"  Content="{Binding btnLogin}" Grid.Row="2" Margin="0,5,0,5" FontWeight="Bold" FontSize="16" Command="{Binding Login}" Grid.Column="1" IsEnabled="False"/>
-                <Button x:Name="btn_register" Content="{Binding btnRegister}" Grid.Row="3" Margin="0,5,0,5" FontWeight="Bold" FontSize="16" Command="{Binding Register}" Grid.Column="1" IsEnabled="False"/>
+                <Button x:Name="btn_login"  Content="{Binding btnLogin}" Grid.Row="2" Margin="0,5,0,5" FontWeight="Bold" FontSize="16" Command="{Binding Login}" Grid.Column="1"/>
+                <Button x:Name="btn_register" Content="{Binding btnRegister}" Grid.Row="3" Margin="0,5,0,5" FontWeight="Bold" FontSize="16" Command="{Binding Register}" Grid.Column="1"/>
                 <Button x:Name="btn_settings" Content="{Binding btnSettings}" Grid.Row="4" Margin="0,5,0,5" FontSize="16" FontWeight="Bold" Command="{Binding Settings}" Grid.Column="1"/>
+                <Button x:Name="btn_quit" Content="{Binding btnQuit}" Grid.Row="5" Margin="0,5,0,5" FontSize="16" FontWeight="Bold" Command="{Binding Quit}" Grid.Column="1"/>
             </Grid>
         </Grid>
         <Frame Name="Frame" NavigationUIVisibility="Hidden"/>

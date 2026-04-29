@@ -6,6 +6,7 @@ using MyriaRPG.Services;
 using MyriaRPG.Utils;
 using MyriaRPG.View.Pages;
 using MyriaRPG.View.Pages.Game;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -152,7 +153,7 @@ namespace MyriaRPG.ViewModel.Pages
 
         }
 
-        public ViewModel_CharacterSelectionPage() 
+        public ViewModel_CharacterSelectionPage()
         {
             Join = new RelayCommand(JoinAction, IsSelected);
             Create = new RelayCommand(CreateAction);
@@ -166,50 +167,38 @@ namespace MyriaRPG.ViewModel.Pages
 
             LocalizationAutoWire.Wire(this);
 
-            characters = CharacterService.LoadCharacters(UserAccoundService.CurrentUser);
-            for (int count = 0; count < characters.Count; count++)
+            if (ServerApiService.Token is null)
+                characters = CharacterService.LoadCharacters(UserAccoundService.CurrentUser);
+
+            var names = UserAccoundService.CurrentUser?.CharacterNames ?? [];
+            for (int count = 0; count < names.Count; count++)
             {
                 switch (count)
                 {
-                    case 0:
-                        btnCharacter1 = characters[count].Name;
-                        Visibility1 = Visibility.Visible; break;
-                    case 1: 
-                        btnCharacter2 = characters[count].Name;
-                        Visibility2 = Visibility.Visible; break;
-                    case 2:
-                        btnCharacter3 = characters[count].Name;
-                        Visibility3 = Visibility.Visible; break;
-                    case 3:
-                        btnCharacter4 = characters[count].Name;
-                        Visibility4 = Visibility.Visible; break;
-                    case 4:
-                        btnCharacter5 = characters[count].Name;
-                        Visibility5 = Visibility.Visible; break;
+                    case 0: btnCharacter1 = names[count]; Visibility1 = Visibility.Visible; break;
+                    case 1: btnCharacter2 = names[count]; Visibility2 = Visibility.Visible; break;
+                    case 2: btnCharacter3 = names[count]; Visibility3 = Visibility.Visible; break;
+                    case 3: btnCharacter4 = names[count]; Visibility4 = Visibility.Visible; break;
+                    case 4: btnCharacter5 = names[count]; Visibility5 = Visibility.Visible; break;
                 }
-
             }
-            
         }
-        private void SelectFirstAction()
+
+        private async void SelectFirstAction()  => SelectedPlayer = await LoadCharacterAsync(0);
+        private async void SelectSecondAction() => SelectedPlayer = await LoadCharacterAsync(1);
+        private async void SelectThirdAction()  => SelectedPlayer = await LoadCharacterAsync(2);
+        private async void SelectFourthAction() => SelectedPlayer = await LoadCharacterAsync(3);
+        private async void SelectFifthAction()  => SelectedPlayer = await LoadCharacterAsync(4);
+
+        private async Task<Player?> LoadCharacterAsync(int index)
         {
-            SelectedPlayer = characters[0];
-        }
-        private void SelectSecondAction()
-        {
-            SelectedPlayer = characters[1];
-        }
-        private void SelectThirdAction()
-        {
-            SelectedPlayer = characters[2];
-        }
-        private void SelectFourthAction()
-        {
-            SelectedPlayer = characters[3];
-        }
-        private void SelectFifthAction()
-        {
-            SelectedPlayer = characters[4];
+            var names = UserAccoundService.CurrentUser?.CharacterNames ?? [];
+            if (index >= names.Count) return null;
+
+            if (ServerApiService.Token is not null)
+                return await ServerApiService.LoadCharacterAsync(names[index]);
+
+            return characters.Count > index ? characters[index] : null;
         }
         private void JoinAction()
         {
@@ -225,8 +214,15 @@ namespace MyriaRPG.ViewModel.Pages
         {
             Navigation.NavigateMain(new Page_CharacterCreation());
         }
-        private void DeleteAction()
+        private async void DeleteAction()
         {
+            if (SelectedPlayer is null) return;
+            var name = SelectedPlayer.Name;
+
+            if (ServerApiService.Token is not null)
+                await ServerApiService.DeleteCharacterAsync(name);
+
+            UserAccoundService.CurrentUser?.CharacterNames.Remove(name);
             SelectedPlayer = null;
             UserAccoundService.CurrentCharacter = null;
         }

@@ -47,6 +47,7 @@
   "pg.character.select.title": "Charakter Auswahl",
   "pg.character.create.title": "Charakter erstellen",
   "pg.character.create.class": "Klasse",
+  "pg.character.create.race": "Rasse",
   "pg.character.create.preview": "Vorschau",
   "pg.character.create.validation.name.short": "Der Name muss mindestens 2 Zeichen lang sein.",
   "pg.character.create.validation.name.invalid": "Der Name darf nur Buchstaben, Zahlen, '_' oder '-' enthalten.",

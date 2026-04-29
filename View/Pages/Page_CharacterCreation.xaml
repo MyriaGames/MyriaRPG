@@ -1,36 +1,12 @@
-﻿<Page x:Class="MyriaRPG.View.Pages.Page_CharacterCreation"
+<Page x:Class="MyriaRPG.View.Pages.Page_CharacterCreation"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:MyriaRPG.View.Pages"
-      mc:Ignorable="d" 
+      mc:Ignorable="d"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Page_CharacterCreation">
-    <Page.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <!-- Small square icon button style -->
-        <Style x:Key="IconButton" TargetType="Button">
-            <Setter Property="Width" Value="36"/>
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="6"/>
-            <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-            <Setter Property="Background" Value="{DynamicResource Brush.Background}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="ToolTipService.ShowDuration" Value="60000"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Page.Resources>
     <Grid Margin="20,20,20,70">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -42,8 +18,7 @@
         <!-- Header -->
         <StackPanel Grid.Row="0">
             <TextBlock Text="{Binding TblTitle}" FontSize="22" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Foreground}"/>
-            <TextBlock Text="Choose a class and a name. You can change UI later, this is the functional version."
-                       Opacity="0.75" Margin="0,4,0,0" Foreground="{DynamicResource Brush.Foreground}"/>
+            <TextBlock Text="Choose a name for your save." Opacity="0.75" Margin="0,4,0,0" Foreground="{DynamicResource Brush.Foreground}"/>
         </StackPanel>
 
         <!-- Form -->
@@ -54,7 +29,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left: inputs -->
+            <!-- Left: name input -->
             <Border Grid.Column="0" Padding="12" CornerRadius="10" Background="{DynamicResource Brush.Background}">
                 <StackPanel>
                     <TextBlock Text="{Binding TblName}" FontWeight="SemiBold" Margin="0,0,0,6" Foreground="{DynamicResource Brush.Foreground}"/>
@@ -63,23 +38,14 @@
                              Background="{DynamicResource Brush.Border}"
                              Foreground="{DynamicResource Brush.Foreground}"
                              Padding="8"
-                             Margin="0,0,0,10"/>
+                             Margin="0,0,0,16"/>
 
-                    <TextBlock Text="{Binding TblClass}" FontWeight="SemiBold" Margin="0,0,0,6" Foreground="{DynamicResource Brush.Foreground}"/>
-                    <ListBox ItemsSource="{Binding Classes}"
-                             SelectedItem="{Binding SelectedClass}"
-                             Background="{DynamicResource Brush.Border}"
-                             Height="280">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" Padding="6" Foreground="{DynamicResource Brush.Foreground}"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <TextBlock Text="{Binding TblRace}" FontWeight="SemiBold" Margin="0,0,0,6" Foreground="{DynamicResource Brush.Foreground}"/>
+                    <TextBlock Text="Myralu" FontSize="15" Padding="8,6" Foreground="{DynamicResource Brush.Foreground}" Opacity="0.85"/>
 
                     <TextBlock Text="{Binding ValidationText}"
                                Foreground="Salmon"
-                               Margin="0,10,0,0"
+                               Margin="0,16,0,0"
                                TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
@@ -91,33 +57,29 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                         <TextBlock Text="{Binding TblShowName}" Opacity="0.7" Foreground="{DynamicResource Brush.Foreground}"/>
-                        <TextBlock Text="{Binding CharacterName}" FontWeight="SemiBold"  Foreground="{DynamicResource Brush.Foreground}"/>
+                        <TextBlock Text="{Binding CharacterName}" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Foreground}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                        <TextBlock Text="{Binding TblShowClass}" Opacity="0.7" Foreground="{DynamicResource Brush.Foreground}"/>
-                        <TextBlock Text="{Binding SelectedClass}" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Foreground}"/>
+                        <TextBlock Text="{Binding TblShowRace}" Opacity="0.7" Foreground="{DynamicResource Brush.Foreground}"/>
+                        <TextBlock Text="Myralu" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Foreground}"/>
                     </StackPanel>
 
                     <Separator Margin="0,10,0,10"/>
 
-                    <TextBlock Text="Starting details" Foreground="{DynamicResource Brush.Foreground}"
-                               FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <TextBlock Text="Level: 1" Opacity="0.85" Foreground="{DynamicResource Brush.Foreground}"/>
-                    <TextBlock Text="Inventory: starter items (later)" Opacity="0.85" Foreground="{DynamicResource Brush.Foreground}"/>
-                    <TextBlock Text="Room: starting room (set in VM)" Opacity="0.85" Foreground="{DynamicResource Brush.Foreground}"/>
+                    <TextBlock Text="Starting Stats" FontWeight="SemiBold" Margin="0,0,0,6" Foreground="{DynamicResource Brush.Foreground}"/>
+                    <TextBlock Text="STR: 13  DEX: 11  END: 14" Opacity="0.85" Foreground="{DynamicResource Brush.Foreground}"/>
+                    <TextBlock Text="INT: 13  SPR: 13" Opacity="0.85" Foreground="{DynamicResource Brush.Foreground}"/>
+                    <TextBlock Text="HP: 120  MP: 115" Opacity="0.85" Margin="0,4,0,0" Foreground="{DynamicResource Brush.Foreground}"/>
+                    <TextBlock Text="Level: 1" Opacity="0.85" Margin="0,4,0,0" Foreground="{DynamicResource Brush.Foreground}"/>
                 </StackPanel>
             </Border>
         </Grid>
 
         <!-- Buttons -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Content="{Binding BtnBack}" Command="{Binding BackCommand}"
-                    Padding="14,6" Margin="0,0,8,0"/>
-            <Button Content="{Binding BtnCreate}"
-                    Command="{Binding CreateCommand}"
-                    Padding="14,6"
-                    IsEnabled="{Binding CanCreate}"/>
+            <Button Content="{Binding BtnBack}" Command="{Binding BackCommand}" Padding="14,6" Margin="0,0,8,0"/>
+            <Button Content="{Binding BtnCreate}" Command="{Binding CreateCommand}" Padding="14,6" IsEnabled="{Binding CanCreate}"/>
         </StackPanel>
     </Grid>
 </Page>

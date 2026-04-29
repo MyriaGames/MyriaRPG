@@ -7,6 +7,7 @@ using MyriaRPG.View.Pages.Game.IngameWindow;
 using MyriaRPG.View.Windows;
 using System.Windows;
 using System.Windows.Input;
+using System.Threading.Tasks;
 
 namespace MyriaRPG.ViewModel.Pages.Game.IngameWindow
 {
@@ -103,26 +104,36 @@ namespace MyriaRPG.ViewModel.Pages.Game.IngameWindow
         {
             Navigation.NavigateIngameMenue(new MyriaRPG.View.Pages.Page_Settings());
         }
-        public void CharacterMenueAction()
+        public async void CharacterMenueAction()
         {
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, UserAccoundService.CurrentCharacter);
+            await SaveAsync();
             Navigation.NavigateMain(new Page_CharacterSelection());
-            MainWindow.Instance.gameWindow.Visibility = Visibility.Hidden; /* open inventory popup */
+            MainWindow.Instance.gameWindow.Visibility = Visibility.Hidden;
         }
-        public void MainMenueAction()
+        public async void MainMenueAction()
         {
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, UserAccoundService.CurrentCharacter);
+            await SaveAsync();
             Navigation.NavigateMain(new Page_StartupMenue());
-            MainWindow.Instance.gameWindow.Visibility = Visibility.Hidden; /* open inventory popup */
+            MainWindow.Instance.gameWindow.Visibility = Visibility.Hidden;
         }
-        public void SaveQuitAction()
+        public async void SaveQuitAction()
         {
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, UserAccoundService.CurrentCharacter);
+            await SaveAsync();
             Application.Current.Shutdown();
         }
         public void QuitAction()
         {
             Application.Current.Shutdown();
+        }
+
+        private static async Task SaveAsync()
+        {
+            var user = UserAccoundService.CurrentUser;
+            var player = UserAccoundService.CurrentCharacter;
+            if (ServerApiService.Token is not null)
+                await ServerApiService.SaveCharacterAsync(player);
+            else
+                CharacterService.SaveCharacter(user, player);
         }
 
     }

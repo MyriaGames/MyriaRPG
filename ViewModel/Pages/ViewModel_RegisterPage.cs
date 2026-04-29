@@ -1,9 +1,11 @@
-﻿using MyriaLib.Services.Manager;
+﻿using MyriaLib.Models;
+using MyriaLib.Services;
 using MyriaLib.Systems;
 using MyriaRPG.Model;
 using MyriaRPG.Services;
 using MyriaRPG.Utils;
 using MyriaRPG.View.Pages;
+using MyriaRPG.View.Windows;
 using System.Windows.Input;
 
 namespace MyriaRPG.ViewModel.Pages
@@ -19,7 +21,6 @@ namespace MyriaRPG.ViewModel.Pages
         private string _btnCancel;
         public ICommand Login { get; }
         public ICommand Cancel { get; }
-        internal string Password { get; set; }
         public string Username { get; set; }
         public string tblUserNameMsg
         {
@@ -105,18 +106,32 @@ namespace MyriaRPG.ViewModel.Pages
 
         public ViewModel_RegisterPage()
         {
-            Login = new RelayCommand(LoginAction);
+            Login = new RelayCommand(RegisterAction);
             Cancel = new RelayCommand(CancelAction);
-                LocalizationAutoWire.Wire(this);
+            LocalizationAutoWire.Wire(this);
         }
-        private void LoginAction()
+        private async void RegisterAction()
         {
-            if (LoginManager.Login(Username, Password))
+            tblUserNameMsg = string.Empty;
+            var result = await ServerApiService.RegisterAsync(Username, Password);
+            switch (result)
             {
-                Navigation.NavigateMain(new Page_CharacterSelection());
+                case AuthResult.Success:
+                    var regNames = await ServerApiService.GetCharacterNamesAsync();
+                    UserAccoundService.CurrentUser = new UserAccount
+                    {
+                        Username = ServerApiService.LastUsername,
+                        CharacterNames = regNames
+                    };
+                    Navigation.NavigateMain(new Page_CharacterSelection());
+                    break;
+                case AuthResult.Conflict:
+                    tblUserNameMsg = Localization.T("pg.register.user.alreadyexists");
+                    break;
+                case AuthResult.ServerError:
+                    new Window_InitError("Register", ServerApiService.LastError ?? "Unknown error").ShowDialog();
+                    break;
             }
-            else
-                tblUserNameMsg = Localization.T("pg.login.user.nonexistent");
         }
         private void CancelAction()
         {

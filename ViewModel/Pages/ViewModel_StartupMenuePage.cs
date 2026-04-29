@@ -5,6 +5,7 @@ using MyriaRPG.Services;
 using MyriaRPG.Utils;
 using MyriaRPG.View.Pages;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 using System.IO;
 
@@ -16,6 +17,8 @@ namespace MyriaRPG.ViewModel.Pages
         private string _btnLogin;
         private string _btnRegister;
         private string _btnSettings;
+        private string _btnQuit;
+        private Type? _activeStartupPage;
         [LocalizedKey("pg.start.btn.single")]
         public string btnSingle 
         { 
@@ -53,8 +56,8 @@ namespace MyriaRPG.ViewModel.Pages
         }
 
         [LocalizedKey("app.general.UI.settings")]
-        public string btnSettings 
-        { 
+        public string btnSettings
+        {
             get { return _btnSettings; }
             private set
             {
@@ -64,10 +67,22 @@ namespace MyriaRPG.ViewModel.Pages
 
         }
 
+        [LocalizedKey("app.general.UI.quit")]
+        public string btnQuit
+        {
+            get { return _btnQuit; }
+            private set
+            {
+                _btnQuit = value;
+                OnPropertyChanged(nameof(btnQuit));
+            }
+        }
+
         public ICommand SinglePlayer {  get; }
         public ICommand Login { get; }
         public ICommand Register { get; }
         public ICommand Settings { get; }
+        public ICommand Quit { get; }
 
         public ViewModel_StartupMenuePage()
         {
@@ -77,6 +92,7 @@ namespace MyriaRPG.ViewModel.Pages
             Login = new RelayCommand(LoginAction);
             Register = new RelayCommand(RegisterAction);
             Settings = new RelayCommand(SettingsAction);
+            Quit = new RelayCommand(() => Application.Current.Shutdown());
         }
         private void SinglePlayerAction()
         {
@@ -104,15 +120,42 @@ namespace MyriaRPG.ViewModel.Pages
         }
         private void LoginAction()
         {
-            Navigation.NavigateStartup(new Page_Login());
+            if (_activeStartupPage == typeof(Page_Login))
+            {
+                _activeStartupPage = null;
+                Navigation.NavigateStartup(null);
+            }
+            else
+            {
+                _activeStartupPage = typeof(Page_Login);
+                Navigation.NavigateStartup(new Page_Login());
+            }
         }
         private void RegisterAction()
         {
-            Navigation.NavigateStartup(new Page_Login(true));
+            if (_activeStartupPage == typeof(ViewModel_RegisterPage))
+            {
+                _activeStartupPage = null;
+                Navigation.NavigateStartup(null);
+            }
+            else
+            {
+                _activeStartupPage = typeof(ViewModel_RegisterPage);
+                Navigation.NavigateStartup(new Page_Login(true));
+            }
         }
         private void SettingsAction()
         {
-            Navigation.NavigateStartup(new Page_Settings());
+            if (_activeStartupPage == typeof(Page_Settings))
+            {
+                _activeStartupPage = null;
+                Navigation.NavigateStartup(null);
+            }
+            else
+            {
+                _activeStartupPage = typeof(Page_Settings);
+                Navigation.NavigateStartup(new Page_Settings());
+            }
         }
 
     }

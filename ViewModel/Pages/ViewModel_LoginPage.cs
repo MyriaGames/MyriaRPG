@@ -1,9 +1,11 @@
-﻿using MyriaLib.Services.Manager;
+﻿using MyriaLib.Models;
+using MyriaLib.Services;
 using MyriaLib.Systems;
 using MyriaRPG.Model;
 using MyriaRPG.Services;
 using MyriaRPG.Utils;
 using MyriaRPG.View.Pages;
+using MyriaRPG.View.Windows;
 using System.Windows.Input;
 
 namespace MyriaRPG.ViewModel.Pages
@@ -19,7 +21,6 @@ namespace MyriaRPG.ViewModel.Pages
         private string _btnCancel;
         public ICommand Login { get; }
         public ICommand Cancel { get; }
-        internal string Password { get; set; }
         public string Username { get; set; }
         public string tblUserNameMsg 
         { 
@@ -111,14 +112,26 @@ namespace MyriaRPG.ViewModel.Pages
         }
         private async void LoginAction()
         {
-            Task<bool> loginTask = Task.Run(() => LoginManager.Login(Username, Password));
-            await loginTask;
-            if (loginTask.Result)
+            tblUserNameMsg = string.Empty;
+            var result = await ServerApiService.LoginAsync(Username, Password);
+            switch (result)
             {
-                Navigation.NavigateMain(new Page_CharacterSelection());
+                case AuthResult.Success:
+                    var loginNames = await ServerApiService.GetCharacterNamesAsync();
+                    UserAccoundService.CurrentUser = new UserAccount
+                    {
+                        Username = ServerApiService.LastUsername,
+                        CharacterNames = loginNames
+                    };
+                    Navigation.NavigateMain(new Page_CharacterSelection());
+                    break;
+                case AuthResult.InvalidCredentials:
+                    tblUserNameMsg = Localization.T("pg.login.user.nonexistent");
+                    break;
+                case AuthResult.ServerError:
+                    new Window_InitError("Login", ServerApiService.LastError ?? "Unknown error").ShowDialog();
+                    break;
             }
-            else
-                tblUserNameMsg = Localization.T("pg.login.user.nonexistent");
         }
         private void CancelAction()
         {

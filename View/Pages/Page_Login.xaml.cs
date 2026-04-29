@@ -17,13 +17,12 @@ namespace MyriaRPG.View.Pages
             if (registration)
             {
                 _viewModel = new ViewModel_RegisterPage();
-                this.DataContext = new ViewModel_RegisterPage();
             }
             else
             {
                 _viewModel = new ViewModel_LoginPage();
-                this.DataContext = _viewModel;
             }
+            this.DataContext = _viewModel;
             pbx_UserPassword.PasswordChanged += PasswordToViewModel;
         }
 
