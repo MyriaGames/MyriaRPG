@@ -125,7 +125,7 @@ namespace Myria.Wpf.ViewModel.Pages
                         // this point (that happens on lobby Join), so don't fetch them here - fetching
                         // now would hit whatever BaseUrl still defaults to and silently cache an empty
                         // list. ViewModel_LobbySelectionPage.JoinAction fetches the real list instead.
-                        UserAccoundService.CurrentUser = new UserAccount
+                        UserAccountService.CurrentUser = new UserAccount
                         {
                             Username = ServerApiService.LastUsername,
                             CharacterNames = []

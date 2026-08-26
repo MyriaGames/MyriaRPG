@@ -252,7 +252,7 @@ namespace Myria.Wpf.ViewModel.Pages
 
         public ViewModel_CharacterCreationPage()
         {
-            _user = UserAccoundService.CurrentUser;
+            _user = UserAccountService.CurrentUser;
             CreateCommand = new RelayCommand(Create);
             BackCommand = new RelayCommand(() => Navigation.Current.Navigate(NavigationFrameType.Main, new Page_CharacterSelection()));
 
@@ -354,11 +354,11 @@ namespace Myria.Wpf.ViewModel.Pages
             else
             {
                 CharacterService.SaveCharacter(_user, character);
-                UserAccoundService.CurrentUser.CharacterNames.Add(character.Name);
-                UserAccoundService.SaveUser();
+                UserAccountService.CurrentUser.CharacterNames.Add(character.Name);
+                UserAccountService.SaveUser();
             }
 
-            UserAccoundService.CurrentCharacter = character;
+            UserAccountService.CurrentCharacter = character;
             GameService.StartSession(character);
             Navigation.Current.Navigate(NavigationFrameType.Main, new Page_Game());
         }

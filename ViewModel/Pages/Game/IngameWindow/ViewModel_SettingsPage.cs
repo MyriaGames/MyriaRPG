@@ -114,8 +114,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         private static async Task SaveAsync()
         {
-            var user = UserAccoundService.CurrentUser;
-            var player = UserAccoundService.CurrentCharacter;
+            var user = UserAccountService.CurrentUser;
+            var player = UserAccountService.CurrentCharacter;
             if (ServerApiService.Token is not null)
                 await ServerApiService.SaveCharacterAsync(player);
             else

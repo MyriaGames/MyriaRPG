@@ -122,7 +122,7 @@ namespace Myria.Wpf.ViewModel.Pages
             if (ServerApiService.Token is not null)
                 await ServerApiService.SaveCharacterAsync(_character);
 
-            UserAccoundService.CurrentCharacter = _character;
+            UserAccountService.CurrentCharacter = _character;
             SkillFactory.UpdateSkills(_character);
             GameService.StartSession(_character);
             Navigation.Current.Navigate(NavigationFrameType.Main, new Page_Game());

@@ -13,7 +13,7 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow
         public Page_Character()
         {
             InitializeComponent();
-            _vm = new CharacterPageViewModel(UserAccoundService.CurrentCharacter);
+            _vm = new CharacterPageViewModel(UserAccountService.CurrentCharacter);
             DataContext = _vm;
 
             // Disable journal navigation on the sub-frame

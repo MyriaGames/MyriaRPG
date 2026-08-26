@@ -132,7 +132,7 @@ namespace Myria.Wpf.ViewModel.Pages
 
         private void BeginSelect(int index)
         {
-            var names = UserAccoundService.CurrentUser?.CharacterNames ?? [];
+            var names = UserAccountService.CurrentUser?.CharacterNames ?? [];
             if (index >= names.Count) return;
             _selectedCharacterName  = names[index];
             _selectedCharacterIndex = index;
@@ -157,7 +157,7 @@ namespace Myria.Wpf.ViewModel.Pages
 
             LocalizationAutoWire.Wire(this);
 
-            var names = UserAccoundService.CurrentUser?.CharacterNames ?? [];
+            var names = UserAccountService.CurrentUser?.CharacterNames ?? [];
             for (int count = 0; count < names.Count; count++)
             {
                 switch (count)
@@ -179,7 +179,7 @@ namespace Myria.Wpf.ViewModel.Pages
 
         private async Task<Character?> LoadCharacterAsync(int index)
         {
-            var names = UserAccoundService.CurrentUser?.CharacterNames ?? [];
+            var names = UserAccountService.CurrentUser?.CharacterNames ?? [];
             if (index >= names.Count) return null;
 
             if (ServerApiService.Token is not null)
@@ -193,7 +193,7 @@ namespace Myria.Wpf.ViewModel.Pages
             }
 
             // ── Mod snapshot check ───────────────────────────────────────────────
-            var savedSnapshot   = CharacterService.ReadModSnapshot(names[index], UserAccoundService.CurrentUser!);
+            var savedSnapshot   = CharacterService.ReadModSnapshot(names[index], UserAccountService.CurrentUser!);
             var currentSnapshot = ModLoader.GetCurrentSnapshot();
 
             if (savedSnapshot == null && currentSnapshot.Mods.Count > 0)
@@ -231,7 +231,7 @@ namespace Myria.Wpf.ViewModel.Pages
 
             // ── Load character ───────────────────────────────────────────────────
             LoadWarnings.Consume();
-            var sp = CharacterService.LoadCharacter(names[index], UserAccoundService.CurrentUser!);
+            var sp = CharacterService.LoadCharacter(names[index], UserAccountService.CurrentUser!);
             var skipped = LoadWarnings.Consume();
 
             if (skipped.Count > 0)
@@ -250,7 +250,7 @@ namespace Myria.Wpf.ViewModel.Pages
             {
                 sp.Race = CharacterRace.Myralu;
                 sp.RaceSelected = true;
-                CharacterService.SaveCharacter(UserAccoundService.CurrentUser!, sp);
+                CharacterService.SaveCharacter(UserAccountService.CurrentUser!, sp);
             }
 
             return sp;
@@ -279,7 +279,7 @@ namespace Myria.Wpf.ViewModel.Pages
                     return;
                 }
 
-                UserAccoundService.CurrentCharacter = character;
+                UserAccountService.CurrentCharacter = character;
                 SkillFactory.UpdateSkills(character);
                 GameService.StartSession(character);
                 Navigation.Current.Navigate(NavigationFrameType.Main, new Page_Game());
@@ -312,14 +312,14 @@ namespace Myria.Wpf.ViewModel.Pages
             {
                 if (ServerApiService.Token is not null)
                     await ServerApiService.DeleteCharacterAsync(name);
-                else if (UserAccoundService.CurrentUser is not null)
-                    CharacterService.DeleteCharacter(name, UserAccoundService.CurrentUser);
+                else if (UserAccountService.CurrentUser is not null)
+                    CharacterService.DeleteCharacter(name, UserAccountService.CurrentUser);
 
-                UserAccoundService.CurrentUser?.CharacterNames.Remove(name);
-                UserAccoundService.SaveUser();
+                UserAccountService.CurrentUser?.CharacterNames.Remove(name);
+                UserAccountService.SaveUser();
                 _selectedCharacterName = null;
                 _characterLoadTask     = null;
-                UserAccoundService.CurrentCharacter = null;
+                UserAccountService.CurrentCharacter = null;
                 Navigation.Current.Navigate(NavigationFrameType.Main, new Page_CharacterSelection());
             }
             finally

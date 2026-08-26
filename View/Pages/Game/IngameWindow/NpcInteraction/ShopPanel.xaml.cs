@@ -18,7 +18,7 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction
         public ShopPanel(Npc npc)
         {
             InitializeComponent();
-            var player = UserAccoundService.CurrentCharacter;
+            var player = UserAccountService.CurrentCharacter;
             Action goBack = () => Myria.Wpf.Services.Navigation.Current.GoBack(NavigationFrameType.NpcWindow);
             this.DataContext = GameHubService.IsConnected
                 ? new MultiplayerShopPanelViewModel(npc, player, goBack)

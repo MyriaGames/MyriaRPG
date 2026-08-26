@@ -30,8 +30,8 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction
         {
             SetNpcWindowSize(DefaultWidth, DefaultHeight);
             DataContext = GameHubService.IsConnected
-                ? new MultiplayerDialogPanelViewModel(_npc, UserAccoundService.CurrentCharacter, NavigateToService)
-                : new DialogPanelViewModel(_npc, UserAccoundService.CurrentCharacter, NavigateToService);
+                ? new MultiplayerDialogPanelViewModel(_npc, UserAccountService.CurrentCharacter, NavigateToService)
+                : new DialogPanelViewModel(_npc, UserAccountService.CurrentCharacter, NavigateToService);
         }
 
         private void NavigateToService(string serviceId)
@@ -51,7 +51,7 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction
                         ? new QuestDialogPanel(q, _npc, isReturn: false)
                         : null,
                 _ when serviceId.StartsWith("quest_return:") =>
-                    UserAccoundService.CurrentCharacter.ActiveQuests
+                    UserAccountService.CurrentCharacter.ActiveQuests
                         .FirstOrDefault(q => q.Id == serviceId[13..]) is Quest rq
                         ? new QuestDialogPanel(rq, _npc, isReturn: true)
                         : null,

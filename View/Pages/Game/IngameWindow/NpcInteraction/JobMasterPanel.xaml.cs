@@ -13,8 +13,8 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction
             InitializeComponent();
             Action goBack = () => Myria.Wpf.Services.Navigation.Current.GoBack(NavigationFrameType.NpcWindow);
             DataContext = GameHubService.IsConnected
-                ? new MultiplayerJobMasterPanelViewModel(npc, UserAccoundService.CurrentCharacter, goBack)
-                : new JobMasterPanelViewModel(npc, UserAccoundService.CurrentCharacter, goBack);
+                ? new MultiplayerJobMasterPanelViewModel(npc, UserAccountService.CurrentCharacter, goBack)
+                : new JobMasterPanelViewModel(npc, UserAccountService.CurrentCharacter, goBack);
         }
     }
 }

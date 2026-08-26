@@ -766,7 +766,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.GetAsync($"{BaseUrl}/api/friends?characterName={Uri.EscapeDataString(me)}");
                 if (!resp.IsSuccessStatusCode) return [];
                 return await resp.Content.ReadFromJsonAsync<List<FriendInfo>>(_jsonOpts) ?? [];
@@ -778,7 +778,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.GetAsync($"{BaseUrl}/api/friends/requests?characterName={Uri.EscapeDataString(me)}");
                 if (!resp.IsSuccessStatusCode) return [];
                 return await resp.Content.ReadFromJsonAsync<List<FriendRequestInfo>>(_jsonOpts) ?? [];
@@ -790,7 +790,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.PostAsJsonAsync($"{BaseUrl}/api/friends/request",
                     new { characterName, fromCharacterName = me }, _jsonOpts);
                 if (resp.IsSuccessStatusCode) return null;
@@ -803,7 +803,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.PostAsync(
                     $"{BaseUrl}/api/friends/{friendshipId}/accept?characterName={Uri.EscapeDataString(me)}", null);
                 return resp.IsSuccessStatusCode;
@@ -815,7 +815,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.DeleteAsync(
                     $"{BaseUrl}/api/friends/{friendshipId}?characterName={Uri.EscapeDataString(me)}");
                 return resp.IsSuccessStatusCode || resp.StatusCode == HttpStatusCode.NoContent;
@@ -830,7 +830,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.GetAsync($"{BaseUrl}/api/blocks?characterName={Uri.EscapeDataString(me)}");
                 if (!resp.IsSuccessStatusCode) return [];
                 return await resp.Content.ReadFromJsonAsync<List<BlockInfo>>(_jsonOpts) ?? [];
@@ -842,7 +842,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.PostAsJsonAsync($"{BaseUrl}/api/blocks",
                     new { characterName, fromCharacterName = me }, _jsonOpts);
                 return resp.IsSuccessStatusCode;
@@ -854,7 +854,7 @@ namespace Myria.Wpf.Services
         {
             try
             {
-                var me = UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+                var me = UserAccountService.CurrentCharacter?.Name ?? string.Empty;
                 var resp = await _http.DeleteAsync(
                     $"{BaseUrl}/api/blocks/{blockId}?characterName={Uri.EscapeDataString(me)}");
                 return resp.IsSuccessStatusCode || resp.StatusCode == HttpStatusCode.NoContent;
@@ -1073,7 +1073,7 @@ namespace Myria.Wpf.Services
         public record GuildInviteInfo(int InviteId, int GuildId, string GuildName, string GuildTag,
             bool IsRookieInvite, DateTime ExpiresAt);
 
-        private static string Me => UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+        private static string Me => UserAccountService.CurrentCharacter?.Name ?? string.Empty;
 
         public static async Task<GuildInfo?> GetMyGuildAsync()
         {

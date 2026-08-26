@@ -13,8 +13,8 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction
             InitializeComponent();
             Action goBack = () => Myria.Wpf.Services.Navigation.Current.GoBack(NavigationFrameType.NpcWindow);
             DataContext = GameHubService.IsConnected
-                ? new MultiplayerUpgradePanelViewModel(npc, UserAccoundService.CurrentCharacter, goBack)
-                : new UpgradePanelViewModel(npc, UserAccoundService.CurrentCharacter, goBack);
+                ? new MultiplayerUpgradePanelViewModel(npc, UserAccountService.CurrentCharacter, goBack)
+                : new UpgradePanelViewModel(npc, UserAccountService.CurrentCharacter, goBack);
         }
     }
 }

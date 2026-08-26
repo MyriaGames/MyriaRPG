@@ -231,7 +231,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         public ViewModel_PageRoom()
         {
-            character = UserAccoundService.CurrentCharacter;
+            character = UserAccountService.CurrentCharacter;
 
             Npcs = new ObservableCollection<Npc>();
             Log = new ObservableCollection<string>();
@@ -530,7 +530,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         private void StartLocalFight(int maxMonsters)
         {
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
 
             List<Monster> monsters;
             if (currentRoom.CurrentMonsters.Count > 0)

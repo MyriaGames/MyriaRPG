@@ -166,7 +166,7 @@ namespace Myria.Wpf.ViewModel.Pages
                     case AuthResult.Success:
                         // Same reasoning as ViewModel_LoginPage.LoginAction: BaseUrl isn't set to the
                         // right realm until lobby Join, so don't fetch character names here.
-                        UserAccoundService.CurrentUser = new UserAccount
+                        UserAccountService.CurrentUser = new UserAccount
                         {
                             Username = ServerApiService.LastUsername,
                             CharacterNames = []

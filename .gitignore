@@ -381,6 +381,10 @@ Setup/certs/*.pfx
 # Local mod content, not meant for the repo
 Data/Mods/
 
+# User account/save data (per-player local state, not shipped content)
+Data/users/
+Data/saves/
+
 # Claude Code local session state, not meant for the repo
 .claude/settings.local.json
 .claude/worktrees/

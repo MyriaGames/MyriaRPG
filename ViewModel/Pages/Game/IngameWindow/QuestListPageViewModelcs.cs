@@ -168,7 +168,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public string EmptyStateText => ShowActive
             ? $"You currently have no active quests."
             : $"There are currently no available quests.";
-        private Character _character = UserAccoundService.CurrentCharacter;
+        private Character _character = UserAccountService.CurrentCharacter;
         // Mode
         private bool _showActive = true;
         public bool ShowActive

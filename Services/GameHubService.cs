@@ -195,7 +195,7 @@ namespace Myria.Wpf.Services
             // react explicitly (e.g. flashing a "+5 gold" toast).
             _connection.On<CharacterUpdateDto>("CharacterUpdated", update => Dispatch(() =>
             {
-                UserAccoundService.CurrentCharacter?.ApplyCharacterUpdate(update);
+                UserAccountService.CurrentCharacter?.ApplyCharacterUpdate(update);
                 CharacterUpdated?.Invoke(update);
             }));
 

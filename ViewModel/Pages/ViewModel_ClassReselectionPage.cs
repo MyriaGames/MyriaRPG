@@ -97,7 +97,7 @@ namespace Myria.Wpf.ViewModel.Pages
                 }
             }
 
-            UserAccoundService.CurrentCharacter = _character;
+            UserAccountService.CurrentCharacter = _character;
             SkillFactory.UpdateSkills(_character);
             GameService.StartSession(_character);
             Navigation.Current.Navigate(NavigationFrameType.Main, new Page_Game());

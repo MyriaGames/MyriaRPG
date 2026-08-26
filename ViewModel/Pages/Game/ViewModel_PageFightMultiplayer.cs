@@ -47,7 +47,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         public ViewModel_PageFightMultiplayer() : base(false /* skip base init */)
         {
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
 
             if (PendingGroupCombat != null)
             {
@@ -120,7 +120,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             if (_groupEncounter == null) return;
 
-            var p = UserAccoundService.CurrentCharacter;
+            var p = UserAccountService.CurrentCharacter;
             _serverCharacterHp = p.CurrentHealth;
             _serverCharacterMp = p.CurrentMana;
 
@@ -164,8 +164,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             SyncRealCharacterHealth();
             SyncRealCharacterMana(snap);
-            _serverCharacterHp = UserAccoundService.CurrentCharacter.CurrentHealth;
-            _serverCharacterMp = UserAccoundService.CurrentCharacter.CurrentMana;
+            _serverCharacterHp = UserAccountService.CurrentCharacter.CurrentHealth;
+            _serverCharacterMp = UserAccountService.CurrentCharacter.CurrentMana;
 
             // base.OnGroupCombatUpdated already raised property-changed notifications, but using
             // the stale server fields (the resync above happens after that). Raise again so the
@@ -193,7 +193,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             if (!snap.CharactersWon) return;
 
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             var myState = snap.Characters.FirstOrDefault(c =>
                 string.Equals(c.Name, character.Name, StringComparison.OrdinalIgnoreCase));
             if (myState == null) return;
@@ -233,7 +233,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             var progress = await GameHubService.GetCharacterProgressAsync();
             if (progress == null) return;
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             character.ApplySyncedProgress(progress);
             SkillFactory.UpdateSkills(character);
             RaiseAll();
@@ -248,7 +248,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             var progress = await GameHubService.GetActiveQuestProgressAsync();
             if (progress.Count == 0) return;
-            UserAccoundService.CurrentCharacter.ApplySyncedQuestProgress(progress);
+            UserAccountService.CurrentCharacter.ApplySyncedQuestProgress(progress);
         }
 
         // Mirrors the local player's current GroupCharacters HP onto the real Character object
@@ -256,7 +256,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         // HealthChanged) stays in sync during and after multiplayer group fights.
         private void SyncRealCharacterHealth()
         {
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             var myVm = GroupCharacters.FirstOrDefault(p =>
                 string.Equals(p.RawName, character.Name, StringComparison.OrdinalIgnoreCase));
             if (myVm != null) character.SetHealth(myVm.Hp);
@@ -266,7 +266,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         // never carried a Mana field, so this reads straight off the raw snapshot DTO instead.
         private void SyncRealCharacterMana(GroupCombatSnapshot snap)
         {
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             var myState = snap.Characters.FirstOrDefault(c =>
                 string.Equals(c.Name, character.Name, StringComparison.OrdinalIgnoreCase));
             if (myState != null) character.SetMana(myState.Mana);
@@ -329,7 +329,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 LogLines.Add(LogLineVm.From(msg.Key,
                     Localization.T(msg.Key, LocalizationText.LocalizeMonsterArgs(msg.Args.Cast<object>()))));
 
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
 
             // The server is authoritative for combat math — apply the HP it computed for
             // this turn. SetHealth (unlike assigning CurrentHealth directly) fires
@@ -387,7 +387,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             if (_isGroupCombat && _isLocalGroupCombat && _groupEncounter != null)
             {
-                var lp = UserAccoundService.CurrentCharacter;
+                var lp = UserAccountService.CurrentCharacter;
                 _groupEncounter.CharacterAttack(lp.Name, _selectedMonsterIndex);
                 SyncFromGroupEncounter();
                 FlushGroupLog();
@@ -433,7 +433,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             if (_isGroupCombat && _isLocalGroupCombat && _groupEncounter != null)
             {
                 int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? 0 : _selectedMonsterIndex;
-                var lp = UserAccoundService.CurrentCharacter;
+                var lp = UserAccountService.CurrentCharacter;
                 _groupEncounter.CharacterCastSkill(lp.Name, vm.Skill, targetIdx);
                 SyncFromGroupEncounter();
                 FlushGroupLog();

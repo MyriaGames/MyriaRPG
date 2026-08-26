@@ -136,7 +136,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
             if (IsOwner)
             {
-                InventoryVm = new MultiplayerInventoryGridViewModel(UserAccoundService.CurrentCharacter);
+                InventoryVm = new MultiplayerInventoryGridViewModel(UserAccountService.CurrentCharacter);
                 // The plain OnPropertyChanged(nameof(StagedItems)) below looks redundant (the
                 // collection instance never changes) but it's what makes the deposit tiles'
                 // IsEnabled MultiBinding (bound to this same property, see

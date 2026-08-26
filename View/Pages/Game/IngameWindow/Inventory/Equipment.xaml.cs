@@ -17,7 +17,7 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.Inventory
         public Equipment()
         {
             InitializeComponent();
-            var ch = UserAccoundService.CurrentCharacter;
+            var ch = UserAccountService.CurrentCharacter;
             _viewModel = GameHubService.IsConnected
                 ? (EquipmentViewModel)new MultiplayerEquipmentViewModel(ch)
                 : new EquipmentViewModel(ch);

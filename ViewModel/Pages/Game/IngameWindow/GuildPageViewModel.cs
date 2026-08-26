@@ -105,7 +105,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public bool ShowPropertyDetail  => IsPropertyTab && _hasProperty;
 
         public string CurrentRoomLabel =>
-            $"Room #{Myria.Lib.Core.Services.UserAccoundService.CurrentCharacter?.CurrentRoomId ?? 0}";
+            $"Room #{Myria.Lib.Core.Services.UserAccountService.CurrentCharacter?.CurrentRoomId ?? 0}";
 
         // ── Invite panel ──────────────────────────────────────────────────────
 
@@ -274,7 +274,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             MemberCount = g.Members.Length;
             RookieCount = g.Rookies.Length;
 
-            var me = Myria.Lib.Core.Services.UserAccoundService.CurrentCharacter?.Name ?? string.Empty;
+            var me = Myria.Lib.Core.Services.UserAccountService.CurrentCharacter?.Name ?? string.Empty;
             var myEntry = g.Members.FirstOrDefault(m =>
                 string.Equals(m.CharacterName, me, StringComparison.OrdinalIgnoreCase));
             MyRank = myEntry?.Rank ?? string.Empty;
@@ -427,7 +427,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         private async void EstablishBase()
         {
             EstablishBaseError = string.Empty;
-            var roomId = Myria.Lib.Core.Services.UserAccoundService.CurrentCharacter?.CurrentRoomId ?? 0;
+            var roomId = Myria.Lib.Core.Services.UserAccountService.CurrentCharacter?.CurrentRoomId ?? 0;
             if (roomId == 0) { EstablishBaseError = "You are not in a valid room."; return; }
             var (success, error) = await ServerApiService.EstablishGuildBaseAsync(roomId);
             if (!success) { EstablishBaseError = error; return; }

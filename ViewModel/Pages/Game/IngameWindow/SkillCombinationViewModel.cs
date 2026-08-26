@@ -96,7 +96,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         public SkillCombinationViewModel()
         {
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
 
             foreach (var s in character.Skills)
                 AvailableSkills.Add(new SkillVm(s));
@@ -137,7 +137,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             var ids = InputSlots.Where(s => s.IsSet).Select(s => s.SkillId!).ToList();
             if (ids.Count < 2) return;
 
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             var result = SkillCombinationService.TryCreateForCharacter(character, ids);
 
             if (result == null)
@@ -146,7 +146,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
                 return;
             }
 
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, character);
+            CharacterService.SaveCharacter(UserAccountService.CurrentUser, character);
 
             CombinedSkills.Add(new CombinedSkillVm(result, character.Skills));
             foreach (var slot in InputSlots) slot.Clear();

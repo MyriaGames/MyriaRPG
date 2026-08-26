@@ -237,7 +237,7 @@ namespace Myria.Wpf.ViewModel.UserControls
             nav.RegisterView(Nav.Job,                NavigationFrameType.CharacterMenu, () => new Page_Jobs());
             nav.RegisterView(Nav.Quest,              NavigationFrameType.CharacterMenu, () => new Page_QuestList());
             nav.RegisterView(Nav.Friends,            NavigationFrameType.CharacterMenu, () => new Page_Friends());
-            nav.RegisterView(Nav.Inventory,          NavigationFrameType.CharacterMenu, () => new InventoryPage(UserAccoundService.CurrentCharacter));
+            nav.RegisterView(Nav.Inventory,          NavigationFrameType.CharacterMenu, () => new InventoryPage(UserAccountService.CurrentCharacter));
             nav.RegisterView(Nav.SkillCombination,   NavigationFrameType.CharacterMenu, () => new Page_SkillCombination());
             nav.RegisterView(Nav.SkillSlot,          NavigationFrameType.CharacterMenu, () => new Page_SkillSlots());
             nav.RegisterView(Nav.Runes,              NavigationFrameType.CharacterMenu, () => new Page_Runes());
@@ -354,7 +354,7 @@ namespace Myria.Wpf.ViewModel.UserControls
 
         private void OpenSkills()
         {
-            if (UserAccoundService.CurrentCharacter.Class == Myria.Lib.Core.Systems.Enums.CharacterClass.RunicMage)
+            if (UserAccountService.CurrentCharacter.Class == Myria.Lib.Core.Systems.Enums.CharacterClass.RunicMage)
             {
                 var runePage = new Page_Runes();
                 var runeTitle = (runePage.DataContext as RunePageViewModel)?.WindowTitle ?? "Runes";
@@ -375,10 +375,10 @@ namespace Myria.Wpf.ViewModel.UserControls
 
         private void OpenInventory()
         {
-            if (UserAccoundService.CurrentCharacter is null)
+            if (UserAccountService.CurrentCharacter is null)
                 return;
 
-            Navigate(new InventoryPage(UserAccoundService.CurrentCharacter), "Inventory", "Inventory", "Inventory");
+            Navigate(new InventoryPage(UserAccountService.CurrentCharacter), "Inventory", "Inventory", "Inventory");
         }
 
         private void OpenFriends() => OpenFriendsTab(FriendsTab.Friends);
@@ -406,7 +406,7 @@ namespace Myria.Wpf.ViewModel.UserControls
 
         private void OpenMap()
         {
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             if (character is null)
                 return;
 
@@ -459,7 +459,7 @@ namespace Myria.Wpf.ViewModel.UserControls
 
         private static async Task SaveAsync()
         {
-            var player = UserAccoundService.CurrentCharacter;
+            var player = UserAccountService.CurrentCharacter;
             if (player is null)
                 return;
 
@@ -469,7 +469,7 @@ namespace Myria.Wpf.ViewModel.UserControls
                 return;
             }
 
-            var user = UserAccoundService.CurrentUser;
+            var user = UserAccountService.CurrentUser;
             if (user is not null)
                 CharacterService.SaveCharacter(user, player);
         }

@@ -88,7 +88,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         public SkillPageViewModel()
         {
-            var player = UserAccoundService.CurrentCharacter;
+            var player = UserAccountService.CurrentCharacter;
 
             // Regular class skills (all classes)
             foreach (var s in player.Skills)

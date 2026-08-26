@@ -137,7 +137,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         public RuneDrawingViewModel()
         {
-            _character     = UserAccoundService.CurrentCharacter;
+            _character     = UserAccountService.CurrentCharacter;
             _recognizer = new RuneLetterRecognizer();
 
             UndoLetterCommand  = new RelayCommand(UndoLetter,  () => CanUndo);

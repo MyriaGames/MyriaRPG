@@ -91,8 +91,8 @@ namespace Myria.Wpf.ViewModel.Pages
             try
             {
                 var names = await ServerApiService.GetCharacterNamesAsync();
-                if (UserAccoundService.CurrentUser != null)
-                    UserAccoundService.CurrentUser.CharacterNames = names;
+                if (UserAccountService.CurrentUser != null)
+                    UserAccountService.CurrentUser.CharacterNames = names;
 
                 Navigation.Current.Navigate(NavigationFrameType.Main, new Page_CharacterSelection());
             }

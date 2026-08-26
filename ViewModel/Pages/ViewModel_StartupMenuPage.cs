@@ -81,7 +81,7 @@ namespace Myria.Wpf.ViewModel.Pages
             }
 
             var json = File.ReadAllText(path);
-            UserAccoundService.CurrentUser = JsonSerializer.Deserialize<UserAccount>(json);
+            UserAccountService.CurrentUser = JsonSerializer.Deserialize<UserAccount>(json);
 
             Navigation.Current.Navigate(NavigationFrameType.Main, new Page_CharacterSelection());
         }

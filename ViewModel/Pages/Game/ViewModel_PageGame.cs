@@ -535,11 +535,11 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             _current = this;
 
-            if (UserAccoundService.CurrentCharacter.CurrentRoom == null)
-                UserAccoundService.CurrentCharacter.CurrentRoom = RoomService.GetRoomById(UserAccoundService.CurrentCharacter.CurrentRoomId);
+            if (UserAccountService.CurrentCharacter.CurrentRoom == null)
+                UserAccountService.CurrentCharacter.CurrentRoom = RoomService.GetRoomById(UserAccountService.CurrentCharacter.CurrentRoomId);
             Navigation.Current.InvalidateCache(Nav.Room);
 
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             character.XpGained       += (s, e) => RefreshQuestBadge();
             character.Inventory.ItemReceived += (s, e) => RefreshQuestBadge();
             RefreshQuestBadge();
@@ -649,7 +649,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         private void RefreshQuestBadge()
         {
-            HasReturnableQuest = UserAccoundService.CurrentCharacter.ActiveQuests
+            HasReturnableQuest = UserAccountService.CurrentCharacter.ActiveQuests
                 .Any(q => q.Status == QuestStatus.Completed);
         }
 
@@ -664,7 +664,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         private void OnPartyUpdated(List<string> members, string? leader)
         {
-            var self = UserAccoundService.CurrentCharacter.Name;
+            var self = UserAccountService.CurrentCharacter.Name;
 
             // Remove members no longer in the party.
             var toRemove = PartyMembers.Where(vm => !members.Contains(vm.Username)).ToList();
@@ -760,7 +760,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         private async Task StartGroupFightAsync()
         {
             if (!GameHubService.IsConnected) return;
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             var result = await GameHubService.StartGroupCombatAsync(character.CurrentRoom.Id);
             if (result == null || !result.Success) return;
             // GroupCombatStarted event fires on all party members (including caller); nav happens there.
@@ -823,7 +823,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         private void OnRoomCharacters(List<string> players)
         {
             RoomCharacters.Clear();
-            var self = UserAccoundService.CurrentCharacter.Name;
+            var self = UserAccountService.CurrentCharacter.Name;
             foreach (var name in players.Where(n => n != self))
                 RoomCharacters.Add(new RoomCharacterVm { Name = name });
             RefreshFriendNames();
@@ -831,7 +831,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         private void OnCharacterEntered(string name)
         {
-            if (name == UserAccoundService.CurrentCharacter.Name) return;
+            if (name == UserAccountService.CurrentCharacter.Name) return;
             if (!RoomCharacters.Any(p => p.Name == name))
                 RoomCharacters.Add(new RoomCharacterVm { Name = name });
         }
@@ -853,7 +853,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         private void OpenMap()
         {
             MainWindow.Instance.playerMenuWindow.Visibility = Visibility.Visible;
-            var room = RoomService.GetRoomById(UserAccoundService.CurrentCharacter.CurrentRoom.Id);
+            var room = RoomService.GetRoomById(UserAccountService.CurrentCharacter.CurrentRoom.Id);
             var vm   = new ViewModel_PageLocalMap(room);
             var page = new Page_LocalMap { DataContext = vm };
             (MainWindow.Instance.playerMenuWindow.DataContext as ViewModel_CharacterMenuWindow)?.SetTitleAndSection(vm.MapTitle, "Map", "Map");
@@ -862,7 +862,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         private void OpenInventory()
         {
             MainWindow.Instance.playerMenuWindow.Visibility = Visibility.Visible;
-            InventoryPage inv = new InventoryPage(UserAccoundService.CurrentCharacter);
+            InventoryPage inv = new InventoryPage(UserAccountService.CurrentCharacter);
             (MainWindow.Instance.playerMenuWindow.DataContext as ViewModel_CharacterMenuWindow)?.SetTitleAndSection("Inventory", "Inventory", "Inventory");
             Navigation.Current.Navigate(inv);
         }
@@ -922,7 +922,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _name; }
             set
             {
-                _name = UserAccoundService.CurrentCharacter.Name;
+                _name = UserAccountService.CurrentCharacter.Name;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(NameAndLevel));
             }
@@ -935,7 +935,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _level; }
             set
             {
-                _level = UserAccoundService.CurrentCharacter.Level;
+                _level = UserAccountService.CurrentCharacter.Level;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(NameAndLevel));
             }
@@ -948,7 +948,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _xp; }
             set
             {
-                _xp = UserAccoundService.CurrentCharacter.Experience;
+                _xp = UserAccountService.CurrentCharacter.Experience;
                 OnPropertyChanged();
                 XpPercent++;
             }
@@ -961,7 +961,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _xpToNext; }
             set
             {
-                _xpToNext = UserAccoundService.CurrentCharacter.ExpForNextLvl;
+                _xpToNext = UserAccountService.CurrentCharacter.ExpForNextLvl;
                 OnPropertyChanged();
                 XpPercent++;
             }
@@ -974,7 +974,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _hp; }
             set
             {
-                _hp = UserAccoundService.CurrentCharacter.CurrentHealth; OnPropertyChanged();
+                _hp = UserAccountService.CurrentCharacter.CurrentHealth; OnPropertyChanged();
                 HpDisplay = "";
             }
 
@@ -986,7 +986,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _hpMax; }
             set
             {
-                _hpMax = UserAccoundService.CurrentCharacter.MaxHealth;
+                _hpMax = UserAccountService.CurrentCharacter.MaxHealth;
                 OnPropertyChanged();
                 HpDisplay = "";
             }
@@ -999,7 +999,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _mp; }
             set
             {
-                _mp = UserAccoundService.CurrentCharacter.CurrentMana;
+                _mp = UserAccountService.CurrentCharacter.CurrentMana;
                 OnPropertyChanged();
                 ManaDisplay = "";
             }
@@ -1012,7 +1012,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get { return _mpMax; }
             set
             {
-                _mpMax = UserAccoundService.CurrentCharacter.MaxMana;
+                _mpMax = UserAccountService.CurrentCharacter.MaxMana;
                 OnPropertyChanged();
                 ManaDisplay = "";
             }
@@ -1055,7 +1055,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         public CharacterHeaderVm()
         {
-            Character character = UserAccoundService.CurrentCharacter;
+            Character character = UserAccountService.CurrentCharacter;
             Set(character.Name, character.Level, character.Experience, character.ExpForNextLvl, character.CurrentHealth, character.MaxHealth, character.CurrentMana, character.MaxMana);
 
             XpPercent = (int)Math.Round(100.0 * CurrentXp / Math.Max(1, XpToNext));

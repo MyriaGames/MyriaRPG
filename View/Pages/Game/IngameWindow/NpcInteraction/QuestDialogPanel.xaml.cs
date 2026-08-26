@@ -13,8 +13,8 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction
             InitializeComponent();
             Action goBack = () => Myria.Wpf.Services.Navigation.Current.GoBack(NavigationFrameType.NpcWindow);
             DataContext = GameHubService.IsConnected
-                ? new MultiplayerQuestDialogPanelViewModel(quest, UserAccoundService.CurrentCharacter, npc, isReturn, goBack)
-                : new QuestDialogPanelViewModel(quest, UserAccoundService.CurrentCharacter, npc, isReturn, goBack);
+                ? new MultiplayerQuestDialogPanelViewModel(quest, UserAccountService.CurrentCharacter, npc, isReturn, goBack)
+                : new QuestDialogPanelViewModel(quest, UserAccountService.CurrentCharacter, npc, isReturn, goBack);
         }
     }
 }

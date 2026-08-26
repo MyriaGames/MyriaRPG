@@ -110,7 +110,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         {
             PartnerName  = partnerName;
             Current      = this;
-            InventoryGrid = new InventoryGridViewModel(UserAccoundService.CurrentCharacter);
+            InventoryGrid = new InventoryGridViewModel(UserAccountService.CurrentCharacter);
 
             ConfirmCommand    = new RelayCommand(Confirm, () => !ImReady);
             CancelCommand     = new RelayCommand(Cancel);
@@ -194,7 +194,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         // the trade in the player's actual inventory/gold even though the server had.
         private static void ApplyResult(TradeCompletedResult result)
         {
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
 
             foreach (var given in result.GivenItems)
             {

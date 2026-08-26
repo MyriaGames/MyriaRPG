@@ -122,7 +122,7 @@ namespace Myria.Wpf.ViewModel.Pages
         private void LogoutAction()
         {
             ServerApiService.ClearToken();
-            UserAccoundService.CurrentUser = null;
+            UserAccountService.CurrentUser = null;
             ReturnToStartupMenu();
         }
 

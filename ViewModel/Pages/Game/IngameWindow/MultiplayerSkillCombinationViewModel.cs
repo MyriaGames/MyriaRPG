@@ -22,7 +22,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
                 return;
             }
 
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             var result = SkillCombinationService.TryCreateForCharacter(character, ids);
             if (result == null) return; // server confirmed but local character already had it — ignore
 

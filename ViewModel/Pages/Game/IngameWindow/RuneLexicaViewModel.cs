@@ -80,7 +80,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         public RuneLexicaViewModel()
         {
-            _character = UserAccoundService.CurrentCharacter;
+            _character = UserAccountService.CurrentCharacter;
 
             BackCommand = new RelayCommand(() => Navigation.Current.Navigate(new View.Pages.Game.IngameWindow.Page_Runes()));
 

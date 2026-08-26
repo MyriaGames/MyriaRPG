@@ -105,7 +105,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         public SkillSlotViewModel()
         {
-            _player = UserAccoundService.CurrentCharacter;
+            _player = UserAccountService.CurrentCharacter;
 
             SlotSkillCommand = new RelayCommand<SlottableSkillVm?>(SlotSkill);
             UnslotSkillCommand = new RelayCommand<ActiveSlotVm?>(UnslotSkill);
@@ -161,7 +161,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         {
             if (vm == null) return;
             SkillSlotService.TryAddSlot(_player, vm.Source, vm.SkillId);
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, _player);
+            CharacterService.SaveCharacter(UserAccountService.CurrentUser, _player);
             Refresh();
         }
 
@@ -169,7 +169,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         {
             if (vm == null) return;
             SkillSlotService.RemoveSlot(_player, vm.Source, vm.SkillId);
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, _player);
+            CharacterService.SaveCharacter(UserAccountService.CurrentUser, _player);
             Refresh();
         }
 
@@ -178,7 +178,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             if (vm == null) return;
             int idx = _player.SkillSlots.FindIndex(s => s.Source == vm.Source && s.SkillId == vm.SkillId);
             SkillSlotService.ReorderSlots(_player, idx, idx - 1);
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, _player);
+            CharacterService.SaveCharacter(UserAccountService.CurrentUser, _player);
             Refresh();
         }
 
@@ -187,7 +187,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             if (vm == null) return;
             int idx = _player.SkillSlots.FindIndex(s => s.Source == vm.Source && s.SkillId == vm.SkillId);
             SkillSlotService.ReorderSlots(_player, idx, idx + 1);
-            CharacterService.SaveCharacter(UserAccoundService.CurrentUser, _player);
+            CharacterService.SaveCharacter(UserAccountService.CurrentUser, _player);
             Refresh();
         }
     }

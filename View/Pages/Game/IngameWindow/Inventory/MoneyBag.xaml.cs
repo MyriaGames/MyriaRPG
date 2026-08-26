@@ -9,7 +9,7 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.Inventory
         public MoneyBag()
         {
             InitializeComponent();
-            this.DataContext = new MoneyBagViewModel(UserAccoundService.CurrentCharacter);
+            this.DataContext = new MoneyBagViewModel(UserAccountService.CurrentCharacter);
         }
     }
 }

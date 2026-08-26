@@ -89,7 +89,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         public RunePageViewModel()
         {
-            var player = UserAccoundService.CurrentCharacter;
+            var player = UserAccountService.CurrentCharacter;
 
             foreach (var rune in player.KnownRunes)
             {

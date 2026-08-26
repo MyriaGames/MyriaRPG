@@ -178,7 +178,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         public ViewModel_PageFight()
         {
             _monster = MonsterService.GetMonsterById(1);
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
 
             SetupCommands();
 
@@ -269,7 +269,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 GroupMonsters.Add(new GroupCombatantVm(m.Name, m.Hp, m.MaxHp, m.IsAlive, m.Level));
 
             CurrentTurnCharacterName = result.CurrentTurnCharacterName ?? "";
-            var myName = UserAccoundService.CurrentCharacter.Name;
+            var myName = UserAccountService.CurrentCharacter.Name;
             IsMyTurn = string.Equals(CurrentTurnCharacterName, myName, StringComparison.OrdinalIgnoreCase);
 
             _selectedMonsterIndex = GroupMonsters.Count > 0
@@ -300,7 +300,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             }
 
             CurrentTurnCharacterName = snap.CurrentTurnCharacterName ?? "";
-            var myName = UserAccoundService.CurrentCharacter.Name;
+            var myName = UserAccountService.CurrentCharacter.Name;
             IsMyTurn = string.Equals(CurrentTurnCharacterName, myName, StringComparison.OrdinalIgnoreCase);
 
             RaiseAll();
@@ -334,7 +334,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             if (snap.CharactersWon)
             {
                 GameHubService.CharacterRespawned -= OnCharacterRespawned;
-                SkillFactory.UpdateSkills(UserAccoundService.CurrentCharacter);
+                SkillFactory.UpdateSkills(UserAccountService.CurrentCharacter);
                 ViewModel_PageRoom.WriteLog(Localization.T("msg.fight.won"));
                 Navigation.Current.SetFightState(false);
                 Navigation.Current.Navigate(Nav.Room);
@@ -355,7 +355,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             if (_isGroupCombat && _isLocalGroupCombat && _groupEncounter != null)
             {
-                var lp = UserAccoundService.CurrentCharacter;
+                var lp = UserAccountService.CurrentCharacter;
                 _groupEncounter.CharacterAttack(lp.Name, _selectedMonsterIndex);
                 SyncFromGroupEncounter();
                 FlushGroupLog();
@@ -385,7 +385,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             if (_isGroupCombat && _isLocalGroupCombat && _groupEncounter != null)
             {
                 int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? 0 : _selectedMonsterIndex;
-                var lp = UserAccoundService.CurrentCharacter;
+                var lp = UserAccountService.CurrentCharacter;
                 _groupEncounter.CharacterCastSkill(lp.Name, vm.Skill, targetIdx);
                 SyncFromGroupEncounter();
                 FlushGroupLog();
@@ -418,7 +418,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         protected void OnCharacterRespawned(int roomId, string roomName)
         {
             GameHubService.CharacterRespawned -= OnCharacterRespawned;
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             character.CurrentRoomId = roomId;
             character.CurrentRoom   = RoomService.GetRoomById(roomId);
             Navigation.Current.SetFightState(false);
@@ -430,7 +430,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             if (_encounter == null || _encounter.Phase != CombatPhase.Finished) return;
 
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
 
             if (!character.IsAlive)
             {
@@ -484,7 +484,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             IsMyTurn = false;
 
-            var character = UserAccoundService.CurrentCharacter;
+            var character = UserAccountService.CurrentCharacter;
             if (_groupEncounter.CharactersWon)
             {
                 SkillFactory.UpdateSkills(character);

@@ -10,7 +10,7 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow
         public Page_Jobs()
         {
             InitializeComponent();
-            var ch = UserAccoundService.CurrentCharacter;
+            var ch = UserAccountService.CurrentCharacter;
             DataContext = GameHubService.IsConnected
                 ? (JobsPageViewModel)new MultiplayerJobsPageViewModel(ch)
                 : new JobsPageViewModel(ch);

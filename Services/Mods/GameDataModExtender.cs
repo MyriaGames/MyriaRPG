@@ -54,7 +54,7 @@ namespace Myria.Wpf.Services.Mods
 
         private static void ReconnectActiveSession()
         {
-            var character = Myria.Lib.Core.Services.UserAccoundService.CurrentCharacter;
+            var character = Myria.Lib.Core.Services.UserAccountService.CurrentCharacter;
             if (character == null) return;
 
             // Room objects are recreated on each reload — update the character's reference.

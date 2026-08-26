@@ -15,7 +15,7 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.Inventory
         public Inventory()
         {
             InitializeComponent();
-            var ch = UserAccoundService.CurrentCharacter;
+            var ch = UserAccountService.CurrentCharacter;
             _viewModel = GameHubService.IsConnected
                 ? (InventoryGridViewModel)new MultiplayerInventoryGridViewModel(ch)
                 : new InventoryGridViewModel(ch);
