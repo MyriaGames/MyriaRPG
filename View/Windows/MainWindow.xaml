@@ -1,0 +1,18 @@
+﻿<Window x:Class="Myria.Wpf.View.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:Myria.Wpf"
+        xmlns:view="clr-namespace:Myria.Wpf.View.UserControls"
+        mc:Ignorable="d"
+        Title="Myria" Height="900" Width="1280" Background="{x:Null}" Name="Root"
+        Icon="/Assets/App.ico"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Grid Name="WindowGrid">
+        <Canvas Name="Canvas" Background="{DynamicResource Brush.Background}" Panel.ZIndex="999" Width="{Binding ActualWidth, ElementName=WindowGrid}" Height="{Binding ActualHeight, ElementName=WindowGrid}" Grid.ColumnSpan="3">
+            <Frame Name="Frame" NavigationUIVisibility="Hidden" Width="{Binding ActualWidth, ElementName=Canvas}" Height="{Binding ActualHeight, ElementName=Canvas}"/>
+        </Canvas>
+    </Grid>
+</Window>

@@ -1,0 +1,314 @@
+<Page x:Class="Myria.Wpf.View.Pages.Page_CharacterSelection"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Page_CharacterSelection">
+
+    <Page.Background>
+        <ImageBrush ImageSource="/Data/images/fantasy-group-adventurers.jpg"/>
+    </Page.Background>
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="SelectPanel" TargetType="Border">
+            <Setter Property="Background"      Value="{DynamicResource Brush.MainPanelGradient}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius"    Value="2"/>
+            <Setter Property="Padding"         Value="24"/>
+            <Setter Property="Effect"          Value="{StaticResource Effect.PanelShadow}"/>
+        </Style>
+
+        <Style x:Key="SelectButton" TargetType="Button">
+            <Setter Property="MinHeight"                  Value="48"/>
+            <Setter Property="Foreground"                 Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="Background"                 Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="BorderBrush"                Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness"            Value="1"/>
+            <Setter Property="FontFamily"                 Value="Georgia"/>
+            <Setter Property="FontSize"                   Value="15"/>
+            <Setter Property="Cursor"                     Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment"   Value="Center"/>
+            <Setter Property="Margin"                     Value="0,0,0,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="4"/>
+                                </Grid.ColumnDefinitions>
+                                <Rectangle x:Name="BarLeft"  Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
+                                <ContentPresenter Grid.Column="1"
+                                                  Margin="14,0"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  RecognizesAccessKey="True"/>
+                                <Rectangle x:Name="BarRight" Grid.Column="2" Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background"              Value="{DynamicResource Brush.NavHover}"/>
+                                <Setter TargetName="BarLeft"  Property="Opacity" Value="1"/>
+                                <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SelectButtonDanger" TargetType="Button" BasedOn="{StaticResource SelectButton}">
+            <Setter Property="Foreground"  Value="{DynamicResource Brush.Error}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Error}"/>
+        </Style>
+
+        <Style x:Key="DialogButton" TargetType="Button">
+            <Setter Property="Height"          Value="40"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DialogButtonDanger" TargetType="Button" BasedOn="{StaticResource DialogButton}">
+            <Setter Property="Foreground"  Value="{DynamicResource Brush.Error}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Error}"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="340"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Decorative gold rings (matches startup menu) -->
+        <Grid Grid.ColumnSpan="2" IsHitTestVisible="False" ClipToBounds="True">
+            <Ellipse Width="520" Height="520"
+                     Stroke="{DynamicResource Brush.Gold}"
+                     StrokeThickness="1"
+                     Opacity="0.22"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Top"
+                     Margin="0,-150,-90,0"/>
+            <Ellipse Width="340" Height="340"
+                     Stroke="{DynamicResource Brush.Gold}"
+                     StrokeThickness="1"
+                     Opacity="0.17"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Top"
+                     Margin="0,-72,-8,0"/>
+        </Grid>
+
+        <!-- Right panel -->
+        <Border Grid.Column="1"
+                Style="{StaticResource SelectPanel}"
+                VerticalAlignment="Center"
+                Margin="0,34,34,34">
+            <StackPanel>
+
+                <!-- Panel heading -->
+                <DockPanel Margin="0,0,0,18">
+                    <TextBlock Text="&#x25CF;"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Segoe UI Symbol"
+                               FontSize="34"
+                               DockPanel.Dock="Left"
+                               Margin="0,0,14,0"/>
+                    <TextBlock Text="Myria"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Georgia"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+
+                <!-- Gold divider -->
+                <Grid Margin="0,0,0,20">
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.65" VerticalAlignment="Center"/>
+                    <TextBlock Text="&#x25C7;"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Segoe UI Symbol"
+                               FontSize="18"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="0,-13,0,0"/>
+                </Grid>
+
+                <!-- Primary actions -->
+                <Button x:Name="btn_Join"
+                        Content="{Binding btnJoin}"
+                        Command="{Binding Join}"
+                        Style="{StaticResource SelectButton}"/>
+                <Button x:Name="btn_Create"
+                        Content="{Binding btnCreate}"
+                        Command="{Binding Create}"
+                        Style="{StaticResource SelectButton}"/>
+
+                <!-- Thin divider before danger zone -->
+                <Grid Margin="0,4,0,8">
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.3"/>
+                </Grid>
+
+                <Button x:Name="btn_Delete"
+                        Content="{Binding btnDelete}"
+                        Command="{Binding Delete}"
+                        Style="{StaticResource SelectButtonDanger}"
+                        Margin="0,0,0,16"/>
+
+                <!-- Divider before back -->
+                <Grid Margin="0,0,0,16">
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.3"/>
+                </Grid>
+
+                <Button x:Name="btn_Back"
+                        Content="{Binding btnBack}"
+                        Command="{Binding Back}"
+                        Style="{StaticResource SelectButton}"
+                        Margin="0"/>
+
+            </StackPanel>
+        </Border>
+
+        <!-- Character slot buttons: scattered across the left area -->
+        <RadioButton x:Name="btn_Character1"
+                     GroupName="CharacterSelection"
+                     Command="{Binding SelectFirst}"
+                     Content="{Binding btnCharacter1}"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Width="140" Height="40" Margin="50,50,0,0"
+                     Visibility="{Binding Visibility1}"
+                     Style="{StaticResource CharacterSelectButton}"/>
+        <RadioButton x:Name="btn_Character2"
+                     GroupName="CharacterSelection"
+                     Command="{Binding SelectSecond}"
+                     Content="{Binding btnCharacter2}"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Width="140" Height="40"
+                     Visibility="{Binding Visibility2}"
+                     Style="{StaticResource CharacterSelectButton}"/>
+        <RadioButton x:Name="btn_Character3"
+                     GroupName="CharacterSelection"
+                     Command="{Binding SelectThird}"
+                     Content="{Binding btnCharacter3}"
+                     HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                     Width="140" Height="40" Margin="50,0,0,50"
+                     Visibility="{Binding Visibility3}"
+                     Style="{StaticResource CharacterSelectButton}"/>
+        <RadioButton x:Name="btn_Character4"
+                     GroupName="CharacterSelection"
+                     Command="{Binding SelectFourth}"
+                     Content="{Binding btnCharacter4}"
+                     HorizontalAlignment="Right" VerticalAlignment="Top"
+                     Width="140" Height="40" Margin="0,50,50,0"
+                     Visibility="{Binding Visibility4}"
+                     Style="{StaticResource CharacterSelectButton}"/>
+        <RadioButton x:Name="btn_Character5"
+                     GroupName="CharacterSelection"
+                     Command="{Binding SelectFifth}"
+                     Content="{Binding btnCharacter5}"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Width="140" Height="40" Margin="0,0,50,50"
+                     Visibility="{Binding Visibility5}"
+                     Style="{StaticResource CharacterSelectButton}"/>
+
+        <!-- In-window delete confirmation overlay -->
+        <Grid Grid.ColumnSpan="2"
+              Background="#B3070B0F"
+              Visibility="{Binding IsConfirmingDelete, Converter={StaticResource BoolToVis}}">
+            <Border Background="{DynamicResource Brush.MainPanelGradient}"
+                    BorderBrush="{DynamicResource Brush.Gold}"
+                    BorderThickness="1"
+                    CornerRadius="2"
+                    Padding="32,28"
+                    Width="360"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="&#x26A0;"
+                               Foreground="{DynamicResource Brush.Error}"
+                               FontSize="34"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Delete Character"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Georgia"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,10"/>
+                    <Rectangle Height="1"
+                               Fill="{DynamicResource Brush.Gold}"
+                               Opacity="0.5"
+                               Margin="0,0,0,16"/>
+                    <TextBlock Text="{Binding ConfirmDeleteMessage}"
+                               Foreground="{DynamicResource Brush.Muted}"
+                               FontFamily="Georgia"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Margin="0,0,0,24"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                Content="Delete"
+                                Command="{Binding ConfirmDelete}"
+                                Style="{StaticResource DialogButtonDanger}"/>
+                        <Button Grid.Column="2"
+                                Content="Cancel"
+                                Command="{Binding CancelDelete}"
+                                Style="{StaticResource DialogButton}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Page>

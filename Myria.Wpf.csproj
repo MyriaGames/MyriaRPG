@@ -1,0 +1,165 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\App.ico</ApplicationIcon>
+    <!-- The project/solution file is Myria.Wpf, but the shipped exe keeps the historic
+         "MyriaRPG" name: myriaRPG_Setupscript.iss hardcodes MyriaAppExeName=MyriaRPG.exe
+         for the install dir, shortcut, and uninstall icon. -->
+    <AssemblyName>MyriaRPG</AssemblyName>
+    <Version>0.2.19</Version>
+    <AssemblyVersion>0.2.19.0</AssemblyVersion>
+    <FileVersion>0.2.19.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ModExperiments\**\*.cs" />
+    <EmbeddedResource Remove="ModExperiments\**\*" />
+    <None Remove="ModExperiments\**\*" />
+    <Page Remove="ModExperiments\**\*.xaml" />
+    <Resource Remove="ModExperiments\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Data\Icons\default.svg" />
+    <None Remove="Data\Icons\iron_ore.svg" />
+    <None Remove="Data\Icons\mage_robe.svg" />
+    <None Remove="Data\Icons\pickaxe.svg" />
+    <None Remove="Data\Icons\shadow_remnant.svg" />
+    <None Remove="Data\Icons\upgrade_stone.svg" />
+    <None Remove="Data\images\fantasy-group-adventurers.jpg" />
+    <None Remove="Data\Maps\caves.json" />
+    <None Remove="Data\Maps\cities.json" />
+    <None Remove="Data\Maps\dungeons.json" />
+    <None Remove="Data\Maps\forests.json" />
+  </ItemGroup>
+
+  <!--
+    Shared static game-content JSON and locale strings live once in Myria.Lib\Myria.Lib.Core\Data
+    (see Myria.Lib.Core.csproj) and are linked in here rather than duplicated, so this
+    project can no longer drift out of sync with MyriaServer's copy the way
+    races.json/classes.json/skills.json previously did.
+  -->
+  <ItemGroup>
+    <Content Include="..\Myria.Lib\Myria.Lib.Core\Data\common\**\*.json" LinkBase="Data\common\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Myria.Lib\Myria.Lib.Core\Data\locales\**\*.json" LinkBase="Data\locales\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\locales-wpf\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Mods\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Myriac Script SVG\*.svg" LinkBase="Assets\MyriacScript\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!--
+      Resource (not Content): these are loaded at runtime via WPF pack://application
+      URIs like "/Data/images/rooms/x.jpg". That mechanism needs the files compiled
+      into the assembly - as loose Content files it depends on Assembly.Location,
+      which is empty under PublishSingleFile and throws ArgumentNullException.
+    -->
+    <Resource Include="Data\images\fantasy-group-adventurers.jpg" />
+    <Resource Include="Data\images\rooms\room.royas.main.jpg" />
+    <Resource Include="Data\images\rooms\room.ceralith.east.jpg" />
+    <Resource Include="Data\images\rooms\room.ceralith.outskirts.jpg" />
+    <Resource Include="Data\images\rooms\room.cera.valley.jpg" />
+    <Resource Include="Data\images\rooms\room.luminacaves.chamber.echoes.jpg" />
+    <Resource Include="Data\images\rooms\room.luminacaves.chamber.hollowcrypt.jpg" />
+    <Resource Include="Data\images\rooms\room.luminacaves.passage.dark.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.center.cathedral.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.center.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.east.district.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.east.gate.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.center.market.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.north.district.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.north.gate.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.north.smithy.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.south.district.jpg" />
+    <Resource Include="Data\images\rooms\room.elorium.center.spellbound.jpg" />
+    <Resource Include="Data\images\rooms\room.elor.plateau.jpg" />
+    <Resource Include="Data\images\rooms\room.cera.farmland.jpg" />
+    <Resource Include="Data\images\rooms\room.whisperingwoods.edge.jpg" />
+    <Resource Include="Data\images\rooms\room.lumina.east.jpg" />
+    <Resource Include="Data\images\rooms\room.whisperingwoods.lumina.jpg" />
+    <Resource Include="Data\images\rooms\room.lumina.north.jpg" />
+    <Resource Include="Data\images\rooms\room.lumina.center.jpg" />
+    <Resource Include="Data\images\rooms\room.cera.hill.jpg" />
+    <Resource Include="Data\images\rooms\room.cera.river.jpg" />
+    <Resource Include="Data\images\rooms\room.whisperingwoods.hollow.jpg" />
+    <Resource Include="Data\images\rooms\room.luminacaves.start.jpg" />
+    <Resource Include="Data\images\rooms\room.sunstone.pass.jpg" />
+    <Content Include="Data\Maps\caves.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Maps\cities.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Maps\dungeons.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Maps\forests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Remove="Data\icon\mage_robe.svg" />
+    <None Remove="Data\icon\shadow_remnant.svg" />
+    <Content Update="Data\Icons\default.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Data\Icons\iron_ore.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Data\Icons\mage_robe.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Data\Icons\pickaxe.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Data\Icons\shadow_remnant.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Data\Icons\upgrade_stone.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Mods\" />
+    <Folder Include="Utils\Graphics\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.11" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Myria.Lib\Myria.Lib.Core\Myria.Lib.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Icons\Iron_Ore.svg" />
+    <None Remove="Assets\Icons\Upgrade_Stone.svg" />
+    <None Remove="Assets\Icons\Pickaxe.svg" />
+    <None Remove="Assets\Icons\Shadow_Reamnent.svg" />
+    <None Remove="Assets\Icons\Aprentance_Cloke.svg" />
+    <None Remove="Assets\Icons\Default.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\App.ico" />
+    <Resource Include="Assets\Fonts\MyriacScript.ttf" />
+  </ItemGroup>
+
+</Project>

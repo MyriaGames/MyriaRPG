@@ -1,0 +1,67 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.IngameWindow.Page_SkillDetail"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel>
+
+            <TextBlock Text="{Binding Name}"
+                       FontFamily="Georgia"
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource Brush.GoldSoft}"
+                       Margin="0,0,0,6"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <TextBlock Text="{Binding ClassName}"
+                           Foreground="{DynamicResource Brush.SecondaryText}"
+                           Margin="0,0,10,0"/>
+                <TextBlock Text="&#x25AA;"
+                           Foreground="{DynamicResource Brush.Gold}"
+                           Opacity="0.5"
+                           Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding TypeText}"
+                           Foreground="{DynamicResource Brush.Foreground}"
+                           Margin="0,0,10,0"/>
+                <TextBlock Text="&#x25AA;"
+                           Foreground="{DynamicResource Brush.Gold}"
+                           Opacity="0.5"
+                           Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding TargetText}"
+                           Foreground="{DynamicResource Brush.Foreground}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <TextBlock Text="Mana: " Foreground="{DynamicResource Brush.SecondaryText}"/>
+                <TextBlock Text="{Binding ManaCost}" Foreground="{DynamicResource Brush.Foreground}" Margin="0,0,16,0"/>
+                <TextBlock Text="{Binding TimingText}" Foreground="{DynamicResource Brush.SecondaryText}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <TextBlock Text="Scaling: " Foreground="{DynamicResource Brush.SecondaryText}"/>
+                <TextBlock Text="{Binding ScalingText}" Foreground="{DynamicResource Brush.Foreground}"/>
+            </StackPanel>
+
+            <Rectangle Height="1"
+                       Fill="{DynamicResource Brush.Gold}"
+                       Opacity="0.3"
+                       Margin="0,0,0,16"/>
+
+            <TextBlock Text="Description"
+                       FontWeight="SemiBold"
+                       FontFamily="Georgia"
+                       FontSize="13"
+                       Foreground="{DynamicResource Brush.SecondaryText}"
+                       Margin="0,0,0,6"/>
+            <TextBlock Text="{Binding Description}"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource Brush.Foreground}"
+                       LineHeight="22"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

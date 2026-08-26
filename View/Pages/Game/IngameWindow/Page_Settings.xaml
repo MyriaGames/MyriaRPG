@@ -1,0 +1,20 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.IngameWindow.Page_IngameMenu"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Myria.Wpf.View.Pages.Game.IngameWindow"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="400"
+      Width="300"
+      Title="Page_IngameMenu">
+
+    <StackPanel VerticalAlignment="Center">
+        <Button Content="{Binding BtnSettings}"      Command="{Binding Settings}"      Style="{StaticResource IngameMenuItem}"/>
+        <Button Content="{Binding BtnCharacterMenu}" Command="{Binding CharacterMenu}" Style="{StaticResource IngameMenuItem}"/>
+        <Separator Margin="20,4" Opacity="0.35"/>
+        <Button Content="{Binding BtnMainMenu}"      Command="{Binding MainMenu}"      Style="{StaticResource IngameMenuItem}"/>
+        <Button Content="{Binding BtnSaveQuit}"      Command="{Binding SaveQuit}"      Style="{StaticResource IngameMenuItem}"/>
+        <Button Content="{Binding BtnQuit}"          Command="{Binding Quit}"          Style="{StaticResource IngameMenuItem}"/>
+    </StackPanel>
+</Page>

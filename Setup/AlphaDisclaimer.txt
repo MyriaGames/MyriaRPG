@@ -1,0 +1,20 @@
+Myria RPG - Alpha Test Build
+
+Thanks for helping test Myria RPG! A few things before you continue:
+
+  - This is an early alpha build. Expect bugs, rough edges, and missing
+    features - that's exactly what this test is for.
+  - Your save data may be reset or become incompatible between alpha
+    builds while things are still changing.
+  - The app will check for newer alpha builds on startup and update
+    itself automatically.
+  - Please report anything odd (crashes, glitches, confusing UI) so it
+    can get fixed before the next build.
+
+Windows may show a "Windows protected your PC" SmartScreen warning the
+first time you run the installer, and/or an "Unknown Publisher" prompt
+the first time you run the game. This is expected for an unreleased
+hobby project without a paid certificate - click "More info" then
+"Run anyway" to continue.
+
+Click Next to continue installing.

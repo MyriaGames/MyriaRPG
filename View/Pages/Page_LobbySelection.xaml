@@ -1,0 +1,244 @@
+<Page x:Class="Myria.Wpf.View.Pages.Page_LobbySelection"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Page_LobbySelection">
+
+    <Page.Background>
+        <ImageBrush ImageSource="/Data/images/fantasy-group-adventurers.jpg"/>
+    </Page.Background>
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- Button style matching StartupMenuButton -->
+        <Style x:Key="LobbyButton" TargetType="Button">
+            <Setter Property="MinHeight"                   Value="46"/>
+            <Setter Property="Foreground"                  Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="Background"                  Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="BorderBrush"                 Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness"             Value="1"/>
+            <Setter Property="FontFamily"                  Value="Georgia"/>
+            <Setter Property="FontSize"                    Value="16"/>
+            <Setter Property="Cursor"                      Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment"  Value="Center"/>
+            <Setter Property="VerticalContentAlignment"    Value="Center"/>
+            <Setter Property="Padding"                     Value="14,0"/>
+            <Setter Property="Margin"                      Value="0,0,0,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="4"/>
+                                </Grid.ColumnDefinitions>
+                                <Rectangle x:Name="BarLeft"  Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
+                                <ContentPresenter Grid.Column="1"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  RecognizesAccessKey="True"/>
+                                <Rectangle x:Name="BarRight" Grid.Column="2"
+                                           Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background"              Value="{DynamicResource Brush.NavHover}"/>
+                                <Setter TargetName="BarLeft"  Property="Opacity" Value="1"/>
+                                <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Chromeless ListBox -->
+        <Style x:Key="LobbyListBox" TargetType="ListBox">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="0"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        </Style>
+
+        <!-- ListBoxItem: fully custom, selection shown by background/border -->
+        <Style x:Key="LobbyListItem" TargetType="ListBoxItem">
+            <Setter Property="Background"               Value="Transparent"/>
+            <Setter Property="BorderThickness"          Value="0"/>
+            <Setter Property="Padding"                  Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Background="{DynamicResource Brush.PanelDark}"
+                                BorderBrush="{DynamicResource Brush.Gold}"
+                                BorderThickness="1"
+                                CornerRadius="2"
+                                Padding="14,11"
+                                Margin="0,0,0,8"
+                                Cursor="Hand">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background"
+                                        Value="{DynamicResource Brush.NavHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background"
+                                        Value="{DynamicResource Brush.NavHover}"/>
+                                <Setter TargetName="ItemBorder" Property="BorderBrush"
+                                        Value="{DynamicResource Brush.GoldSoft}"/>
+                                <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1.5"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsOnline}" Value="False">
+                                <Setter Property="IsEnabled" Value="False"/>
+                                <Setter TargetName="ItemBorder" Property="Opacity" Value="0.45"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="360"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Decorative rings -->
+        <Grid Grid.ColumnSpan="2" IsHitTestVisible="False" ClipToBounds="True">
+            <Ellipse Width="520" Height="520"
+                     Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1" Opacity="0.22"
+                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-150,-90,0"/>
+            <Ellipse Width="340" Height="340"
+                     Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1" Opacity="0.17"
+                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-72,-8,0"/>
+        </Grid>
+
+        <!-- Right panel -->
+        <Border Grid.Column="1"
+                Background="{DynamicResource Brush.MainPanelGradient}"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1"
+                CornerRadius="2"
+                Padding="24"
+                VerticalAlignment="Center"
+                Margin="0,34,34,34"
+                Effect="{StaticResource Effect.PanelShadow}">
+            <StackPanel>
+
+                <!-- Header -->
+                <DockPanel Margin="0,0,0,18">
+                    <TextBlock Text="&#x25CF;"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Segoe UI Symbol"
+                               FontSize="28"
+                               DockPanel.Dock="Left"
+                               Margin="0,0,14,0"/>
+                    <TextBlock Text="Select a Lobby"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Georgia"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+
+                <!-- Gold divider -->
+                <Grid Margin="0,0,0,16">
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.65" VerticalAlignment="Center"/>
+                    <TextBlock Text="&#x25C7;"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Segoe UI Symbol"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="0,-11,0,0"/>
+                </Grid>
+
+                <!-- Loading text -->
+                <TextBlock Text="Loading..."
+                           Foreground="{DynamicResource Brush.Muted}"
+                           FontFamily="Georgia"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Margin="0,8,0,16"
+                           Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"/>
+
+                <!-- Lobby list -->
+                <ListBox ItemsSource="{Binding Lobbies}"
+                         SelectedItem="{Binding SelectedLobby}"
+                         Style="{StaticResource LobbyListBox}"
+                         ItemContainerStyle="{StaticResource LobbyListItem}"
+                         Visibility="{Binding IsNotLoading, Converter={StaticResource BoolToVis}}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="{Binding Name}"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia"
+                                           FontSize="17"
+                                           VerticalAlignment="Center"/>
+
+                                <!-- Population badge -->
+                                <Border Grid.Column="1"
+                                        Background="{Binding PopulationBrush}"
+                                        CornerRadius="10"
+                                        Padding="10,3"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding PopulationLabel}"
+                                               Foreground="White"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Divider before buttons -->
+                <Grid Margin="0,8,0,14">
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.35"/>
+                </Grid>
+
+                <Button Content="Join"
+                        Command="{Binding Join}"
+                        IsEnabled="{Binding IsJoinEnabled}"
+                        Style="{StaticResource LobbyButton}"/>
+
+                <Button Content="Refresh"
+                        Command="{Binding Reload}"
+                        Style="{StaticResource LobbyButton}"/>
+
+                <Button Content="Back"
+                        Command="{Binding Back}"
+                        Margin="0"
+                        Style="{StaticResource LobbyButton}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

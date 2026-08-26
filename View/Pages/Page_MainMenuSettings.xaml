@@ -1,0 +1,128 @@
+<Page x:Class="Myria.Wpf.View.Pages.Page_MainMenuSettings"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="600" d:DesignWidth="520"
+      Title="Page_MainMenuSettings">
+
+    <Page.Resources>
+        <Style x:Key="SettingsTab" TargetType="RadioButton">
+            <Setter Property="Height"          Value="44"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Muted}"/>
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="18,0">
+                            <Grid>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Rectangle x:Name="Indicator" Height="2"
+                                           Fill="{DynamicResource Brush.Gold}"
+                                           VerticalAlignment="Bottom"
+                                           Opacity="0"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+                                <Setter TargetName="Indicator" Property="Opacity" Value="1"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsChecked" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <!-- Decorative rings -->
+        <Grid IsHitTestVisible="False" ClipToBounds="True">
+            <Ellipse Width="400" Height="400"
+                     Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1" Opacity="0.18"
+                     HorizontalAlignment="Right" VerticalAlignment="Top"
+                     Margin="0,-130,-70,0"/>
+            <Ellipse Width="260" Height="260"
+                     Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1" Opacity="0.13"
+                     HorizontalAlignment="Right" VerticalAlignment="Top"
+                     Margin="0,-55,-6,0"/>
+        </Grid>
+
+        <!-- Tab bar + content -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Tab navigation bar -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource Brush.PanelDark}"
+                    BorderBrush="{DynamicResource Brush.Gold}"
+                    BorderThickness="1"
+                    Effect="{StaticResource Effect.PanelShadow}">
+                <UniformGrid Rows="1" Columns="4">
+                    <RadioButton IsChecked="True"
+                                 GroupName="SettingsTabs"
+                                 Content="{Binding TblVisuals}"
+                                 Command="{Binding ShowVisuals}"
+                                 Style="{StaticResource SettingsTab}"/>
+                    <RadioButton GroupName="SettingsTabs"
+                                 Content="{Binding TblKeybindings}"
+                                 Command="{Binding ShowKeybindings}"
+                                 Style="{StaticResource SettingsTab}"/>
+                    <RadioButton GroupName="SettingsTabs"
+                                 Content="{Binding TblMods}"
+                                 Command="{Binding ShowMods}"
+                                 Style="{StaticResource SettingsTab}"/>
+                    <RadioButton GroupName="SettingsTabs"
+                                 Content="{Binding TblGame}"
+                                 Command="{Binding ShowGame}"
+                                 Style="{StaticResource SettingsTab}"/>
+                </UniformGrid>
+            </Border>
+
+            <!-- Content frame -->
+            <Frame Grid.Row="1"
+                   x:Name="ContentFrame"
+                   Background="{x:Null}"
+                   NavigationUIVisibility="Hidden"
+                   Margin="0,6,0,0"/>
+
+            <!-- Version label - visible on every tab -->
+            <StackPanel Grid.Row="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        IsHitTestVisible="False"
+                        Opacity="0.55"
+                        Margin="0,0,4,4">
+                <TextBlock Text="{Binding TblVersionLabel}"
+                           FontSize="11"
+                           Foreground="{DynamicResource Brush.Muted}"/>
+                <TextBlock Text=" "/>
+                <TextBlock Text="{Binding VersionText}"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Muted}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

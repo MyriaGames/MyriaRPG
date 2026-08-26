@@ -1,0 +1,240 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.IngameWindow.Page_RuneLexica"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:vm="clr-namespace:Myria.Wpf.ViewModel.Pages.Game.IngameWindow"
+      mc:Ignorable="d"
+      d:DesignHeight="700" d:DesignWidth="900"
+      d:DataContext="{d:DesignInstance vm:RuneLexicaViewModel}"
+      Title="Rune Lexica">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="GhostButton" TargetType="Button">
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Muted}"/>
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background"  Value="{DynamicResource Brush.NavHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ColHeader" TargetType="TextBlock">
+            <Setter Property="Foreground"  Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="FontFamily"  Value="Georgia"/>
+            <Setter Property="FontSize"    Value="11"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+            <Setter Property="FontStyle"   Value="Italic"/>
+            <Setter Property="Opacity"     Value="0.8"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid MinWidth="560" MinHeight="360" Background="{DynamicResource Brush.WindowBackgroundGradient}">
+
+        <Border Margin="10"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1">
+            <Grid Margin="18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="56"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- ── HEADER ────────────────────────────────────────────── -->
+                <Grid Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                        <TextBlock Text="→"
+                                   Foreground="{DynamicResource Brush.Gold}"
+                                   FontSize="34"
+                                   Margin="0,4,14,0"/>
+                        <TextBlock Text="{Binding TblTitle}"
+                                   Style="{StaticResource HeaderText}"/>
+                        <TextBlock Text=" | Words discovered in the world."
+                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                   FontFamily="Georgia"
+                                   FontStyle="Italic"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   Margin="18,6,0,0"/>
+                    </StackPanel>
+                    <Rectangle Height="1"
+                               Fill="{DynamicResource Brush.Gold}"
+                               VerticalAlignment="Bottom"
+                               Opacity="0.55"/>
+                </Grid>
+
+                <!-- ── BODY ──────────────────────────────────────────────── -->
+                <Border Grid.Row="1"
+                        Margin="0,14,0,0"
+                        Style="{StaticResource GoldBorder}"
+                        Padding="14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- entry count -->
+                        <TextBlock Grid.Row="0"
+                                   Text="{Binding HeaderText}"
+                                   Style="{StaticResource MutedText}"
+                                   FontSize="12"
+                                   Margin="2,0,0,10"/>
+
+                        <!-- column headers -->
+                        <Grid Grid.Row="1" Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="{Binding TblColWord}"
+                                       Style="{StaticResource ColHeader}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TblColGuess}"
+                                       Style="{StaticResource ColHeader}"
+                                       Margin="12,0,0,0"/>
+                            <TextBlock Grid.Column="2" Text="{Binding TblColMeaning}"
+                                       Style="{StaticResource ColHeader}"
+                                       Margin="12,0,0,0"/>
+                        </Grid>
+
+                        <!-- separator under headers -->
+                        <Rectangle Grid.Row="2"
+                                   Height="1"
+                                   Fill="{DynamicResource Brush.Border}"
+                                   Margin="0,0,0,8"
+                                   Opacity="0.6"/>
+
+                        <!-- entry list -->
+                        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Entries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{DynamicResource Brush.Border}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="Transparent"
+                                                Padding="0,8"
+                                                Margin="0,0,0,2">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="110"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Myriac script -->
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Script}"
+                                                           FontFamily="{StaticResource Font.Myriac}"
+                                                           Foreground="{DynamicResource Brush.Gold}"
+                                                           FontSize="24"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center"/>
+
+                                                <!-- Character's guess column -->
+                                                <StackPanel Grid.Column="1"
+                                                            Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Margin="12,0,8,0">
+                                                    <TextBox Text="{Binding EditLabel, UpdateSourceTrigger=PropertyChanged}"
+                                                             MinWidth="120"
+                                                             MaxWidth="200"
+                                                             FontFamily="Georgia"
+                                                             FontSize="13"
+                                                             Padding="5,3"
+                                                             Background="{DynamicResource Brush.PanelDark}"
+                                                             Foreground="{DynamicResource Brush.Foreground}"
+                                                             BorderBrush="{DynamicResource Brush.Border}"/>
+                                                    <Button Content="{Binding DataContext.TblSaveLabel, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            Style="{StaticResource GhostButton}"
+                                                            Height="26"
+                                                            Padding="8,0"
+                                                            Margin="5,0,0,0"
+                                                            Tag="{Binding}"
+                                                            Click="SaveLabel_Click"/>
+                                                </StackPanel>
+
+                                                <!-- Official translation column -->
+                                                <Grid Grid.Column="2"
+                                                      Margin="12,0,0,0"
+                                                      VerticalAlignment="Center">
+
+                                                    <!-- learned: show name + badge -->
+                                                    <StackPanel Orientation="Horizontal"
+                                                                Visibility="{Binding IsOfficiallyLearned, Converter={StaticResource BoolToVis}}">
+                                                        <TextBlock Text="{Binding OfficialTranslation}"
+                                                                   Foreground="{DynamicResource Brush.Foreground}"
+                                                                   FontFamily="Georgia"
+                                                                   FontSize="13"
+                                                                   VerticalAlignment="Center"/>
+                                                        <Border Background="{DynamicResource Brush.Success}"
+                                                                CornerRadius="2"
+                                                                Padding="5,1"
+                                                                Margin="8,0,0,0"
+                                                                VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding DataContext.TblKnown, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                       Foreground="White"
+                                                                       FontSize="10"
+                                                                       FontWeight="SemiBold"/>
+                                                        </Border>
+                                                    </StackPanel>
+
+                                                    <!-- not yet learned: dimmed placeholder -->
+                                                    <TextBlock Text="— — —"
+                                                               Foreground="{DynamicResource Brush.Muted}"
+                                                               FontFamily="Georgia"
+                                                               FontSize="13"
+                                                               Opacity="0.4"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsOfficiallyLearned}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

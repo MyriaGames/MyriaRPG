@@ -1,0 +1,499 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.IngameWindow.Page_Character"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      Title="Character">
+
+    <Grid MinWidth="700" MinHeight="460">
+
+        <!-- Atmosphere watermark -->
+        <TextBlock Text="♜" FontSize="220" Foreground="{DynamicResource Brush.Panel}" Opacity="0.45"
+                   HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,15,60,0"/>
+
+        <Border Margin="10" BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1">
+            <Grid Margin="18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="52"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- ── HEADER ── -->
+                <Grid Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                        <TextBlock Text="→" Foreground="{DynamicResource Brush.Gold}" FontSize="30" Margin="0,0,14,0"/>
+                        <TextBlock Text="CHARACTER" Style="{StaticResource HeaderText}" FontSize="35"/>
+                        <TextBlock Text=" | Your story. Your path. Your legend."
+                                   Foreground="{DynamicResource Brush.GoldSoft}" FontFamily="Georgia"
+                                   FontStyle="Italic" FontSize="12"
+                                   VerticalAlignment="Center" Margin="16,0,0,0"/>
+                    </StackPanel>
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" VerticalAlignment="Bottom" Opacity="0.55"/>
+                </Grid>
+
+                <!-- ── BODY ── -->
+                <Grid Grid.Row="1" Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- ══════════════════════════════════════
+                         CONTENT AREA
+                         ══════════════════════════════════════ -->
+                    <Grid Grid.Column="1">
+
+                        <!-- ── OVERVIEW ── -->
+                        <Grid Visibility="{Binding IsOverviewTab, Converter={StaticResource BoolToVis}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="252"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                                <!-- Hero Card -->
+                                <Border Grid.Row="0" Grid.ColumnSpan="3" Grid.Column="0" Style="{StaticResource GoldBorder}" Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="132"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Portrait + level diamond -->
+                                        <Grid Grid.Column="0" ClipToBounds="False">
+                                            <Border BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                    Background="{DynamicResource Brush.PortraitGradient}" MaxWidth="104">
+                                                <Grid>
+                                                    <Ellipse Width="78" Height="78"
+                                                             Stroke="{DynamicResource Brush.Border}" StrokeThickness="2"
+                                                             Fill="{DynamicResource Brush.PanelDark}"
+                                                             VerticalAlignment="Top" Margin="0,14,0,0"/>
+                                                    <TextBlock Text="♞" Foreground="{DynamicResource Brush.Muted}" Opacity="0.45" FontSize="58"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Top" Margin="0,10,0,0"/>
+                                                    <TextBlock Text="{Binding CharacterName}"
+                                                               Foreground="{DynamicResource Brush.GoldSoft}"
+                                                               FontFamily="Georgia" FontSize="12"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Bottom" Margin="4,0,4,10"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </Grid>
+                                            </Border>
+                                            <!-- Rotated level diamond -->
+                                            <Border Width="42" Height="42"
+                                                    Background="{DynamicResource Brush.Panel}"
+                                                    BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                                    Margin="-6,0,0,-6"
+                                                    RenderTransformOrigin="0.5,0.5">
+                                                <Border.RenderTransform>
+                                                    <RotateTransform Angle="45"/>
+                                                </Border.RenderTransform>
+                                                <TextBlock Text="{Binding Level, Mode=OneWay}"
+                                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                                           FontFamily="Georgia" FontSize="15"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           RenderTransformOrigin="0.5,0.5" Margin="0,0,2,2">
+                                                    <TextBlock.RenderTransform>
+                                                        <RotateTransform Angle="-45"/>
+                                                    </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Character info -->
+                                        <StackPanel Grid.Column="2" Margin="0">
+                                            <TextBlock Text="{Binding CharacterName}"
+                                                       Foreground="{DynamicResource Brush.Foreground}"
+                                                       FontFamily="Georgia" FontSize="22"/>
+                                            <TextBlock Text="{Binding CharClass}"
+                                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                                       FontFamily="Georgia" FontSize="14" Margin="0,2,0,0"/>
+                                            <TextBlock Text="{Binding ClassLevelLabel}"
+                                                       Foreground="{DynamicResource Brush.Gold}"
+                                                       FontFamily="Georgia" FontSize="12" Margin="0,2,0,6"/>
+
+                                        <!-- Level XP bar -->
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <DockPanel Margin="0,15,0,0">
+                                                <TextBlock DockPanel.Dock="Left" Text="XP"
+                                                           Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="11"
+                                                         VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                <Border Height="8" BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                      CornerRadius="4" Background="{DynamicResource Brush.PanelDark}">
+
+                                                    <ProgressBar Style="{StaticResource RoundBar}" Height="6"
+                                                                 Foreground="{DynamicResource Brush.Gold}"
+                                                                 Minimum="0"
+                                                                 Maximum="{Binding XpToNextLevel, Mode=OneWay}"
+                                                                 Value="{Binding XpCurrent, Mode=OneWay}"/>
+                                                </Border>
+                                            </DockPanel>
+                                            <TextBlock Text="{Binding XpProgressText}"
+                                                       Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="12"
+                                                       HorizontalAlignment="Right" Margin="0,1,0,5"/>
+                                            <StackPanel Grid.Column="2">
+                                                <DockPanel Margin="0,0,0,1">
+                                                    <TextBlock DockPanel.Dock="Left" Text="♥"
+                                                                  Foreground="{DynamicResource Brush.Error}" FontSize="14"
+                                                                   VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <TextBlock Text="{Binding Derived.HP}"    Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="15"/>
+                                                        <TextBlock Text="/"                       Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="13" Margin="3,0"/>
+                                                        <TextBlock Text="{Binding Derived.MaxHP}" Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="13"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                                <ProgressBar Style="{StaticResource RoundBar}" Height="4"
+                                                                 Foreground="{DynamicResource Brush.Error}" Background="{DynamicResource Brush.PanelDark}"
+                                                                 Minimum="0"
+                                                                 Maximum="{Binding Derived.MaxHPValue, Mode=OneWay}"
+                                                                 Value="{Binding Derived.HPValue, Mode=OneWay}"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                            <!-- Class XP bar -->
+
+                                            <!-- HP / MP bars -->
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <DockPanel Margin="0,13,0,0">
+                                                <TextBlock DockPanel.Dock="Left" Text="CL"
+                                                           Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="11"
+                                                         VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                <Border Height="8" BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                      CornerRadius="4" Background="{DynamicResource Brush.PanelDark}">
+
+                                                    <ProgressBar Style="{StaticResource RoundBar}" Height="6"
+                                                                 Foreground="{DynamicResource Brush.Muted}"
+                                                                 Minimum="0" Maximum="1"
+                                                                 Value="{Binding ClassXpFraction, Mode=OneWay}"/>
+                                                </Border>
+                                            </DockPanel>
+                                            <TextBlock Text="{Binding ClassXpText}"
+                                                       Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="12"
+                                                       HorizontalAlignment="Right" Margin="0,1,0,8"/>
+                                            <StackPanel Grid.Column="2">
+                                                    <DockPanel Margin="0,0,0,1">
+                                                        <TextBlock DockPanel.Dock="Left" Text="◇"
+                                                                  Foreground="{DynamicResource Brush.Accent}" FontSize="14"
+                                                                   VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                            <TextBlock Text="{Binding Derived.MP}"    Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="15"/>
+                                                            <TextBlock Text="/"                       Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="13" Margin="3,0"/>
+                                                            <TextBlock Text="{Binding Derived.MaxMP}" Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="13"/>
+                                                        </StackPanel>
+                                                    </DockPanel>
+                                                    <ProgressBar Style="{StaticResource RoundBar}" Height="4"
+                                                                 Foreground="{DynamicResource Brush.Accent}" Background="{DynamicResource Brush.PanelDark}"
+                                                                 Minimum="0"
+                                                                 Maximum="{Binding Derived.MaxMPValue, Mode=OneWay}"
+                                                                 Value="{Binding Derived.MPValue, Mode=OneWay}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Stats Detail Panel -->
+                                <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource GoldBorder}" Padding="18">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <StackPanel>
+                                            <!-- 4 quick-stat tiles -->
+                                            <UniformGrid Columns="4" Margin="0,0,0,14">
+                                                <StackPanel Margin="4,6">
+                                                    <TextBlock Text="⚔" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="20" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding TblATK}" Style="{StaticResource MutedText}" TextAlignment="Center" FontSize="11"/>
+                                                    <TextBlock Text="{Binding Derived.ATK}" Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="18" TextAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Margin="4,6">
+                                                    <TextBlock Text="◈" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="20" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding TblDEF}" Style="{StaticResource MutedText}" TextAlignment="Center" FontSize="11"/>
+                                                    <TextBlock Text="{Binding Derived.DEF}" Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="18" TextAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Margin="4,6">
+                                                    <TextBlock Text="✧" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="20" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding TblMATK}" Style="{StaticResource MutedText}" TextAlignment="Center" FontSize="11"/>
+                                                    <TextBlock Text="{Binding Derived.MATK}" Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="18" TextAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Margin="4,6">
+                                                    <TextBlock Text="☽" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="20" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding TblMDEF}" Style="{StaticResource MutedText}" TextAlignment="Center" FontSize="11"/>
+                                                    <TextBlock Text="{Binding Derived.MDEF}" Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="18" TextAlignment="Center"/>
+                                                </StackPanel>
+                                            </UniformGrid>
+
+                                            <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.45" Margin="0,0,0,12"/>
+
+                                            <!-- COMBAT -->
+                                            <TextBlock Text="⚔  COMBAT" Style="{StaticResource SectionTitle}" Margin="0,0,0,8"/>
+                                            <Grid Margin="0,0,0,16">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="76"/>
+                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="76"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="28"/>
+                                                    <RowDefinition Height="28"/>
+                                                    <RowDefinition Height="28"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Row="0" Text="{Binding TblATK}"    Style="{StaticResource MutedText}"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Derived.ATK}"   Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Row="1" Text="{Binding TblMATK}"   Style="{StaticResource MutedText}"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Derived.MATK}"  Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Row="2" Text="{Binding TblAim}"    Style="{StaticResource MutedText}"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Derived.Aim}"   Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding TblCrit}"     Style="{StaticResource MutedText}"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding Derived.CritPercent}"  Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding TblBlock}"    Style="{StaticResource MutedText}"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding Derived.BlockPercent}" Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding TblEvasion}"  Style="{StaticResource MutedText}"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding Derived.Evasion}"      Style="{StaticResource BodyText}" HorizontalAlignment="Right"/>
+                                            </Grid>
+
+                                            <!-- DEFENSE -->
+                                            <TextBlock Text="◇  DEFENSE" Style="{StaticResource SectionTitle}" Margin="0,0,0,8"/>
+                                            <StackPanel>
+                                                <DockPanel Margin="0,0,0,10">
+                                                    <TextBlock DockPanel.Dock="Left" Text="{Binding TblDEF}" Style="{StaticResource MutedText}" VerticalAlignment="Center"/>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <TextBlock Text="{Binding Derived.DEF}"      Style="{StaticResource BodyText}"/>
+                                                        <TextBlock Text="{Binding Derived.DEF_Hint}" Foreground="{DynamicResource Brush.Muted}" FontSize="10" VerticalAlignment="Bottom" Margin="4,0,0,1"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                                <DockPanel Margin="0,0,0,14">
+                                                    <TextBlock DockPanel.Dock="Left" Text="{Binding TblMDEF}" Style="{StaticResource MutedText}" VerticalAlignment="Center"/>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <TextBlock Text="{Binding Derived.MDEF}"      Style="{StaticResource BodyText}"/>
+                                                        <TextBlock Text="{Binding Derived.MDEF_Hint}" Foreground="{DynamicResource Brush.Muted}" FontSize="10" VerticalAlignment="Bottom" Margin="4,0,0,1"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                                <!-- HP bar -->
+                                                <StackPanel Margin="0,0,0,8">
+                                                    <DockPanel>
+                                                        <TextBlock DockPanel.Dock="Left" Text="{Binding TblHP}" Style="{StaticResource MutedText}" FontSize="12"/>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                            <TextBlock Text="{Binding Derived.HP}"    Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="12" FontWeight="SemiBold"/>
+                                                            <TextBlock Text=" / "                     Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="12"/>
+                                                            <TextBlock Text="{Binding Derived.MaxHP}" Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="12"/>
+                                                            <TextBlock Text="{Binding Derived.HP_Hint}" Foreground="{DynamicResource Brush.Muted}" FontSize="10" VerticalAlignment="Bottom" Margin="4,0,0,1"/>
+                                                        </StackPanel>
+                                                    </DockPanel>
+                                                    <ProgressBar Style="{StaticResource RoundBar}" Height="5" Margin="0,3,0,0"
+                                                                 Foreground="{DynamicResource Brush.Error}" Background="{DynamicResource Brush.PanelDark}"
+                                                                 Minimum="0"
+                                                                 Maximum="{Binding Derived.MaxHPValue, Mode=OneWay}"
+                                                                 Value="{Binding Derived.HPValue, Mode=OneWay}"/>
+                                                </StackPanel>
+                                                <!-- MP bar -->
+                                                <StackPanel>
+                                                    <DockPanel>
+                                                        <TextBlock DockPanel.Dock="Left" Text="{Binding TblMP}" Style="{StaticResource MutedText}" FontSize="12"/>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                            <TextBlock Text="{Binding Derived.MP}"    Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="12" FontWeight="SemiBold"/>
+                                                            <TextBlock Text=" / "                     Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="12"/>
+                                                            <TextBlock Text="{Binding Derived.MaxMP}" Foreground="{DynamicResource Brush.Foreground}" FontFamily="Georgia" FontSize="12"/>
+                                                            <TextBlock Text="{Binding Derived.MP_Hint}" Foreground="{DynamicResource Brush.Muted}" FontSize="10" VerticalAlignment="Bottom" Margin="4,0,0,1"/>
+                                                        </StackPanel>
+                                                    </DockPanel>
+                                                    <ProgressBar Style="{StaticResource RoundBar}" Height="5" Margin="0,3,0,0"
+                                                                 Foreground="{DynamicResource Brush.Accent}" Background="{DynamicResource Brush.PanelDark}"
+                                                                 Minimum="0"
+                                                                 Maximum="{Binding Derived.MaxMPValue, Mode=OneWay}"
+                                                                 Value="{Binding Derived.MPValue, Mode=OneWay}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Border>
+
+                            <!-- Right: Attributes panel (same row as Stats panel) -->
+                            <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource GoldBorder}" Padding="18">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Text="ATTRIBUTES" Style="{StaticResource SectionTitle}" Margin="0,0,0,10"/>
+
+                                    <ScrollViewer Grid.Row="1"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  Padding="0,0,8,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="48"/>
+                                            <ColumnDefinition Width="6"/>
+                                            <ColumnDefinition Width="22"/>
+                                            <ColumnDefinition Width="4"/>
+                                            <ColumnDefinition Width="22"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="36"/>
+                                            <RowDefinition Height="36"/>
+                                            <RowDefinition Height="36"/>
+                                            <RowDefinition Height="36"/>
+                                            <RowDefinition Height="36"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- STR -->
+                                        <TextBlock Grid.Row="0" Text="♜" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="15" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TblSTR}" Style="{StaticResource MutedText}" FontSize="13" VerticalAlignment="Center"
+                                                   ToolTipService.ShowDuration="60000">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Gold}"
+                                                         DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                    <TextBlock Text="{Binding StrTooltip}" Foreground="{DynamicResource Brush.Foreground}" MaxWidth="200" TextWrapping="Wrap"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Base.STR_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="0" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="STR"/>
+                                        <Button Grid.Row="0" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="STR"/>
+
+                                        <!-- DEX -->
+                                        <TextBlock Grid.Row="1" Text="⚔" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="15" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TblDEX}" Style="{StaticResource MutedText}" FontSize="13" VerticalAlignment="Center"
+                                                   ToolTipService.ShowDuration="60000">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Gold}"
+                                                         DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                    <TextBlock Text="{Binding DexTooltip}" Foreground="{DynamicResource Brush.Foreground}" MaxWidth="200" TextWrapping="Wrap"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Base.DEX_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="1" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="DEX"/>
+                                        <Button Grid.Row="1" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="DEX"/>
+
+                                        <!-- END -->
+                                        <TextBlock Grid.Row="2" Text="♥" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="15" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TblEND}" Style="{StaticResource MutedText}" FontSize="13" VerticalAlignment="Center"
+                                                   ToolTipService.ShowDuration="60000">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Gold}"
+                                                         DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                    <TextBlock Text="{Binding EndTooltip}" Foreground="{DynamicResource Brush.Foreground}" MaxWidth="200" TextWrapping="Wrap"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Base.END_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="2" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="END"/>
+                                        <Button Grid.Row="2" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="END"/>
+
+                                        <!-- INT -->
+                                        <TextBlock Grid.Row="3" Text="✧" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="15" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding TblINT}" Style="{StaticResource MutedText}" FontSize="13" VerticalAlignment="Center"
+                                                   ToolTipService.ShowDuration="60000">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Gold}"
+                                                         DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                    <TextBlock Text="{Binding IntTooltip}" Foreground="{DynamicResource Brush.Foreground}" MaxWidth="200" TextWrapping="Wrap"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Base.INT_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="3" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="INT"/>
+                                        <Button Grid.Row="3" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="INT"/>
+
+                                        <!-- SPR -->
+                                        <TextBlock Grid.Row="4" Text="☽" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="15" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding TblSPR}" Style="{StaticResource MutedText}" FontSize="13" VerticalAlignment="Center"
+                                                   ToolTipService.ShowDuration="60000">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Gold}"
+                                                         DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                    <TextBlock Text="{Binding SprTooltip}" Foreground="{DynamicResource Brush.Foreground}" MaxWidth="200" TextWrapping="Wrap"/>
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+                                        <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding Base.SPR_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="4" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="SPR"/>
+                                        <Button Grid.Row="4" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="SPR"/>
+                                    </Grid>
+                                    </ScrollViewer>
+
+                                    <Rectangle Grid.Row="2" Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.45" Margin="0,8,0,10"/>
+
+                                    <!-- Unspent points -->
+                                    <Grid Grid.Row="3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding TblUnspent}"
+                                                   Style="{StaticResource MutedText}" FontSize="13" VerticalAlignment="Center"/>
+                                        <Border Grid.Column="1"
+                                                Background="{DynamicResource Brush.Gold}"
+                                                CornerRadius="10" Padding="8,2"
+                                                VerticalAlignment="Center"
+                                                Visibility="{Binding Base.HasUnspent, Converter={StaticResource BoolToVis}}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Base.Unspent}" Foreground="{DynamicResource Brush.TextOnGold}" FontSize="11" FontWeight="Bold"/>
+                                                <TextBlock Text=" pts"                   Foreground="{DynamicResource Brush.TextOnGold}" FontSize="11"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Text="{Binding Base.Unspent}"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Base.HasUnspent}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <!-- ── TabFrame (Skills / Jobs / Quests) ── -->
+                        <Frame x:Name="TabFrame"
+                               NavigationUIVisibility="Hidden"
+                               ClipToBounds="True">
+                            <Frame.Style>
+                                <Style TargetType="Frame">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSubPageTab}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Frame.Style>
+                        </Frame>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

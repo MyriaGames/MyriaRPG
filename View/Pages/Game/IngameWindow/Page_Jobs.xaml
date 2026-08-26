@@ -1,0 +1,502 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.IngameWindow.Page_Jobs"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Myria.Wpf.View.Pages.Game.IngameWindow"
+      mc:Ignorable="d"
+      Title="Jobs">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- Fame purple — not in theme palette -->
+        <SolidColorBrush x:Key="Brush.Fame" Color="#8D5BC4"/>
+
+        <!-- Rounded, gold-bordered aspect progress bar -->
+        <Style x:Key="AspectBar" TargetType="ProgressBar">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="10"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Border CornerRadius="5"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{DynamicResource Brush.Gold}"
+                                BorderThickness="1">
+                            <Border x:Name="PART_Track">
+                                <Border x:Name="PART_Indicator"
+                                        CornerRadius="4"
+                                        Background="{TemplateBinding Foreground}"
+                                        HorizontalAlignment="Left"
+                                        Margin="1"/>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Gold-bordered panel with dark gradient interior -->
+        <Style x:Key="GoldPanel" TargetType="Border">
+            <Setter Property="Background"      Value="{DynamicResource Brush.MainPanelGradient}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius"    Value="2"/>
+            <Setter Property="Effect"          Value="{StaticResource Effect.PanelShadow}"/>
+        </Style>
+
+        <!-- RPG action button (gold border, BlueActive fill) -->
+        <Style x:Key="RpgBtn" TargetType="Button">
+            <Setter Property="Height"          Value="44"/>
+            <Setter Property="Padding"         Value="20,0"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.BlueActive}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="14" ShadowDepth="0" Opacity="0.4" Color="#C99A4A"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <!-- Outer gold-bordered frame -->
+    <Border Background="{DynamicResource Brush.WindowBackgroundGradient}"
+            BorderBrush="{DynamicResource Brush.Gold}"
+            BorderThickness="1">
+
+        <Grid Margin="42,24,42,28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="112"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Faint ornamental rings (Grid.RowSpan spans all rows so they cover the full page) -->
+            <Ellipse Grid.RowSpan="3"
+                     Width="380" Height="380"
+                     Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1" Opacity="0.07"
+                     HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-135,-120,0,0"/>
+            <Ellipse Grid.RowSpan="3"
+                     Width="420" Height="420"
+                     Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1" Opacity="0.07"
+                     HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-130,-120,0"/>
+
+            <!-- ── Header ── -->
+            <Grid Grid.Row="0">
+                <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+                        Command="{Binding GoBackCommand}"
+                        Style="{StaticResource RpgBtn}"
+                        Content="{Binding TblBack}"
+                        Padding="16,0"/>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding TblTitle}" Style="{StaticResource HeaderText}" HorizontalAlignment="Center"/>
+                    <Grid Width="330" Margin="0,6,0,0">
+                        <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.55" VerticalAlignment="Center"/>
+                        <TextBlock Text="◇"
+                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                   FontSize="22" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" Margin="0,-14,0,0"/>
+                    </Grid>
+                    <TextBlock Text="{Binding TblSubtitle}"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Georgia" FontStyle="Italic" FontSize="14"
+                               HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ── Cooldown notice ── -->
+            <Border Grid.Row="1"
+                    Margin="0,0,0,8"
+                    Padding="12,6"
+                    CornerRadius="4"
+                    Background="{DynamicResource Brush.PanelDark}"
+                    BorderBrush="{DynamicResource Brush.Gold}"
+                    BorderThickness="1"
+                    Visibility="{Binding IsOnCooldown, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="{Binding CooldownMessage}"
+                           Foreground="{DynamicResource Brush.GoldSoft}"
+                           FontFamily="Georgia" FontStyle="Italic" FontSize="13"
+                           TextWrapping="Wrap"/>
+            </Border>
+
+            <!-- ── Main content ── -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="260"/>
+                    <ColumnDefinition Width="18"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ── Current Job (left panel) ── -->
+                <Border Grid.Column="0" Style="{StaticResource GoldPanel}" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="46"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Section title with decorative rule -->
+                        <Grid Grid.Row="0">
+                            <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.55" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding TblCurrentJob}"
+                                       Style="{StaticResource SectionTitle}"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       Padding="22,0"/>
+                        </Grid>
+
+                        <!-- Placeholder: no active job -->
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                    Visibility="{Binding HasNoActiveJob, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="◇"
+                                       Foreground="{DynamicResource Brush.Gold}"
+                                       FontSize="40" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding TblNoActive}"
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia" FontSize="20"
+                                       HorizontalAlignment="Center" Margin="0,12,0,8"/>
+                            <TextBlock Text="{Binding TblNoActiveHint}"
+                                       Foreground="{DynamicResource Brush.Muted}"
+                                       FontFamily="Georgia" FontStyle="Italic" FontSize="14"
+                                       HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Active job details (scrollable so tall content is never clipped) -->
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      Visibility="{Binding HasActiveJob, Converter={StaticResource BoolToVis}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Hero: small avatar left, name + level + description right -->
+                            <Grid Grid.Row="0" Margin="0,10,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="82"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Width="72" Height="72"
+                                        BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                        Background="{DynamicResource Brush.PortraitGradient}"
+                                        CornerRadius="36" VerticalAlignment="Top" Margin="0,2,0,0">
+                                    <TextBlock Text="⚒"
+                                               Foreground="{DynamicResource Brush.GoldSoft}"
+                                               FontSize="34"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="8,0,0,0">
+                                    <TextBlock Text="{Binding CurrentJob.Name}"
+                                               Foreground="{DynamicResource Brush.Foreground}"
+                                               FontFamily="Georgia" FontSize="20"
+                                               TextWrapping="Wrap"/>
+                                    <Border Height="22" BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                            Background="{DynamicResource Brush.PanelDark}"
+                                            HorizontalAlignment="Left" Margin="0,6,0,8" Padding="10,0">
+                                        <TextBlock Text="{Binding CurrentJob.ActiveSkillLevelText}"
+                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                   FontFamily="Georgia" FontSize="11"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding CurrentJob.Description}"
+                                               Style="{StaticResource MutedText}"
+                                               FontSize="11" LineHeight="17"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Progress tracks (no icon column — just label/xp header + bar) -->
+                            <StackPanel Grid.Row="1">
+                                <Grid Margin="0,0,0,10">
+                                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.55" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding TblOverview}"
+                                               Foreground="{DynamicResource Brush.GoldSoft}"
+                                               FontFamily="Georgia" FontSize="13"
+                                               Background="{DynamicResource Brush.Panel}"
+                                               Padding="12,0" HorizontalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Skill -->
+                                <StackPanel Margin="0,0,0,8">
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock DockPanel.Dock="Left"
+                                                   Text="{Binding TblSkill, StringFormat='⚒  {0}'}"
+                                                   Style="{StaticResource BodyText}" FontSize="13"/>
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding CurrentJob.SkillProgress}"
+                                                   Style="{StaticResource MutedText}" FontSize="11"
+                                                   HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding CurrentJob.SkillLevelText}"
+                                                   Style="{StaticResource MutedText}" FontSize="11"
+                                                   HorizontalAlignment="Center"/>
+                                    </DockPanel>
+                                    <ProgressBar Style="{StaticResource AspectBar}"
+                                                 Foreground="{DynamicResource Brush.Gold}"
+                                                 Minimum="0" Maximum="1"
+                                                 Value="{Binding CurrentJob.SkillFraction, Mode=OneWay}"/>
+                                </StackPanel>
+
+                                <!-- Knowledge -->
+                                <StackPanel Margin="0,0,0,8">
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock DockPanel.Dock="Left"
+                                                   Text="{Binding TblKnowledge, StringFormat='📖  {0}'}"
+                                                   Style="{StaticResource BodyText}" FontSize="13"/>
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding CurrentJob.KnowledgeProgress}"
+                                                   Style="{StaticResource MutedText}" FontSize="11"
+                                                   HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding CurrentJob.KnowledgeLevelText}"
+                                                   Style="{StaticResource MutedText}" FontSize="11"
+                                                   HorizontalAlignment="Center"/>
+                                    </DockPanel>
+                                    <ProgressBar Style="{StaticResource AspectBar}"
+                                                 Foreground="{DynamicResource Brush.Accent}"
+                                                 Minimum="0" Maximum="1"
+                                                 Value="{Binding CurrentJob.KnowledgeFraction, Mode=OneWay}"/>
+                                </StackPanel>
+
+                                <!-- Fame -->
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock DockPanel.Dock="Left"
+                                                   Text="{Binding TblFame, StringFormat='⚑  {0}'}"
+                                                   Style="{StaticResource BodyText}" FontSize="13"/>
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding CurrentJob.FameProgress}"
+                                                   Style="{StaticResource MutedText}" FontSize="11"
+                                                   HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding CurrentJob.FameLevelText}"
+                                                   Style="{StaticResource MutedText}" FontSize="11"
+                                                   HorizontalAlignment="Center"/>
+                                    </DockPanel>
+                                    <ProgressBar Style="{StaticResource AspectBar}"
+                                                 Foreground="{StaticResource Brush.Fame}"
+                                                 Minimum="0" Maximum="1"
+                                                 Value="{Binding CurrentJob.FameFraction, Mode=OneWay}"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Stop working button -->
+                            <Button Grid.Row="2"
+                                    Style="{StaticResource RpgBtn}"
+                                    Content="{Binding CurrentJob.ActiveLabel}"
+                                    Command="{Binding CurrentJob.ToggleActiveCommand}"
+                                    HorizontalAlignment="Stretch" Margin="0,12,0,0"/>
+                        </Grid>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- ── Available Jobs (right panel) ── -->
+                <Border Grid.Column="2" Style="{StaticResource GoldPanel}" Padding="18">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="46"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Section title with decorative rule -->
+                        <Grid Grid.Row="0">
+                            <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.55" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding TblAvailable}"
+                                       Style="{StaticResource SectionTitle}"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       Padding="22,0"/>
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding Jobs}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <!-- 2-col card: small avatar | stacked content -->
+                                        <Grid Margin="0,0,0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="62"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="8"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Bottom separator spanning both columns -->
+                                            <Border Grid.ColumnSpan="2" Grid.Row="3"
+                                                    BorderBrush="{DynamicResource Brush.Gold}"
+                                                    BorderThickness="0,0,0,1" Opacity="0.3"
+                                                    VerticalAlignment="Bottom"/>
+
+                                            <!-- Avatar (top-aligned, spans rows 0-2) -->
+                                            <Border Grid.RowSpan="3"
+                                                    Width="48" Height="48" CornerRadius="24"
+                                                    BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                    Background="{DynamicResource Brush.PortraitGradient}"
+                                                    HorizontalAlignment="Center" VerticalAlignment="Top"
+                                                    Margin="0,8,0,0">
+                                                <TextBlock Text="⚒"
+                                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                                           FontSize="22"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <!-- Row 0: Name + active badge + button -->
+                                            <Grid Grid.Column="1" Grid.Row="0" Margin="8,8,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               Foreground="{DynamicResource Brush.GoldSoft}"
+                                                               FontFamily="Georgia" FontSize="16"
+                                                               VerticalAlignment="Center"/>
+                                                    <Border Margin="6,0,0,0" Padding="6,1"
+                                                            Background="{DynamicResource Brush.BlueActive}"
+                                                            BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                            CornerRadius="3" VerticalAlignment="Center"
+                                                            Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}">
+                                                        <TextBlock Text="{Binding DataContext.TblActiveBadge, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                                   FontFamily="Georgia" FontSize="9"/>
+                                                    </Border>
+                                                </StackPanel>
+                                                <Button Grid.Column="1"
+                                                        Style="{StaticResource RpgBtn}"
+                                                        Content="{Binding ActiveLabel}"
+                                                        Command="{Binding ToggleActiveCommand}"
+                                                        Height="30" Padding="10,0"/>
+                                            </Grid>
+
+                                            <!-- Row 1: Description (1 line, truncates) -->
+                                            <TextBlock Grid.Column="1" Grid.Row="1"
+                                                       Text="{Binding Description}"
+                                                       Style="{StaticResource MutedText}"
+                                                       FontSize="11"
+                                                       Margin="8,4,4,0"
+                                                       TextTrimming="CharacterEllipsis"/>
+
+                                            <!-- Row 2: Three aspect tracks via UniformGrid -->
+                                            <UniformGrid Grid.Column="1" Grid.Row="2"
+                                                         Columns="3" Margin="8,6,4,8">
+
+                                                <!-- Skill -->
+                                                <StackPanel Margin="0,0,6,0">
+                                                    <DockPanel Margin="0,0,0,3">
+                                                        <TextBlock DockPanel.Dock="Left"
+                                                                   Text="⚒"
+                                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                                   FontSize="11" VerticalAlignment="Center"/>
+                                                        <TextBlock DockPanel.Dock="Right"
+                                                                   Text="{Binding SkillLevelText}"
+                                                                   Style="{StaticResource MutedText}"
+                                                                   FontSize="10" HorizontalAlignment="Right"/>
+                                                        <TextBlock Text="{Binding DataContext.TblSkill, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   Style="{StaticResource MutedText}"
+                                                                   FontSize="10" Margin="3,0,0,0"/>
+                                                    </DockPanel>
+                                                    <ProgressBar Style="{StaticResource AspectBar}"
+                                                                 Foreground="{DynamicResource Brush.Gold}"
+                                                                 Minimum="0" Maximum="1"
+                                                                 Value="{Binding SkillFraction, Mode=OneWay}"/>
+                                                    <TextBlock Text="{Binding SkillProgress}"
+                                                               Style="{StaticResource MutedText}"
+                                                               FontSize="9" Margin="0,2,0,0"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+
+                                                <!-- Knowledge -->
+                                                <StackPanel Margin="0,0,6,0">
+                                                    <DockPanel Margin="0,0,0,3">
+                                                        <TextBlock DockPanel.Dock="Left"
+                                                                   Text="📖"
+                                                                   FontSize="11" VerticalAlignment="Center"/>
+                                                        <TextBlock DockPanel.Dock="Right"
+                                                                   Text="{Binding KnowledgeLevelText}"
+                                                                   Style="{StaticResource MutedText}"
+                                                                   FontSize="10" HorizontalAlignment="Right"/>
+                                                        <TextBlock Text="{Binding DataContext.TblKnowledge, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   Style="{StaticResource MutedText}"
+                                                                   FontSize="10" Margin="3,0,0,0"/>
+                                                    </DockPanel>
+                                                    <ProgressBar Style="{StaticResource AspectBar}"
+                                                                 Foreground="{DynamicResource Brush.Accent}"
+                                                                 Minimum="0" Maximum="1"
+                                                                 Value="{Binding KnowledgeFraction, Mode=OneWay}"/>
+                                                    <TextBlock Text="{Binding KnowledgeProgress}"
+                                                               Style="{StaticResource MutedText}"
+                                                               FontSize="9" Margin="0,2,0,0"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+
+                                                <!-- Fame -->
+                                                <StackPanel>
+                                                    <DockPanel Margin="0,0,0,3">
+                                                        <TextBlock DockPanel.Dock="Left"
+                                                                   Text="⚑"
+                                                                   Foreground="{StaticResource Brush.Fame}"
+                                                                   FontSize="11" VerticalAlignment="Center"/>
+                                                        <TextBlock DockPanel.Dock="Right"
+                                                                   Text="{Binding FameLevelText}"
+                                                                   Style="{StaticResource MutedText}"
+                                                                   FontSize="10" HorizontalAlignment="Right"/>
+                                                        <TextBlock Text="{Binding DataContext.TblFame, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   Style="{StaticResource MutedText}"
+                                                                   FontSize="10" Margin="3,0,0,0"/>
+                                                    </DockPanel>
+                                                    <ProgressBar Style="{StaticResource AspectBar}"
+                                                                 Foreground="{StaticResource Brush.Fame}"
+                                                                 Minimum="0" Maximum="1"
+                                                                 Value="{Binding FameFraction, Mode=OneWay}"/>
+                                                    <TextBlock Text="{Binding FameProgress}"
+                                                               Style="{StaticResource MutedText}"
+                                                               FontSize="9" Margin="0,2,0,0"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+
+                                            </UniformGrid>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Page>

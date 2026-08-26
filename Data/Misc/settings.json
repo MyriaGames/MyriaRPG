@@ -1,0 +1,34 @@
+{
+  "LanguageSettings": {
+    "Local": "En"
+  },
+  "VisualSettings": {
+    "DarkMode": false,
+    "FullScreen": true
+  },
+  "Keybindings": {
+    "MoveNorth": "W",
+    "MoveSouth": "S",
+    "MoveWest": "Tab",
+    "MoveEast": "C",
+    "OpenInventory": "R",
+    "OpenCharacter": "C",
+    "OpenSkills": "Right",
+    "OpenQuests": "J",
+    "OpenMap": "M",
+    "OpenSettings": "Escape",
+    "StartFight": "F",
+    "StartGather": "G",
+    "FightAttack": "OemCaret",
+    "FightSkill1": "D1",
+    "FightSkill2": "D2",
+    "FightSkill3": "D3",
+    "FightSkill4": "D4",
+    "FightSkill5": "D5",
+    "FightSkill6": "D6",
+    "FightSkill7": "D7",
+    "FightSkill8": "D8",
+    "FightSkill9": "D9",
+    "FightSkill10": "D0"
+  }
+}

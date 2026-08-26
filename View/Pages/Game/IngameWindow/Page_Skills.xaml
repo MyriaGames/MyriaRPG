@@ -1,0 +1,334 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.IngameWindow.Page_Skills"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Myria.Wpf.View.Pages.Game.IngameWindow"
+      mc:Ignorable="d"
+      d:DesignHeight="700" d:DesignWidth="900"
+      Title="Skills">
+
+    <Page.Resources>
+
+        <!-- Tab-style button (header actions: Combine, Manage Slots) -->
+        <Style x:Key="TabButton" TargetType="Button">
+            <Setter Property="Height"          Value="38"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Muted}"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontWeight"      Value="Bold"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Ghost button (Details, pagination arrows) -->
+        <Style x:Key="GhostButton" TargetType="Button">
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Muted}"/>
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background"   Value="{DynamicResource Brush.NavHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush"  Value="{DynamicResource Brush.Gold}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Page.Resources>
+
+    <Grid MinWidth="560" MinHeight="360" Background="{DynamicResource Brush.WindowBackgroundGradient}">
+
+        <!-- Decorative watermark -->
+        <TextBlock Text="✦"
+                   FontSize="220"
+                   Foreground="{DynamicResource Brush.Panel}"
+                   Opacity="0.4"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Top"
+                   Margin="0,10,40,0"/>
+
+        <!-- Outer gold-bordered container -->
+        <Border Margin="10"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1">
+            <Grid Margin="18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="72"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- ── HEADER ────────────────────────────────────────────── -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Arrow + title + tagline -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                        <TextBlock Text="→"
+                                   Foreground="{DynamicResource Brush.Gold}"
+                                   FontSize="34"
+                                   Margin="0,4,14,0"/>
+                        <TextBlock Text="{Binding TblTitle}"
+                                   Style="{StaticResource HeaderText}"/>
+                        <TextBlock Text=" | Hone your abilities."
+                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                   FontFamily="Georgia"
+                                   FontStyle="Italic"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   Margin="18,6,0,0"/>
+                    </StackPanel>
+
+                    <!-- Action buttons -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                VerticalAlignment="Center" Margin="0,0,0,10">
+                        <Button Content="{Binding TblCombineSkills}"
+                                Command="{Binding OpenCombineCommand}"
+                                Style="{StaticResource TabButton}"
+                                Padding="16,0"
+                                Margin="0,0,8,0"/>
+                        <Button Content="{Binding TblManageSlots}"
+                                Command="{Binding OpenSlotsCommand}"
+                                Style="{StaticResource TabButton}"
+                                Padding="16,0"/>
+                    </StackPanel>
+
+                    <!-- Bottom gold rule -->
+                    <Rectangle Grid.ColumnSpan="2"
+                               Height="1"
+                               Fill="{DynamicResource Brush.Gold}"
+                               VerticalAlignment="Bottom"
+                               Opacity="0.55"/>
+                </Grid>
+
+                <!-- ── BODY ──────────────────────────────────────────────── -->
+                <Border Grid.Row="1"
+                        Margin="0,14,0,0"
+                        Style="{StaticResource GoldBorder}"
+                        Padding="14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Skill count label -->
+                        <TextBlock Grid.Row="0"
+                                   Text="{Binding HeaderText}"
+                                   Style="{StaticResource MutedText}"
+                                   FontSize="12"
+                                   Margin="2,0,0,12"/>
+
+                        <!-- Skill list -->
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      Margin="0,0,0,4">
+                            <ItemsControl ItemsSource="{Binding PagedSkills}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="CardBorder"
+                                                BorderBrush="{DynamicResource Brush.Border}"
+                                                BorderThickness="1"
+                                                Background="{DynamicResource Brush.PanelDark}"
+                                                Padding="14,12"
+                                                Margin="0,0,0,8"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="44"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Skill icon (green for healing, gold otherwise) -->
+                                                <TextBlock x:Name="SkillIcon"
+                                                           Grid.Column="0"
+                                                           Text="✦"
+                                                           Foreground="{DynamicResource Brush.Gold}"
+                                                           FontSize="22"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center"/>
+
+                                                <!-- Name + class + description + tags -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   Foreground="{DynamicResource Brush.Foreground}"
+                                                                   FontFamily="Georgia"
+                                                                   FontSize="15"
+                                                                   FontWeight="SemiBold"/>
+                                                        <TextBlock Text="{Binding ClassName}"
+                                                                   Style="{StaticResource MutedText}"
+                                                                   FontSize="11"
+                                                                   Margin="10,1,0,0"
+                                                                   VerticalAlignment="Bottom"/>
+                                                    </StackPanel>
+
+                                                    <TextBlock Text="{Binding ShortDescription}"
+                                                               Style="{StaticResource MutedText}"
+                                                               FontSize="12"
+                                                               Margin="0,5,0,7"
+                                                               TextTrimming="CharacterEllipsis"/>
+
+                                                    <!-- Tags -->
+                                                    <StackPanel Orientation="Horizontal">
+
+                                                        <Border Background="{DynamicResource Brush.Accent}"
+                                                                CornerRadius="2" Padding="6,2" Margin="0,0,6,0"
+                                                                Visibility="{Binding HasTag, Converter={StaticResource BoolToVis}}">
+                                                            <TextBlock Text="{Binding Tag}"
+                                                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                                                       FontSize="10" FontWeight="SemiBold"/>
+                                                        </Border>
+
+                                                        <Border BorderBrush="{DynamicResource Brush.Border}"
+                                                                BorderThickness="1" CornerRadius="2"
+                                                                Padding="6,2" Margin="0,0,6,0">
+                                                            <TextBlock Text="{Binding TypeText}"
+                                                                       Style="{StaticResource MutedText}"
+                                                                       FontSize="10"/>
+                                                        </Border>
+
+                                                        <Border BorderBrush="{DynamicResource Brush.Border}"
+                                                                BorderThickness="1" CornerRadius="2"
+                                                                Padding="6,2" Margin="0,0,6,0">
+                                                            <TextBlock Text="{Binding TargetText}"
+                                                                       Style="{StaticResource MutedText}"
+                                                                       FontSize="10"/>
+                                                        </Border>
+
+                                                        <Border Background="{DynamicResource Brush.Success}"
+                                                                CornerRadius="2" Padding="6,2" Margin="0,0,6,0"
+                                                                Visibility="{Binding IsHealing, Converter={StaticResource BoolToVis}}">
+                                                            <TextBlock Text="{Binding DataContext.TblHealingTag, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                       Foreground="White"
+                                                                       FontSize="10" FontWeight="SemiBold"/>
+                                                        </Border>
+
+                                                        <TextBlock Style="{StaticResource MutedText}"
+                                                                   FontFamily="Georgia" FontSize="10">
+                                                            <Run Text="{Binding DataContext.TblMinLevel, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}"/>
+                                                            <Run Text="{Binding MinLevel, Mode=OneWay}"
+                                                                 Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                                        </TextBlock>
+
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <!-- MP + timing + Details button -->
+                                                <StackPanel Grid.Column="2"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Right"
+                                                            Margin="14,0,0,0">
+
+                                                    <TextBlock HorizontalAlignment="Right"
+                                                               FontFamily="Georgia" FontSize="13">
+                                                        <Run Text="{Binding DataContext.TblMp, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}"
+                                                             Foreground="{DynamicResource Brush.Muted}"/>
+                                                        <Run Text=" "/>
+                                                        <Run Text="{Binding ManaCost, Mode=OneWay}"
+                                                             Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                                    </TextBlock>
+
+                                                    <TextBlock Text="{Binding TimingText}"
+                                                               Style="{StaticResource MutedText}"
+                                                               FontSize="11"
+                                                               HorizontalAlignment="Right"
+                                                               Margin="0,4,0,8"/>
+
+                                                    <Button Content="{Binding DataContext.TblDetails, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            Command="{Binding DataContext.OpenDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource GhostButton}"
+                                                            Height="32" Padding="14,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsHealing}" Value="True">
+                                                <Setter TargetName="SkillIcon" Property="Foreground"
+                                                        Value="{DynamicResource Brush.Success}"/>
+                                                <Setter TargetName="SkillIcon" Property="Text" Value="♥"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Pagination -->
+                        <StackPanel Grid.Row="2"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,6,0,0">
+                            <Button Content="←"
+                                    Command="{Binding PrevPageCommand}"
+                                    Style="{StaticResource GhostButton}"
+                                    Height="36" Width="46"/>
+                            <TextBlock Text="{Binding PageText}"
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia"
+                                       FontSize="15"
+                                       VerticalAlignment="Center"
+                                       Margin="16,0"/>
+                            <Button Content="→"
+                                    Command="{Binding NextPageCommand}"
+                                    Style="{StaticResource GhostButton}"
+                                    Height="36" Width="46"/>
+                        </StackPanel>
+
+                    </Grid>
+                </Border>
+
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

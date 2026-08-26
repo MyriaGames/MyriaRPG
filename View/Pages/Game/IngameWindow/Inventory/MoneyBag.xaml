@@ -1,0 +1,58 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.IngameWindow.Inventory.MoneyBag"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="56" d:DesignWidth="800"
+      Background="Transparent"
+      Title="MoneyBag">
+
+    <Border Background="{DynamicResource Brush.HudBodyGradient}"
+            BorderBrush="{DynamicResource Brush.Gold}"
+            BorderThickness="1"
+            CornerRadius="2"
+            Padding="14,10"
+            Effect="{StaticResource Effect.PanelShadow}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Label -->
+            <TextBlock Grid.Column="0"
+                       Text="{Binding MoneyBagTitle}"
+                       FontFamily="Georgia"
+                       FontSize="11"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource Brush.GoldSoft}"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+
+            <!-- Separator -->
+            <Rectangle Grid.Column="1"
+                       Height="1"
+                       Fill="{DynamicResource Brush.Gold}"
+                       Opacity="0.3"
+                       VerticalAlignment="Center"
+                       Margin="0,0,16,0"/>
+
+            <!-- Amount with coin symbol -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="◆"
+                           Foreground="{DynamicResource Brush.Gold}"
+                           FontSize="14"
+                           VerticalAlignment="Center"
+                           Margin="0,0,6,0"/>
+                <TextBlock Text="{Binding MoneyDisplay}"
+                           FontFamily="Georgia"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource Brush.Gold}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Page>

@@ -1,0 +1,95 @@
+<UserControl x:Class="Myria.Wpf.View.UserControls.NpcWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:beh="clr-namespace:Myria.Wpf.Model.Behaviors"
+             mc:Ignorable="d"
+             d:DesignHeight="480"
+             d:DesignWidth="620">
+
+    <Grid Canvas.Left="{Binding Left}"
+          Canvas.Top="{Binding Top}"
+          Panel.ZIndex="{Binding ZIndex}"
+          Width="{Binding Width}"
+          Height="{Binding Height}"
+          MinWidth="380"
+          MinHeight="280">
+
+        <Border Margin="10"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1"
+                Background="{DynamicResource Brush.WindowBackgroundGradient}"
+                Effect="{DynamicResource Effect.WindowShadow}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="52"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource Brush.WindowPanelGradient}"
+                        BorderBrush="{DynamicResource Brush.Gold}"
+                        BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Thumb x:Name="DragThumb" Opacity="0">
+                            <i:Interaction.Behaviors>
+                                <beh:DragThumbToCommandBehavior Command="{Binding DragDeltaCommand}" />
+                            </i:Interaction.Behaviors>
+                            <Thumb.Template>
+                                <ControlTemplate TargetType="Thumb">
+                                    <Rectangle Fill="Transparent"/>
+                                </ControlTemplate>
+                            </Thumb.Template>
+                        </Thumb>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="52"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="52"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Title}"
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia"
+                                       FontSize="15"
+                                       FontStyle="Italic"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
+                            <Button Grid.Column="2"
+                                    Content="&#x2715;"
+                                    Command="{Binding CloseCommand}"
+                                    Style="{StaticResource WindowCloseButtonSmall}"
+                                    ToolTip="Close" Margin="5,5,10,10"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Content -->
+                <Border Grid.Row="1"
+                        BorderBrush="{DynamicResource Brush.Gold}"
+                        BorderThickness="1"
+                        Background="{DynamicResource Brush.Background}"
+                        Margin="14">
+                    <Frame Name="Frame"
+                           NavigationUIVisibility="Hidden"
+                           Background="Transparent"
+                           Padding="18, 8"
+                           ClipToBounds="True"/>
+                </Border>
+            </Grid>
+        </Border>
+
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="PreviewMouseDown">
+                <i:InvokeCommandAction Command="{Binding FocusCommand}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+    </Grid>
+</UserControl>

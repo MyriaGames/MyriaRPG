@@ -1,0 +1,143 @@
+<UserControl x:Class="Myria.Wpf.View.UserControls.TradeProposalWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="900" d:DesignWidth="1280">
+
+    <!-- Full-canvas dim layer so the proposal always reads clearly -->
+    <Grid Background="#88060A0F">
+
+        <Border Width="340"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{DynamicResource Brush.HudBodyGradient}"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1"
+                Effect="{StaticResource Effect.WindowShadow}"
+                Padding="26,22">
+            <StackPanel>
+
+                <!-- Title row -->
+                <DockPanel Margin="0,0,0,14">
+                    <TextBlock Text="&#x25C7;"
+                               DockPanel.Dock="Left"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Segoe UI Symbol"
+                               FontSize="22"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"/>
+                    <TextBlock Text="Trade Request"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Georgia"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+
+                <!-- Gold divider -->
+                <Grid Margin="0,0,0,18">
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.55" VerticalAlignment="Center"/>
+                    <TextBlock Text="&#x25C6;"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Segoe UI Symbol"
+                               FontSize="10"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="0,-8,0,0"/>
+                </Grid>
+
+                <!-- Message -->
+                <TextBlock x:Name="tbl_Message"
+                           Foreground="{DynamicResource Brush.Foreground}"
+                           FontFamily="Georgia"
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           Margin="0,0,0,22"/>
+
+                <!-- Accept / Decline -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="btn_Accept"
+                            Grid.Column="0"
+                            Content="Accept"
+                            Click="OnAccept"
+                            Height="38"
+                            Background="{DynamicResource Brush.BlueActive}"
+                            Foreground="{DynamicResource Brush.GoldSoft}"
+                            BorderBrush="{DynamicResource Brush.Gold}"
+                            BorderThickness="1"
+                            FontFamily="Georgia"
+                            FontSize="13"
+                            FontWeight="Bold"
+                            Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="2"
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.8"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.65"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <Button x:Name="btn_Decline"
+                            Grid.Column="2"
+                            Content="Decline"
+                            Click="OnDecline"
+                            Height="38"
+                            Background="Transparent"
+                            Foreground="{DynamicResource Brush.Muted}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="1"
+                            FontFamily="Georgia"
+                            FontSize="13"
+                            Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="2"
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brush.GoldSoft}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                </Grid>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</UserControl>

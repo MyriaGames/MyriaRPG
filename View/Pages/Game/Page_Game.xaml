@@ -1,0 +1,1024 @@
+<Page x:Class="Myria.Wpf.View.Pages.Game.Page_Game"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Myria.Wpf.View.Pages.Game"
+      mc:Ignorable="d"
+      d:DesignHeight="980" d:DesignWidth="1040"
+      Title="Game">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Game area (frame + all HUD overlays) ── -->
+        <Grid Grid.Row="0">
+        <Frame Name="frm_Navigation" NavigationUIVisibility="Hidden"/>
+
+        <!-- TOP-LEFT: self character card + party member cards + invite banner -->
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,20,0,0">
+
+            <!-- Self character HUD -->
+            <Grid Width="500" Height="68" Tag="{Binding}">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsInParty}" Value="True">
+                                <Setter Property="ContextMenu">
+                                    <Setter.Value>
+                                        <ContextMenu>
+                                            <MenuItem Header="{Binding PlacementTarget.Tag.TblLeaveParty, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                      Command="{Binding PlacementTarget.Tag.LeavePartyCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        </ContextMenu>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <!-- Main ornate HUD body -->
+                <Border Height="46"
+                        Margin="56,11,10,11"
+                        Background="{DynamicResource Brush.HudBodyGradient}"
+                        BorderBrush="{DynamicResource Brush.Gold}"
+                        BorderThickness="1"
+                        CornerRadius="2"
+                        Effect="{StaticResource Effect.HudShadow}">
+                    <Grid Margin="30,5,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition Width="1"/>
+                            <ColumnDefinition Width="115"/>
+                            <ColumnDefinition Width="1"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Name / Level -->
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="{Binding Char.Name}"
+                                       Foreground="{DynamicResource Brush.Foreground}"
+                                       FontFamily="Georgia" FontSize="12" FontWeight="SemiBold"
+                                       VerticalAlignment="Center"/>
+
+                            <Grid Grid.Row="1" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Lv."
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           VerticalAlignment="Bottom" Margin="0,0,0,1"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding Char.Level}"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia" FontSize="18"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+
+                        <Rectangle Grid.Column="1" Fill="#6C5128" Opacity="0.65" Margin="0,2"/>
+
+                        <!-- XP -->
+                        <Grid Grid.Column="2" Margin="10,0" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="XP"
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Column="1">
+                                <Border Height="8"
+                                        BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                        Background="{DynamicResource Brush.PanelDark}" CornerRadius="4">
+                                    <ProgressBar Style="{StaticResource RoundBar}"
+                                                 Background="Transparent" Margin="1"
+                                                 Minimum="0" Maximum="100"
+                                                 Value="{Binding Char.XpPercent, Mode=OneWay}">
+                                        <ProgressBar.Foreground>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#F0C66A" Offset="0"/>
+                                                <GradientStop Color="#C4862B" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </ProgressBar.Foreground>
+                                    </ProgressBar>
+                                </Border>
+                                <TextBlock Text="{Binding Char.XpPercent, StringFormat={}{0}%}"
+                                           Foreground="{DynamicResource Brush.Foreground}"
+                                           FontFamily="Georgia" FontSize="8"
+                                           HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Rectangle Grid.Column="3" Fill="#6C5128" Opacity="0.65" Margin="0,2"/>
+
+                        <!-- HP / MP -->
+                        <Grid Grid.Column="4" Margin="8,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- HP -->
+                            <Grid Grid.Row="0" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="34"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="HP"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="♥"
+                                           Foreground="#E07568" FontSize="10"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Border Grid.Column="2" Height="8"
+                                        BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                        Background="{DynamicResource Brush.PanelDark}" CornerRadius="4" VerticalAlignment="Center">
+                                    <ProgressBar Style="{StaticResource RoundBar}"
+                                                 Background="Transparent" Margin="1"
+                                                 Minimum="0"
+                                                 Maximum="{Binding Char.MaxHp, Mode=OneWay}"
+                                                 Value="{Binding Char.Hp, Mode=OneWay}">
+                                        <ProgressBar.Foreground>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#E07568" Offset="0"/>
+                                                <GradientStop Color="#9E2E2A" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </ProgressBar.Foreground>
+                                    </ProgressBar>
+                                </Border>
+                                <TextBlock Grid.Column="3"
+                                           Text="{Binding Char.HpDisplay}"
+                                           Foreground="{DynamicResource Brush.Foreground}"
+                                           FontFamily="Georgia" FontSize="8"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- MP -->
+                            <Grid Grid.Row="1" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="34"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="MP"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="♦"
+                                           Foreground="#65B5E8" FontSize="9"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Border Grid.Column="2" Height="8"
+                                        BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                        Background="{DynamicResource Brush.PanelDark}" CornerRadius="4" VerticalAlignment="Center">
+                                    <ProgressBar Style="{StaticResource RoundBar}"
+                                                 Background="Transparent" Margin="1"
+                                                 Minimum="0"
+                                                 Maximum="{Binding Char.MaxMana, Mode=OneWay}"
+                                                 Value="{Binding Char.Mana, Mode=OneWay}">
+                                        <ProgressBar.Foreground>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#65B5E8" Offset="0"/>
+                                                <GradientStop Color="#1F5E9C" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </ProgressBar.Foreground>
+                                    </ProgressBar>
+                                </Border>
+                                <TextBlock Grid.Column="3"
+                                           Text="{Binding Char.ManaDisplay}"
+                                           Foreground="{DynamicResource Brush.Foreground}"
+                                           FontFamily="Georgia" FontSize="8"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Left crest medallion (overlaps HUD body left edge) -->
+                <Grid Width="58" Height="58" HorizontalAlignment="Left" Margin="6,5,0,5">
+                    <Border Background="{DynamicResource Brush.PanelDark}"
+                            BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                            CornerRadius="5"
+                            RenderTransformOrigin="0.5,0.5"
+                            Effect="{StaticResource Effect.HudShadow}">
+                        <Border.RenderTransform>
+                            <RotateTransform Angle="45"/>
+                        </Border.RenderTransform>
+                    </Border>
+                    <Border Width="42" Height="48"
+                            Background="{DynamicResource Brush.HudCrestGradient}"
+                            BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                            CornerRadius="4"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="♞" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="20"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- Right end cap -->
+                <TextBlock Text="◆" Foreground="{DynamicResource Brush.Gold}" FontSize="9"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"/>
+
+                <!-- Turn indicator (combat only) -->
+                <TextBlock Text="▶" Foreground="#FFD700" FontSize="11" FontWeight="Bold"
+                           HorizontalAlignment="Left" VerticalAlignment="Center" Margin="59,0,0,0"
+                           Visibility="{Binding CurrentFight.IsMyTurn, Converter={StaticResource BoolToVis}}"/>
+            </Grid>
+
+            <!-- Party member cards (one per party member, excluding self) -->
+            <ItemsControl ItemsSource="{Binding PartyMembers}"
+                          Visibility="{Binding IsInParty, Converter={StaticResource BoolToVis}}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,3,0,0"
+                                Height="50"
+                                Width="220"
+                                HorizontalAlignment="Left"
+                                Background="{DynamicResource Brush.HudBodyGradient}"
+                                BorderBrush="{DynamicResource Brush.Gold}"
+                                BorderThickness="1"
+                                CornerRadius="2"
+                                Padding="8,4"
+                                Effect="{StaticResource Effect.HudShadow}"
+                                Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
+                            <Border.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{Binding PlacementTarget.Tag.TblWhisperLabel,         RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Command="{Binding PlacementTarget.Tag.WhisperMemberCommand,  RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext.Username, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    <MenuItem Header="{Binding PlacementTarget.Tag.TblFriendRequestLabel,     RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Command="{Binding PlacementTarget.Tag.SendFriendRequestCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext.Username, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                        <MenuItem.Visibility>
+                                            <MultiBinding Converter="{StaticResource NotFriendToVis}">
+                                                <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                                <Binding Path="PlacementTarget.DataContext.Username" RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                            </MultiBinding>
+                                        </MenuItem.Visibility>
+                                    </MenuItem>
+                                    <MenuItem Header="{Binding PlacementTarget.Tag.TblProposeTradeLabel,   RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Command="{Binding PlacementTarget.Tag.ProposeTradeCommand,   RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext.Username, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    <Separator Visibility="{Binding PlacementTarget.DataContext.ShowLeaderActions, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                    <MenuItem Header="{Binding PlacementTarget.Tag.TblPartyPromote,            RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Command="{Binding PlacementTarget.Tag.TransferPartyLeaderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext.Username,  RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Visibility="{Binding PlacementTarget.DataContext.ShowLeaderActions, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                    <MenuItem Header="{Binding PlacementTarget.Tag.TblPartyKickLabel,      RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Command="{Binding PlacementTarget.Tag.KickFromPartyCommand,  RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext.Username, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Visibility="{Binding PlacementTarget.DataContext.ShowLeaderActions, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                </ContextMenu>
+                            </Border.ContextMenu>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Name + leader star -->
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="▶ "
+                                               Foreground="#FFD700" FontSize="9" FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding IsCurrentTurn, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBlock Text="★ "
+                                               Foreground="{DynamicResource Brush.Gold}"
+                                               FontSize="8"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding IsLeader, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBlock Text="{Binding Username}"
+                                               Foreground="{DynamicResource Brush.Foreground}"
+                                               FontFamily="Georgia"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- HP + MP bars -->
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="2"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- HP -->
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="HP"
+                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                   FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                                   VerticalAlignment="Center"/>
+                                        <Border Grid.Column="1" Height="6"
+                                                BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                Background="{DynamicResource Brush.PanelDark}" CornerRadius="3" Margin="2,0">
+                                            <ProgressBar Style="{StaticResource RoundBar}"
+                                                         Background="Transparent" Margin="1"
+                                                         Minimum="0"
+                                                         Maximum="{Binding MaxHp, Mode=OneWay}"
+                                                         Value="{Binding Hp, Mode=OneWay}">
+                                                <ProgressBar.Foreground>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                        <GradientStop Color="#E07568" Offset="0"/>
+                                                        <GradientStop Color="#C04040" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </ProgressBar.Foreground>
+                                            </ProgressBar>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="{Binding HpDisplay}"
+                                                   Foreground="{DynamicResource Brush.Foreground}"
+                                                   FontFamily="Georgia" FontSize="9"
+                                                   VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                    </Grid>
+
+                                    <!-- MP -->
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="MP"
+                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                   FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                                   VerticalAlignment="Center"/>
+                                        <Border Grid.Column="1" Height="6"
+                                                BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                                Background="{DynamicResource Brush.PanelDark}" CornerRadius="3" Margin="2,0">
+                                            <ProgressBar Style="{StaticResource RoundBar}"
+                                                         Background="Transparent" Margin="1"
+                                                         Minimum="0"
+                                                         Maximum="{Binding MaxMana, Mode=OneWay}"
+                                                         Value="{Binding Mana, Mode=OneWay}">
+                                                <ProgressBar.Foreground>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                        <GradientStop Color="#7E57C2" Offset="0"/>
+                                                        <GradientStop Color="#512DA8" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </ProgressBar.Foreground>
+                                            </ProgressBar>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="{Binding ManaDisplay}"
+                                                   Foreground="{DynamicResource Brush.Foreground}"
+                                                   FontFamily="Georgia" FontSize="9"
+                                                   VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Party invite banner -->
+            <Border Margin="0,4,250,0" Background="#CC142814" CornerRadius="8" Padding="10,8"
+                    Visibility="{Binding HasPendingInvite, Converter={StaticResource BoolToVis}}">
+                <StackPanel>
+                    <TextBlock Text="{Binding PartyInviteText}"
+                               Foreground="#A5D6A7" FontWeight="SemiBold" FontSize="11"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                        <Button Content="{Binding TblAcceptInvite}" Command="{Binding AcceptPartyInviteCommand}"
+                                Style="{StaticResource SmallBtn}" Background="#2E7D32" Margin="0,0,6,0"/>
+                        <Button Content="{Binding TblDeclineInvite}" Command="{Binding DeclinePartyInviteCommand}"
+                                Style="{StaticResource SmallBtn}" Background="#555"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+
+
+        <!-- TOP-RIGHT: small icon-only actions with tooltips (hidden during combat) -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12"
+                    Visibility="{Binding IsNotInFight, Converter={StaticResource BoolToVis}}">
+            <Button Style="{StaticResource IconButton}" Command="{Binding OpenInventoryCommand}">
+                <TextBlock Text="&#x1F392;" FontSize="18"/>
+                <Button.ToolTip><ToolTip Content="{Binding BtnInventory}"/></Button.ToolTip>
+            </Button>
+            <Button Style="{StaticResource IconButton}" Command="{Binding OpenCharacterCommand}">
+                <TextBlock Text="&#x1F9CD;" FontSize="18"/>
+                <Button.ToolTip><ToolTip Content="{Binding BtnCharacter}"/></Button.ToolTip>
+            </Button>
+            <Button Style="{StaticResource IconButton}" Command="{Binding OpenQuestsCommand}">
+                <Grid>
+                    <TextBlock Text="&#x1F4DC;" FontSize="18"/>
+                    <Border Background="{DynamicResource Brush.Accent}"
+                            CornerRadius="5" Width="12" Height="12"
+                            HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Margin="0,-3,-3,0"
+                            Visibility="{Binding HasReturnableQuest, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="!" FontSize="8" FontWeight="Bold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+                <Button.ToolTip><ToolTip Content="{Binding BtnQuests}"/></Button.ToolTip>
+            </Button>
+            <Button Style="{StaticResource IconButton}" Command="{Binding MapCommand}">
+                <TextBlock Text="&#x1F5FA;&#xFE0F;" FontSize="18"/>
+                <Button.ToolTip><ToolTip Content="{Binding BtnMap}"/></Button.ToolTip>
+            </Button>
+            <Button Style="{StaticResource IconButton}"
+                    Command="{Binding OpenFriendsCommand}"
+                    Visibility="{Binding IsChatAvailable, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="&#x1F465;" FontSize="18"/>
+                <Button.ToolTip><ToolTip Content="{Binding BtnFriends}"/></Button.ToolTip>
+            </Button>
+            <Button Style="{StaticResource IconButton}" Command="{Binding SettingsCommand}">
+                <TextBlock Text="&#x2699;&#xFE0F;" FontSize="18"/>
+                <Button.ToolTip><ToolTip Content="{Binding BtnSettings}"/></Button.ToolTip>
+            </Button>
+        </StackPanel>
+        <!-- TOP-RIGHT: Monster card + other enemies (visible only during combat) -->
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,16,0"
+                    Visibility="{Binding IsInFight, Converter={StaticResource BoolToVis}}">
+        <Grid Width="400" Height="68">
+
+            <!-- Main ornate HUD body (mirrored: crest on right) -->
+            <Border Height="46"
+                    Margin="10,11,56,11"
+                    Background="{DynamicResource Brush.HudBodyGradient}"
+                    BorderBrush="{DynamicResource Brush.Gold}"
+                    BorderThickness="1"
+                    CornerRadius="2"
+                    Effect="{StaticResource Effect.HudShadow}">
+                <Grid Margin="10,5,10,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="1"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Name / Level -->
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding CurrentFight.ActiveMonsterName}"
+                                   Foreground="{DynamicResource Brush.Foreground}"
+                                   FontFamily="Georgia" FontSize="11" FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <Grid Grid.Row="1" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Lv."
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       VerticalAlignment="Bottom" Margin="0,0,0,1"/>
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding CurrentFight.EnemyLevel}"
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia" FontSize="18"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Grid>
+
+                    <Rectangle Grid.Column="1" Fill="#6C5128" Opacity="0.65" Margin="0,2"/>
+
+                    <!-- HP / MP bars -->
+                    <Grid Grid.Column="2" Margin="8,0,10,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- HP row -->
+                        <Grid VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="HP"
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="♥"
+                                       Foreground="#E07568" FontSize="10"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Border Grid.Column="2" Height="8"
+                                    BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                    Background="{DynamicResource Brush.PanelDark}" CornerRadius="4" VerticalAlignment="Center">
+                                <ProgressBar Style="{StaticResource RoundBar}"
+                                             Background="Transparent" Margin="1"
+                                             Minimum="0"
+                                             Maximum="{Binding CurrentFight.EnemyHpMax, Mode=OneWay}"
+                                             Value="{Binding CurrentFight.EnemyHp, Mode=OneWay}">
+                                    <ProgressBar.Foreground>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#E07568" Offset="0"/>
+                                            <GradientStop Color="#9E2E2A" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </ProgressBar.Foreground>
+                                </ProgressBar>
+                            </Border>
+                            <TextBlock Grid.Column="3"
+                                       Foreground="{DynamicResource Brush.Foreground}"
+                                       FontFamily="Georgia" FontSize="8"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}/{1}">
+                                        <Binding Path="CurrentFight.EnemyHp"/>
+                                        <Binding Path="CurrentFight.EnemyHpMax"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+
+                        <!-- MP row -->
+                        <Grid Grid.Row="1" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="MP"
+                                       Foreground="{DynamicResource Brush.GoldSoft}"
+                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="✦"
+                                       Foreground="#5B8CDD" FontSize="8"
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Border Grid.Column="2" Height="8"
+                                    BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                    Background="{DynamicResource Brush.PanelDark}" CornerRadius="4" VerticalAlignment="Center">
+                                <ProgressBar Style="{StaticResource RoundBar}"
+                                             Background="Transparent" Margin="1"
+                                             Minimum="0"
+                                             Maximum="{Binding CurrentFight.EnemyMpMax, Mode=OneWay}"
+                                             Value="{Binding CurrentFight.EnemyMp, Mode=OneWay}">
+                                    <ProgressBar.Foreground>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#5B8CDD" Offset="0"/>
+                                            <GradientStop Color="#2A5499" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </ProgressBar.Foreground>
+                                </ProgressBar>
+                            </Border>
+                            <TextBlock Grid.Column="3"
+                                       Foreground="{DynamicResource Brush.Foreground}"
+                                       FontFamily="Georgia" FontSize="8"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}/{1}">
+                                        <Binding Path="CurrentFight.EnemyMp"/>
+                                        <Binding Path="CurrentFight.EnemyMpMax"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Right crest medallion (skull, mirrors character card's left crest) -->
+            <Grid Width="58" Height="58" HorizontalAlignment="Right" Margin="0,5,6,5">
+                <Border Background="{DynamicResource Brush.PanelDark}"
+                        BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                        CornerRadius="5"
+                        RenderTransformOrigin="0.5,0.5"
+                        Effect="{StaticResource Effect.HudShadow}">
+                    <Border.RenderTransform>
+                        <RotateTransform Angle="45"/>
+                    </Border.RenderTransform>
+                </Border>
+                <Border Width="42" Height="48"
+                        Background="{DynamicResource Brush.HudCrestGradient}"
+                        BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                        CornerRadius="4"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="☠" Foreground="{DynamicResource Brush.GoldSoft}" FontSize="20"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+            </Grid>
+
+            <!-- Left end cap (mirrors character card's right end cap) -->
+            <TextBlock Text="◆" Foreground="{DynamicResource Brush.Gold}" FontSize="9"
+                       HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"/>
+        </Grid>
+
+        <!-- Other enemies list (group combat only) -->
+        <ItemsControl ItemsSource="{Binding CurrentFight.OtherMonsters}"
+                      Visibility="{Binding CurrentFight.HasOtherMonsters, Converter={StaticResource BoolToVis}}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,4,0,0"
+                            Height="52"
+                            Width="400"
+                            Background="{DynamicResource Brush.HudBodyGradient}"
+                            BorderBrush="{DynamicResource Brush.Gold}"
+                            BorderThickness="1"
+                            CornerRadius="2"
+                            Padding="10,6"
+                            Cursor="Hand"
+                            Effect="{StaticResource Effect.HudShadow}">
+                        <Border.InputBindings>
+                            <MouseBinding MouseAction="LeftClick"
+                                          Command="{Binding DataContext.CurrentFight.SelectMonsterCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                          CommandParameter="{Binding}"/>
+                        </Border.InputBindings>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Name + level -->
+                            <Grid Grid.Row="0" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}"
+                                           Foreground="{DynamicResource Brush.Foreground}"
+                                           FontFamily="Georgia" FontSize="12" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="1" Text="Lv."
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           VerticalAlignment="Bottom" Margin="0,0,0,1"/>
+                                <TextBlock Grid.Column="3" Text="{Binding Level}"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia" FontSize="16"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- HP bar -->
+                            <Grid Grid.Row="1" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="56"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="HP"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="♥"
+                                           Foreground="#E07568" FontSize="10"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Border Grid.Column="2" Height="7"
+                                        BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                        Background="{DynamicResource Brush.PanelDark}" CornerRadius="3" VerticalAlignment="Center">
+                                    <ProgressBar Style="{StaticResource RoundBar}"
+                                                 Background="Transparent" Margin="1"
+                                                 Minimum="0"
+                                                 Maximum="{Binding MaxHp, Mode=OneWay}"
+                                                 Value="{Binding Hp, Mode=OneWay}">
+                                        <ProgressBar.Foreground>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#E07568" Offset="0"/>
+                                                <GradientStop Color="#9E2E2A" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </ProgressBar.Foreground>
+                                    </ProgressBar>
+                                </Border>
+                                <TextBlock Grid.Column="3"
+                                           Text="{Binding HpText}"
+                                           Foreground="{DynamicResource Brush.Foreground}"
+                                           FontFamily="Georgia" FontSize="8"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        </StackPanel>
+
+        <!-- Other players in the same room, and shops open in it — bottom-right overlay above
+             info panel. Both stack inside one Right/Bottom-anchored, height-capped container so
+             neither can grow (or, if a Margin/alignment is ever forgotten again, default-stretch)
+             into covering the chat bar below. -->
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Margin="0,0,12,137"
+                    MaxHeight="260">
+        <Border Background="{DynamicResource Brush.HudBodyGradient}"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1"
+                CornerRadius="2"
+                Padding="10,8"
+                MinWidth="170"
+                Effect="{StaticResource Effect.HudShadow}"
+                Visibility="{Binding HasRoomCharacters, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding TblAlsoHere}"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Georgia" FontSize="10" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <Rectangle Grid.Column="1" Height="1"
+                               Fill="{DynamicResource Brush.Gold}"
+                               Opacity="0.4" VerticalAlignment="Center"/>
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding RoomCharacters}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"
+                                       Foreground="{DynamicResource Brush.Foreground}"
+                                       FontFamily="Georgia" FontSize="11"
+                                       Margin="0,2"
+                                       Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{Binding PlacementTarget.Tag.TblProposeTradeLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  Command="{Binding PlacementTarget.Tag.ProposeTradeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext.Name, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        <MenuItem Header="{Binding PlacementTarget.Tag.TblVisitShopLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  Command="{Binding PlacementTarget.Tag.VisitCharacterShopCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext.Name, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        <MenuItem Header="{Binding PlacementTarget.Tag.TblInvitePartyLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  Command="{Binding PlacementTarget.Tag.InviteToPartyFromRoomCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext.Name, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        <MenuItem Header="{Binding PlacementTarget.Tag.TblFriendRequestLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  Command="{Binding PlacementTarget.Tag.SendFriendRequestCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext.Name, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                            <MenuItem.Visibility>
+                                                <MultiBinding Converter="{StaticResource NotFriendToVis}">
+                                                    <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                                    <Binding Path="PlacementTarget.DataContext.Name" RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                                </MultiBinding>
+                                            </MenuItem.Visibility>
+                                        </MenuItem>
+                                        <Separator/>
+                                        <MenuItem Header="{Binding PlacementTarget.Tag.TblBlockCharacterLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  Command="{Binding PlacementTarget.Tag.BlockCharacterCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext.Name, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ── Shops open in this room — separate from "also here", since a shop kept open
+             by a Merchant's Seal is listed here even when its owner isn't physically present. ── -->
+        <Border Background="{DynamicResource Brush.HudBodyGradient}"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1"
+                CornerRadius="2"
+                Padding="10,8"
+                MinWidth="170"
+                Margin="0,8,0,0"
+                MaxHeight="180"
+                Effect="{StaticResource Effect.HudShadow}">
+            <StackPanel>
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding TblShopsHere}"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Georgia" FontSize="10" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <Rectangle Grid.Column="1" Height="1"
+                               Fill="{DynamicResource Brush.Gold}"
+                               Opacity="0.4" VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Permanently pinned at the top - only usable in a city room, same rule
+                     GameHub.OpenShop enforces server-side. -->
+                <Button Content="{Binding TblOpenShopHere}"
+                        Command="{Binding OpenMyShopCommand}"
+                        IsEnabled="{Binding IsCurrentRoomCity}"
+                        Margin="0,0,0,6"
+                        Padding="6,4"
+                        Background="{DynamicResource Brush.NavHover}"
+                        Foreground="{DynamicResource Brush.GoldSoft}"
+                        BorderBrush="{DynamicResource Brush.Gold}"
+                        BorderThickness="1"
+                        FontFamily="Georgia" FontSize="11"
+                        Cursor="Hand"/>
+
+                <!-- Capped the same way the NPC list is (Page_Room.xaml) so a room with many
+                     shops open (esp. seal-anchored ones from players who aren't even here)
+                     can't grow this panel over everything else. -->
+                <ScrollViewer MaxHeight="76"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding RoomShopOwners}"
+                                  Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding}"
+                                        Margin="0,2"
+                                        HorizontalContentAlignment="Left"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="{DynamicResource Brush.Foreground}"
+                                        FontFamily="Georgia" FontSize="11"
+                                        Cursor="Hand"
+                                        Command="{Binding Tag.VisitCharacterShopCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+        </StackPanel>
+
+        </Grid>
+        <!-- end game area -->
+
+        <!-- ── Chat bar — multiplayer only ── -->
+        <Border Grid.Row="1"
+                Visibility="{Binding IsChatAvailable, Converter={StaticResource BoolToVis}}"
+                Height="178"
+                Background="{DynamicResource Brush.MainPanelGradient}"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="0,1,0,0"
+                Effect="{StaticResource Effect.PanelShadow}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>  <!-- tabs -->
+                    <RowDefinition Height="*"/>     <!-- messages -->
+                    <RowDefinition Height="Auto"/>  <!-- input -->
+                </Grid.RowDefinitions>
+
+                <!-- ── Channel tabs ── -->
+                <Border Grid.Row="0"
+                        BorderBrush="{DynamicResource Brush.Gold}"
+                        BorderThickness="0,0,0,1"
+                        Padding="12,8,12,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource ChatTabBtn}"
+                                Background="{Binding BgGeneral}"
+                                Command="{Binding SetChannelGeneralCommand}"
+                                Content="{Binding TblChatAll}"/>
+                        <Button Style="{StaticResource ChatTabBtn}"
+                                Background="{Binding BgRoom}"
+                                Command="{Binding SetChannelRoomCommand}"
+                                Content="{Binding TblChatRoom}"/>
+                        <Button Style="{StaticResource ChatTabBtn}"
+                                Background="{Binding BgGlobal}"
+                                Command="{Binding SetChannelGlobalCommand}"
+                                Foreground="#FFD700"
+                                Content="{Binding TblChatGlobal}"/>
+                        <Button Style="{StaticResource ChatTabBtn}"
+                                Background="{Binding BgParty}"
+                                Command="{Binding SetChannelPartyCommand}"
+                                Foreground="#4FC3F7"
+                                Content="{Binding TblChatParty}"/>
+                        <Button Style="{StaticResource ChatTabBtn}"
+                                Background="{Binding BgWhisper}"
+                                Command="{Binding SetChannelWhisperCommand}"
+                                Foreground="#CE93D8"
+                                Content="{Binding TblChatWhisper}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Message area ── -->
+                <Border Grid.Row="1"
+                        Background="#AA05080B"
+                        BorderBrush="{DynamicResource Brush.Gold}"
+                        BorderThickness="0,0,0,1"
+                        Padding="14,6">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding ChatMessages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Text}"
+                                               Foreground="{Binding Foreground}"
+                                               FontFamily="Georgia" FontSize="13"
+                                               TextWrapping="Wrap" Margin="0,2"
+                                               Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
+                                        <TextBlock.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="{Binding PlacementTarget.Tag.TblFriendRequestLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          Command="{Binding PlacementTarget.Tag.SendFriendRequestCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext.Sender, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                    <MenuItem.Visibility>
+                                                        <MultiBinding Converter="{StaticResource NotFriendToVis}">
+                                                            <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                                            <Binding Path="PlacementTarget.DataContext.Sender" RelativeSource="{RelativeSource AncestorType=ContextMenu}"/>
+                                                        </MultiBinding>
+                                                    </MenuItem.Visibility>
+                                                </MenuItem>
+                                                <Separator/>
+                                                <MenuItem Header="{Binding PlacementTarget.Tag.TblBlockCharacterLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          Command="{Binding PlacementTarget.Tag.BlockCharacterCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext.Sender, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                            </ContextMenu>
+                                        </TextBlock.ContextMenu>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- ── Input row ── -->
+                <Grid Grid.Row="2" Margin="12,8,12,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>  <!-- whisper target (conditional) -->
+                        <RowDefinition Height="Auto"/>  <!-- text input + send -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Whisper target (whisper mode only) -->
+                    <Grid Grid.Row="0" Margin="0,0,0,4"
+                          Visibility="{Binding IsWhisperMode, Converter={StaticResource BoolToVis}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="☽  To:"
+                                   Foreground="#CE93D8"
+                                   FontFamily="Georgia" FontSize="13"
+                                   VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding WhisperTarget, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="{DynamicResource Brush.PanelDark}"
+                                 BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                 Foreground="#CE93D8" FontFamily="Georgia" FontSize="13"
+                                 Padding="8,3"/>
+                    </Grid>
+
+                    <!-- Chat input + send -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>   <!-- + button -->
+                            <ColumnDefinition Width="*"/>    <!-- text input -->
+                            <ColumnDefinition Width="100"/>  <!-- send button -->
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0"
+                                Content="+"
+                                Background="{DynamicResource Brush.PanelDark}"
+                                BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                Foreground="{DynamicResource Brush.GoldSoft}"
+                                FontSize="18" Margin="0,0,8,0"/>
+
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="500"
+                                 Background="{DynamicResource Brush.PanelDark}"
+                                 BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                 Foreground="{DynamicResource Brush.Foreground}"
+                                 FontFamily="Georgia" FontSize="14"
+                                 Padding="12,0" VerticalContentAlignment="Center">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding SendChatCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <Button Grid.Column="2"
+                                Content="{Binding TblChatSend}"
+                                Command="{Binding SendChatCommand}"
+                                Background="{DynamicResource Brush.BlueActive}"
+                                BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
+                                Foreground="{DynamicResource Brush.GoldSoft}"
+                                FontFamily="Georgia" FontSize="14"
+                                Margin="8,0,0,0"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

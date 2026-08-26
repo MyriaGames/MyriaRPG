@@ -1,0 +1,282 @@
+﻿<UserControl x:Class="Myria.Wpf.View.UserControls.CharacterMenuWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:beh="clr-namespace:Myria.Wpf.Model.Behaviors"
+             mc:Ignorable="d"
+             d:DesignHeight="720"
+             d:DesignWidth="1120">
+
+
+    <Grid Canvas.Left="{Binding Left}"
+          Canvas.Top="{Binding Top}"
+          Panel.ZIndex="{Binding ZIndex}"
+          Width="{Binding Width}"
+          Height="{Binding Height}"
+          MinWidth="900"
+          MinHeight="600"
+          Name="Grid">
+
+        <Border Margin="10"
+                BorderBrush="{DynamicResource Brush.Gold}"
+                BorderThickness="1"
+                Background="{DynamicResource Brush.WindowBackgroundGradient}"
+                Effect="{DynamicResource Effect.WindowShadow}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="96"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="&#x265C;"
+                           FontFamily="Segoe UI Symbol"
+                           FontSize="260"
+                           Foreground="{DynamicResource Brush.Panel}"
+                           Opacity="0.25"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Top"
+                           Margin="0,20,30,0"/>
+
+                <Border Grid.Row="0"
+                        Background="{DynamicResource Brush.WindowPanelGradient}"
+                        BorderBrush="{DynamicResource Brush.Gold}"
+                        BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Thumb x:Name="DragThumb" Opacity="0">
+                            <i:Interaction.Behaviors>
+                                <beh:DragThumbToCommandBehavior Command="{Binding DragDeltaCommand}" />
+                            </i:Interaction.Behaviors>
+                            <Thumb.Template>
+                                <ControlTemplate TargetType="Thumb">
+                                    <Rectangle Fill="Transparent"/>
+                                </ControlTemplate>
+                            </Thumb.Template>
+                        </Thumb>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="66"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0" Margin="16,8">
+                                <Border Background="{DynamicResource Brush.PanelDark}"
+                                        BorderBrush="{DynamicResource Brush.Gold}"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        RenderTransformOrigin="0.5,0.5">
+                                    <Border.RenderTransform>
+                                        <RotateTransform Angle="45"/>
+                                    </Border.RenderTransform>
+                                </Border>
+
+                                <Border Width="76"
+                                        Height="76"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Background="{DynamicResource Brush.BlueActive}"
+                                        BorderBrush="{DynamicResource Brush.Gold}"
+                                        BorderThickness="2"
+                                        CornerRadius="8">
+                                    <Grid>
+                                        <TextBlock Text="&#x265B;"
+                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                   FontFamily="Segoe UI Symbol"
+                                                   FontSize="22"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Top"
+                                                   Margin="0,7,0,0"/>
+                                        <TextBlock Text="&#x265E;"
+                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                   FontFamily="Segoe UI Symbol"
+                                                   FontSize="40"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,8,0,0"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <UniformGrid Grid.Column="1" Rows="1">
+                                <Button Style="{StaticResource TopNavCharacterButton}"
+                                        Tag="&#x265E;" Content="{Binding NavCharacter}"
+                                        Command="{Binding OpenOverviewCommand}"/>
+                                <Button Style="{StaticResource TopNavQuestsButton}"
+                                        Tag="&#x270E;" Content="{Binding NavQuests}"
+                                        Command="{Binding OpenQuestsCommand}"/>
+                                <Button Style="{StaticResource TopNavInventoryButton}"
+                                        Tag="&#x25C8;" Content="{Binding NavInventory}"
+                                        Command="{Binding OpenInventoryCommand}"/>
+                                <Button Style="{StaticResource TopNavSocialButton}"
+                                        Tag="&#x26AD;" Content="{Binding NavFriends}"
+                                        Command="{Binding OpenFriendsCommand}"
+                                        Visibility="{Binding IsChatAvailable, Converter={StaticResource BoolToVis}}"/>
+                                <Button Style="{StaticResource TopNavMapButton}"
+                                        Tag="&#x2726;" Content="{Binding NavMap}"
+                                        Command="{Binding OpenMapCommand}"/>
+                                <Button Style="{StaticResource TopNavSettingsButton}"
+                                        Tag="&#x2699;" Content="{Binding NavSettings}"
+                                        Command="{Binding OpenSettingsCommand}"/>
+                            </UniformGrid>
+
+                            <Button Grid.Column="2"
+                                    Content="&#x2715;"
+                                    Command="{Binding CloseCommand}"
+                                    Style="{StaticResource WindowCloseButton}"
+                                    ToolTip="Close"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="1" Margin="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding SideColumnWidth}"/>
+                        <ColumnDefinition Width="{Binding SideGutterWidth}"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            BorderBrush="{DynamicResource Brush.Gold}"
+                            BorderThickness="1"
+                            Background="{DynamicResource Brush.WindowPanelGradient}"
+                            Visibility="{Binding SideNavigationVisibility}">
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="170"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Margin="0,14,0,0">
+                                <StackPanel Visibility="{Binding CharacterSideVisibility}">
+                                    <Button Style="{StaticResource SideNavOverviewButton}"
+                                            Tag="&#x265E;"
+                                            Content="{Binding NavOverview}"
+                                            Command="{Binding OpenOverviewCommand}"/>
+                                    <Button Style="{StaticResource SideNavSkillsButton}"
+                                            Tag="&#x2726;"
+                                            Content="{Binding NavSkills}"
+                                            Command="{Binding OpenSkillsCommand}"/>
+                                    <Button Style="{StaticResource SideNavJobsButton}"
+                                            Tag="&#x2692;"
+                                            Content="{Binding NavJobs}"
+                                            Command="{Binding OpenJobsCommand}"/>
+                                </StackPanel>
+
+                                <StackPanel Visibility="{Binding QuestsSideVisibility}">
+                                    <Button Style="{StaticResource SideNavQuestsButton}"
+                                            Tag="&#x270E;"
+                                            Content="{Binding NavQuests}"
+                                            Command="{Binding OpenQuestsCommand}"/>
+                                    <Button Style="{StaticResource SideNavJobsButton}"
+                                            Tag="&#x2692;"
+                                            Content="{Binding NavJobs}"
+                                            Command="{Binding OpenJobsCommand}"/>
+                                </StackPanel>
+
+                                <StackPanel Visibility="{Binding SocialSideVisibility}">
+                                    <Button Style="{StaticResource SideNavFriendsButton}"
+                                            Tag="👥"
+                                            Content="{Binding NavFriends}"
+                                            Command="{Binding SelectFriendsTabCommand}"/>
+                                    <Button Style="{StaticResource SideNavRequestsButton}"
+                                            Tag="📨"
+                                            Content="{Binding NavRequests}"
+                                            Command="{Binding SelectRequestsTabCommand}"/>
+                                    <Button Style="{StaticResource SideNavBlockedButton}"
+                                            Tag="🚫"
+                                            Content="{Binding NavBlocked}"
+                                            Command="{Binding SelectBlockedTabCommand}"/>
+                                    <Button Style="{StaticResource SideNavGuildButton}"
+                                            Tag="⚔"
+                                            Content="{Binding NavGuild}"
+                                            Command="{Binding OpenGuildCommand}"/>
+                                </StackPanel>
+
+                                <StackPanel Visibility="{Binding InventorySideVisibility}">
+                                    <Button Style="{StaticResource SideNavInventoryButton}"
+                                            Tag="&#x25C8;"
+                                            Content="{Binding NavInventory}"
+                                            Command="{Binding OpenInventoryCommand}"/>
+                                    <Button Style="{StaticResource SideNavCharacterButton}"
+                                            Tag="&#x265E;"
+                                            Content="{Binding NavCharacter}"
+                                            Command="{Binding OpenCharacterCommand}"/>
+                                </StackPanel>
+
+                                <StackPanel Visibility="{Binding SettingsSideVisibility}">
+                                    <Button Style="{StaticResource SideNavVisualsButton}"
+                                            Tag="&#x25D0;"
+                                            Content="{Binding NavVisuals}"
+                                            Command="{Binding OpenVisualsCommand}"/>
+                                    <Button Style="{StaticResource SideNavKeybindingsButton}"
+                                            Tag="&#x2328;"
+                                            Content="{Binding NavKeybindings}"
+                                            Command="{Binding OpenKeybindingsCommand}"/>
+                                    <Button Style="{StaticResource SideNavModsButton}"
+                                            Tag="🧩"
+                                            Content="{Binding NavMods}"
+                                            Command="{Binding OpenModsCommand}"/>
+                                    <Button Style="{StaticResource SideNavButton}"
+                                            Tag="&#x265E;"
+                                            Content="{Binding NavCharSelect}"
+                                            Command="{Binding OpenCharacterSelectionCommand}"/>
+                                    <Button Style="{StaticResource SideNavButton}"
+                                            Tag="&#x2302;"
+                                            Content="{Binding NavMainMenu}"
+                                            Command="{Binding OpenMainMenuCommand}"/>
+                                    <Button Style="{StaticResource SideNavButton}"
+                                            Tag="&#x2713;"
+                                            Content="{Binding NavSave}"
+                                            Command="{Binding SaveCommand}"/>
+                                    <Button Style="{StaticResource SideNavButton}"
+                                            Tag="&#x23FB;"
+                                            Content="{Binding NavSaveQuit}"
+                                            Command="{Binding SaveAndQuitCommand}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="&#x2726;"
+                                           Foreground="{DynamicResource Brush.Gold}"
+                                           FontFamily="Segoe UI Symbol"
+                                           FontSize="52"
+                                           HorizontalAlignment="Center"/>
+                                <Rectangle Width="110" Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.65" Margin="0,12,0,12"/>
+                                <TextBlock Text="{Binding SidebarQuote}"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Georgia"
+                                           FontSize="13"
+                                           FontStyle="Italic"
+                                           TextAlignment="Center"
+                                           Width="170"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="2"
+                            BorderBrush="{DynamicResource Brush.Gold}"
+                            BorderThickness="1"
+                            Background="{DynamicResource Brush.Background}">
+                        <Frame Name="Frame"
+                               NavigationUIVisibility="Hidden"
+                               Background="Transparent"
+                               ClipToBounds="True"/>
+                    </Border>
+
+                </Grid>
+            </Grid>
+        </Border>
+
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="PreviewMouseDown">
+                <i:InvokeCommandAction Command="{Binding FocusCommand}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+    </Grid>
+</UserControl>

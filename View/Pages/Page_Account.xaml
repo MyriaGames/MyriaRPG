@@ -1,0 +1,215 @@
+<Page x:Class="Myria.Wpf.View.Pages.Page_Account"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="600" d:DesignWidth="520"
+      Title="Page_Account">
+
+    <Page.Resources>
+        <Style x:Key="AccPanel" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Brush.MainPanelGradient}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+            <Setter Property="Effect" Value="{StaticResource Effect.PanelShadow}"/>
+        </Style>
+
+        <Style x:Key="AccSectionTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <Style x:Key="AccLabelText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="AccMessageText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Error}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="MinHeight" Value="16"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+
+        <Style x:Key="AccWarningText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Muted}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <Style x:Key="AccTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource Brush.Foreground}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccButton" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccDeleteButton" TargetType="Button" BasedOn="{StaticResource AccButton}">
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Error}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Error}"/>
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="4">
+            <TextBlock Text="{Binding TblTitle}"
+                       Foreground="{DynamicResource Brush.GoldSoft}"
+                       FontFamily="Georgia"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Margin="0,0,0,16"/>
+
+            <!-- Change username -->
+            <Border Style="{StaticResource AccPanel}">
+                <StackPanel>
+                    <TextBlock Text="{Binding TblUsernameSection}" Style="{StaticResource AccSectionTitle}"/>
+
+                    <TextBlock Text="{Binding TblNewUsername}" Style="{StaticResource AccLabelText}"/>
+                    <TextBox Text="{Binding NewUsername, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource AccTextBox}"/>
+
+                    <TextBlock Text="{Binding TblCurrentPassword}" Style="{StaticResource AccLabelText}"/>
+                    <PasswordBox x:Name="pbx_CurrentPasswordForUsername" Style="{StaticResource AccPasswordBox}"/>
+
+                    <TextBlock Text="{Binding tblUsernameMsg}" Style="{StaticResource AccMessageText}"/>
+
+                    <Button Content="{Binding TblChangeUsernameBtn}"
+                            Command="{Binding ChangeUsername}"
+                            Style="{StaticResource AccButton}"
+                            Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Change password -->
+            <Border Style="{StaticResource AccPanel}">
+                <StackPanel>
+                    <TextBlock Text="{Binding TblPasswordSection}" Style="{StaticResource AccSectionTitle}"/>
+
+                    <TextBlock Text="{Binding TblOldPassword}" Style="{StaticResource AccLabelText}"/>
+                    <PasswordBox x:Name="pbx_OldPassword" Style="{StaticResource AccPasswordBox}"/>
+
+                    <TextBlock Text="{Binding TblNewPassword}" Style="{StaticResource AccLabelText}"/>
+                    <PasswordBox x:Name="pbx_NewPassword" Style="{StaticResource AccPasswordBox}"/>
+
+                    <TextBlock Text="{Binding TblConfirmNewPassword}" Style="{StaticResource AccLabelText}"/>
+                    <PasswordBox x:Name="pbx_ConfirmNewPassword" Style="{StaticResource AccPasswordBox}"/>
+
+                    <TextBlock Text="{Binding tblPasswordMsg}" Style="{StaticResource AccMessageText}"/>
+
+                    <Button Content="{Binding TblChangePasswordBtn}"
+                            Command="{Binding ChangePassword}"
+                            Style="{StaticResource AccButton}"
+                            Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Delete account -->
+            <Border Style="{StaticResource AccPanel}">
+                <StackPanel>
+                    <TextBlock Text="{Binding TblDeleteSection}" Style="{StaticResource AccSectionTitle}"/>
+                    <TextBlock Text="{Binding TblDeleteWarning}" Style="{StaticResource AccWarningText}"/>
+
+                    <TextBlock Text="{Binding TblCurrentPassword}" Style="{StaticResource AccLabelText}"/>
+                    <PasswordBox x:Name="pbx_DeletePassword" Style="{StaticResource AccPasswordBox}"/>
+
+                    <TextBlock Text="{Binding tblDeleteMsg}" Style="{StaticResource AccMessageText}"/>
+
+                    <Button Content="{Binding TblDeleteAccountBtn}"
+                            Command="{Binding DeleteAccount}"
+                            Style="{StaticResource AccDeleteButton}"
+                            Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

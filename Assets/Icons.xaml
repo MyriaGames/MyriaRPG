@@ -1,0 +1,975 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:selectors="clr-namespace:Myria.Wpf.View.Selectors">
+
+    <selectors:IconTemplateSelector x:Key="ItemIconTemplateSelector"/>
+
+    <!-- Default Icon -->
+    <DataTemplate x:Key="Icon.Default">
+        <Viewbox>
+            <Grid Width="512" Height="512">
+                <Grid.Resources>
+                    <LinearGradientBrush x:Key="frameGrad" StartPoint="0.2,0.2" EndPoint="0.8,0.8">
+                        <GradientStop Offset="0" Color="#3a3f4a"/>
+                        <GradientStop Offset="1" Color="#161a22"/>
+                    </LinearGradientBrush>
+                    <RadialGradientBrush x:Key="bgGrad" Center="0.5,0.45" GradientOrigin="0.5,0.45" RadiusX="0.65" RadiusY="0.65">
+                        <GradientStop Offset="0" Color="#2c3140"/>
+                        <GradientStop Offset="1" Color="#11141b"/>
+                    </RadialGradientBrush>
+                    <LinearGradientBrush x:Key="crystalGrad" StartPoint="0.4,0.27" EndPoint="0.62,0.7">
+                        <GradientStop Offset="0" Color="#cfd6e6"/>
+                        <GradientStop Offset="0.5" Color="#7f8aa3"/>
+                        <GradientStop Offset="1" Color="#3e4658"/>
+                    </LinearGradientBrush>
+                </Grid.Resources>
+
+                <!-- Outer Frame -->
+                <Rectangle Canvas.Left="56" Canvas.Top="56" Width="400" Height="400" RadiusX="64" RadiusY="64"
+                           Fill="{StaticResource frameGrad}" Stroke="#0a0d12" StrokeThickness="14"/>
+
+                <!-- Inner Panel -->
+                <Rectangle Canvas.Left="96" Canvas.Top="96" Width="320" Height="320" RadiusX="40" RadiusY="40"
+                           Fill="{StaticResource bgGrad}" Stroke="#0f1218" StrokeThickness="8"/>
+
+                <!-- Subtle glow ring -->
+                <Ellipse Width="220" Height="220" Stroke="#ffffff" StrokeThickness="16" Opacity="0.06"/>
+
+                <!-- Generic Item Crystal -->
+                <Grid>
+                    <Path Data="M256 148 L330 210 L306 336 L256 380 L206 336 L182 210 Z"
+                          Fill="{StaticResource crystalGrad}" Stroke="#0c0f14" StrokeThickness="10" StrokeLineJoin="Round">
+                        <Path.Effect>
+                            <DropShadowEffect ShadowDepth="10" BlurRadius="10" Opacity="0.35" Direction="270"/>
+                        </Path.Effect>
+                    </Path>
+
+                    <!-- Facets -->
+                    <Path Data="M256 148 L232 230 L182 210 Z" Fill="#ffffff" Opacity="0.18"/>
+                    <Path Data="M256 148 L330 210 L280 230 Z" Fill="#000000" Opacity="0.18"/>
+                    <Path Data="M206 336 L256 380 L306 336 Z" Fill="#000000" Opacity="0.15"/>
+
+                    <!-- Highlight -->
+                    <Path Data="M230 220 C250 200, 280 200, 300 220" Stroke="#ffffff" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.25"/>
+                </Grid>
+            </Grid>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Iron Ore Icon -->
+    <DataTemplate x:Key="Icon.iron_ore">
+        <Viewbox>
+            <Grid Width="512" Height="512">
+                <Grid.Resources>
+                    <LinearGradientBrush x:Key="RockGradient" StartPoint="0.17,0.17" EndPoint="0.82,0.86">
+                        <GradientStop Offset="0" Color="#6b6f7a"/>
+                        <GradientStop Offset="0.55" Color="#3f434c"/>
+                        <GradientStop Offset="1" Color="#24262b"/>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="RustGradient" StartPoint="0.27,0.27" EndPoint="0.8,0.82">
+                        <GradientStop Offset="0" Color="#b04a2a"/>
+                        <GradientStop Offset="0.6" Color="#7d2f1a"/>
+                        <GradientStop Offset="1" Color="#541c10"/>
+                    </LinearGradientBrush>
+                </Grid.Resources>
+
+                <Ellipse Width="340" Height="76" Margin="98,411,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#000" Opacity="0.12"/>
+
+                <Path Data="M138 176 L220 110 L334 126 L404 214 L386 340 L284 418 L168 386 L112 276 Z"
+                      Fill="{StaticResource RockGradient}" Stroke="#14151a" StrokeThickness="10" StrokeLineJoin="Round">
+                    <Path.Effect>
+                        <DropShadowEffect ShadowDepth="10" BlurRadius="20" Opacity="0.25" Direction="270"/>
+                    </Path.Effect>
+                </Path>
+
+                <Path Data="M220 110 L206 186 L138 176 Z" Fill="#7a7f8c" Opacity="0.65"/>
+                <Path Data="M334 126 L306 206 L206 186 L220 110 Z" Fill="#5b5f6b" Opacity="0.85"/>
+                <Path Data="M404 214 L306 206 L334 126 Z" Fill="#4b4f5a" Opacity="0.9"/>
+                <Path Data="M386 340 L314 318 L404 214 Z" Fill="#2f323a" Opacity="0.95"/>
+                <Path Data="M284 418 L314 318 L386 340 Z" Fill="#3a3d46" Opacity="0.9"/>
+                <Path Data="M168 386 L210 304 L314 318 L284 418 Z" Fill="#4a4e59" Opacity="0.85"/>
+                <Path Data="M112 276 L210 304 L168 386 Z" Fill="#3a3e48" Opacity="0.9"/>
+
+                <Grid>
+                    <Grid.Clip>
+                        <PathGeometry Figures="M138 176 L220 110 L334 126 L404 214 L386 340 L284 418 L168 386 L112 276 Z"/>
+                    </Grid.Clip>
+                    <Path Data="M165 245 C205 190, 255 210, 290 170 C330 125, 380 155, 395 215 C410 275, 350 310, 305 295 C260 280, 245 330, 195 315 C145 300, 140 275, 165 245 Z"
+                          Fill="{StaticResource RustGradient}" Opacity="0.9"/>
+                    <Path Data="M150 320 C180 300, 210 320, 230 355 C250 390, 210 415, 175 395 C140 375, 125 345, 150 320 Z"
+                          Fill="#a43f24" Opacity="0.75"/>
+                    <Ellipse Width="40" Height="40" Margin="310,240,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#8d331d" Opacity="0.75"/>
+                    <Ellipse Width="24" Height="24" Margin="343,218,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#c65a33" Opacity="0.65"/>
+                </Grid>
+            </Grid>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Upgrade Stone Icon -->
+    <DataTemplate x:Key="Icon.upgrade_stone">
+        <Viewbox>
+            <Grid Width="512" Height="512">
+                <Grid.Resources>
+                    <LinearGradientBrush x:Key="StoneGradient" StartPoint="0.27,0.17" EndPoint="0.76,0.86">
+                        <GradientStop Offset="0" Color="#8f7cff"/>
+                        <GradientStop Offset="0.55" Color="#4a3fb8"/>
+                        <GradientStop Offset="1" Color="#251f63"/>
+                    </LinearGradientBrush>
+                    <RadialGradientBrush x:Key="GlowGradient" Center="0.42,0.38" GradientOrigin="0.42,0.38" RadiusX="0.6" RadiusY="0.6">
+                        <GradientStop Offset="0" Color="#F2e9e6ff"/>
+                        <GradientStop Offset="0.35" Color="#A6b6abff"/>
+                        <GradientStop Offset="1" Color="#006a5cff"/>
+                    </RadialGradientBrush>
+                    <LinearGradientBrush x:Key="FacetHiGradient" StartPoint="0.33,0.25" EndPoint="0.66,0.58">
+                        <GradientStop Offset="0" Color="#8Cffffff"/>
+                        <GradientStop Offset="1" Color="#00ffffff"/>
+                    </LinearGradientBrush>
+                </Grid.Resources>
+
+                <Ellipse Width="340" Height="68" Margin="86,422,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#000" Opacity="0.12"/>
+
+                <Path Data="M256 74 L344 128 L410 236 L356 378 L256 448 L156 378 L102 236 L168 128 Z"
+                      Fill="{StaticResource StoneGradient}" Stroke="#16152a" StrokeThickness="10" StrokeLineJoin="Round">
+                    <Path.Effect>
+                        <DropShadowEffect ShadowDepth="10" BlurRadius="20" Opacity="0.25" Direction="270"/>
+                    </Path.Effect>
+                </Path>
+
+                <Path Data="M256 86 L336 136 L396 236 L348 366 L256 434 L164 366 L116 236 L176 136 Z"
+                      Stroke="#59bdb2ff" StrokeThickness="8" StrokeLineJoin="Round">
+                    <Path.Effect>
+                        <BlurEffect Radius="12"/>
+                    </Path.Effect>
+                </Path>
+
+                <Path Data="M256 74 L244 176 L168 128 Z" Fill="#a79aff" Opacity="0.55"/>
+                <Path Data="M256 74 L344 128 L268 176 Z" Fill="#7666f0" Opacity="0.7"/>
+                <Path Data="M344 128 L410 236 L310 226 Z" Fill="#5a4ad0" Opacity="0.8"/>
+                <Path Data="M410 236 L356 378 L302 300 Z" Fill="#3b31a7" Opacity="0.9"/>
+                <Path Data="M356 378 L256 448 L276 318 Z" Fill="#4a3fb8" Opacity="0.85"/>
+                <Path Data="M256 448 L156 378 L236 318 Z" Fill="#5d4fe0" Opacity="0.75"/>
+                <Path Data="M156 378 L102 236 L210 300 Z" Fill="#3a319e" Opacity="0.9"/>
+                <Path Data="M102 236 L168 128 L202 226 Z" Fill="#6b5cf0" Opacity="0.78"/>
+
+                <Grid>
+                    <Grid.Clip>
+                        <PathGeometry Figures="M256 74 L344 128 L410 236 L356 378 L256 448 L156 378 L102 236 L168 128 Z"/>
+                    </Grid.Clip>
+                    <Rectangle Margin="80,60,0,0" Width="360" Height="420" Fill="{StaticResource GlowGradient}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="12" Height="12" Margin="224,164,0,0" Fill="#ffffff" Opacity="0.7" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="8" Height="8" Margin="301,206,0,0" Fill="#ffffff" Opacity="0.6" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="10" Height="10" Margin="255,265,0,0" Fill="#ffffff" Opacity="0.45" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="7" Height="7" Margin="206.5,306.5,0,0" Fill="#ffffff" Opacity="0.5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </Grid>
+
+                <Path Data="M176 136 C210 120, 246 120, 286 140 C248 176, 212 220, 202 266 C178 238, 156 192, 156 170 C156 154, 164 144, 176 136 Z"
+                      Fill="{StaticResource FacetHiGradient}" Opacity="0.9"/>
+
+                <Path Data="M168 128 L244 176 L202 226 L168 128 Z" Fill="#000" Opacity="0.12"/>
+            </Grid>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Pickaxe Icon -->
+    <DataTemplate x:Key="Icon.pickaxe">
+        <Viewbox>
+            <Grid Width="512" Height="512">
+                <Grid.Resources>
+                    <LinearGradientBrush x:Key="wood" StartPoint="0.35,0.92" EndPoint="0.64,0.16">
+                        <GradientStop Offset="0" Color="#7a3f22"/>
+                        <GradientStop Offset="0.55" Color="#b16739"/>
+                        <GradientStop Offset="1" Color="#e0a063"/>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="woodHi" StartPoint="0.41,0.84" EndPoint="0.59,0.23">
+                        <GradientStop Offset="0" Color="#00ffffff"/>
+                        <GradientStop Offset="0.4" Color="#2effffff"/>
+                        <GradientStop Offset="1" Color="#00ffffff"/>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="metal" StartPoint="0.18,0.23" EndPoint="0.82,0.51">
+                        <GradientStop Offset="0" Color="#eef3f8"/>
+                        <GradientStop Offset="0.45" Color="#a3afbc"/>
+                        <GradientStop Offset="1" Color="#5b6775"/>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="edge" StartPoint="0.23,0.27" EndPoint="0.84,0.51">
+                        <GradientStop Offset="0" Color="#2e343c"/>
+                        <GradientStop Offset="1" Color="#12151a"/>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="grip" StartPoint="0.41,0.9" EndPoint="0.61,0.64">
+                        <GradientStop Offset="0" Color="#2a2d33"/>
+                        <GradientStop Offset="1" Color="#0e1014"/>
+                    </LinearGradientBrush>
+                </Grid.Resources>
+
+                <Ellipse Width="300" Height="56" Margin="106,434,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#000" Opacity="0.12"/>
+
+                <Grid RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <RotateTransform Angle="45"/>
+                    </Grid.RenderTransform>
+
+                    <!-- Handle -->
+                    <Grid>
+                        <Path Data="M238 462 C248 472, 264 472, 274 462 L298 438 L292 174 C292 154, 276 140, 256 140 C236 140, 220 154, 220 174 L214 438 Z"
+                              Fill="{StaticResource wood}" Stroke="#1a120c" StrokeThickness="10" StrokeLineJoin="Round">
+                            <Path.Effect>
+                                <DropShadowEffect ShadowDepth="10" BlurRadius="10" Opacity="0.25" Direction="270"/>
+                            </Path.Effect>
+                        </Path>
+
+                        <Path Data="M246 452 L270 428 L266 184 C266 170, 262 162, 256 158 C250 162, 246 170, 246 184 L242 428 Z"
+                              Fill="{StaticResource woodHi}"/>
+
+                        <Path Data="M212 420 L300 420 L300 468 C300 486, 285 500, 267 500 L245 500 C227 500, 212 486, 212 468 Z"
+                              Fill="{StaticResource grip}" Stroke="#0a0b0f" StrokeThickness="10" StrokeLineJoin="Round"/>
+
+                        <Path Data="M226 436 H286" Stroke="#ffffff" Opacity="0.12" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <Path Data="M226 456 H286" Stroke="#ffffff" Opacity="0.10" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <Path Data="M226 476 H286" Stroke="#ffffff" Opacity="0.08" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                    </Grid>
+
+                    <!-- Head -->
+                    <Grid>
+                        <Path Data="M216 164 H296 C312 164, 324 176, 324 192 V216 C324 232, 312 244, 296 244 H216 C200 244, 188 232, 188 216 V192 C188 176, 200 164, 216 164 Z"
+                              Fill="#2b3139" Stroke="#111419" StrokeThickness="10" StrokeLineJoin="Round">
+                            <Path.Effect>
+                                <DropShadowEffect ShadowDepth="6" BlurRadius="6" Opacity="0.22" Direction="270"/>
+                            </Path.Effect>
+                        </Path>
+
+                        <Path Data="M90 210 C84 194, 92 176, 110 170 C170 150, 228 154, 256 176 C284 154, 342 150, 402 170 C420 176, 428 194, 422 210 C416 226, 396 234, 380 228 C338 214, 296 214, 276 232 C268 240, 262 248, 256 260 C250 248, 244 240, 236 232 C216 214, 174 214, 132 228 C116 234, 96 226, 90 210 Z"
+                              Fill="{StaticResource metal}" Stroke="#16181d" StrokeThickness="10" StrokeLineJoin="Round"/>
+
+                        <Path Data="M104 206 C142 188, 190 180, 224 190"
+                              Stroke="{StaticResource edge}" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.9"/>
+
+                        <Path Data="M408 206 C370 188, 322 180, 288 190"
+                              Stroke="{StaticResource edge}" StrokeThickness="12" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.9"/>
+
+                        <Path Data="M118 186 C176 168, 226 170, 256 190 C286 170, 336 168, 394 186"
+                              Stroke="#ffffff" Opacity="0.22" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Shadow Remnant Icon -->
+    <DataTemplate x:Key="Icon.shadow_remnant">
+        <Viewbox>
+            <Grid Width="512" Height="512">
+                <Grid.Resources>
+                    <RadialGradientBrush x:Key="core" Center="0.42,0.36" GradientOrigin="0.42,0.36" RadiusX="0.7" RadiusY="0.7">
+                        <GradientStop Offset="0" Color="#2b2d3a"/>
+                        <GradientStop Offset="0.45" Color="#141523"/>
+                        <GradientStop Offset="1" Color="#070711"/>
+                    </RadialGradientBrush>
+                    <LinearGradientBrush x:Key="sheen" StartPoint="0.31,0.23" EndPoint="0.7,0.74">
+                        <GradientStop Offset="0" Color="#8Cb9a6ff"/>
+                        <GradientStop Offset="0.35" Color="#387a5cff"/>
+                        <GradientStop Offset="1" Color="#00000000"/>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="aura" StartPoint="0.25,0.23" EndPoint="0.76,0.82">
+                        <GradientStop Offset="0" Color="#8Cb89cff"/>
+                        <GradientStop Offset="0.55" Color="#406a4cff"/>
+                        <GradientStop Offset="1" Color="#00000000"/>
+                    </LinearGradientBrush>
+                </Grid.Resources>
+
+                <Ellipse Width="320" Height="60" Margin="96,426,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#000" Opacity="0.14"/>
+
+                <!-- Aura wisps -->
+                <Grid Opacity="0.95">
+                    <Path Data="M262 84 C310 136, 318 150, 346 190 C382 244, 432 250, 422 292 C410 344, 344 348, 332 396 C316 458, 248 494, 196 470 C146 448, 146 398, 120 356 C90 308, 46 280, 74 226 C104 168, 176 182, 206 138 C230 104, 236 92, 262 84 Z"
+                          Stroke="{StaticResource aura}" StrokeThickness="12" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.75">
+                        <Path.Effect>
+                            <BlurEffect Radius="10"/>
+                        </Path.Effect>
+                    </Path>
+                    <Path Data="M242 104 C286 146, 300 176, 326 206 C358 244, 404 258, 394 288 C382 328, 334 334, 320 372 C302 424, 256 450, 220 438 C178 424, 172 390, 154 360 C132 326, 98 300, 112 258 C126 214, 182 224, 206 188 C224 160, 224 126, 242 104 Z"
+                          Stroke="#389a86ff" StrokeThickness="10" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                </Grid>
+
+                <!-- Core remnant -->
+                <Path Data="M270 70 C306 118, 318 152, 336 176 C364 214, 418 236, 408 280 C396 332, 330 332, 320 380 C308 438, 258 468, 214 452 C162 434, 156 384, 136 350 C112 308, 64 278, 88 232 C112 186, 178 194, 206 154 C230 120, 242 88, 270 70 Z"
+                      Fill="{StaticResource core}" Stroke="#0b0b12" StrokeThickness="10" StrokeLineJoin="Round">
+                    <Path.Effect>
+                        <DropShadowEffect ShadowDepth="12" BlurRadius="12" Opacity="0.35" Direction="270"/>
+                    </Path.Effect>
+                </Path>
+
+                <!-- Internal void sheen + specks -->
+                <Grid>
+                    <Grid.Clip>
+                        <PathGeometry Figures="M270 70 C306 118, 318 152, 336 176 C364 214, 418 236, 408 280 C396 332, 330 332, 320 380 C308 438, 258 468, 214 452 C162 434, 156 384, 136 350 C112 308, 64 278, 88 232 C112 186, 178 194, 206 154 C230 120, 242 88, 270 70 Z"/>
+                    </Grid.Clip>
+                    <Path Data="M190 200 C220 150, 270 150, 300 190 C330 228, 320 260, 350 300 C380 340, 330 380, 300 380 C260 380, 250 340, 210 330 C165 318, 150 250, 190 200 Z"
+                          Fill="{StaticResource sheen}" Opacity="0.95"/>
+
+                    <Path Data="M120 290 C170 260, 230 270, 300 300 C350 322, 390 310, 420 292"
+                          Stroke="#1Ab9a6ff" StrokeThickness="16" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                    <Path Data="M110 340 C170 320, 240 330, 292 352 C330 368, 360 368, 392 356"
+                          Stroke="#1A7a5cff" StrokeThickness="14" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+
+                    <Ellipse Width="11" Height="11" Margin="242.5,206.5,0,0" Fill="#ffffff" Opacity="0.35" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="8" Height="8" Margin="304,234,0,0" Fill="#ffffff" Opacity="0.28" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="7.6" Height="7.6" Margin="214.2,288.2,0,0" Fill="#ffffff" Opacity="0.22" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="10" Height="10" Margin="287,313,0,0" Fill="#ffffff" Opacity="0.18" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Ellipse Width="8.4" Height="8.4" Margin="185.8,355.8,0,0" Fill="#ffffff" Opacity="0.20" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </Grid>
+
+                <Path Data="M262 92 C288 126, 296 150, 312 170 C338 204, 380 224, 372 252"
+                      Stroke="#29ffffff" StrokeThickness="10" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
+            </Grid>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Mage Robe Icon -->
+    <DataTemplate x:Key="Icon.mage_robe">
+        <Viewbox>
+            <Grid Width="512" Height="512">
+                <Grid.Resources>
+                    <LinearGradientBrush x:Key="cloak" StartPoint="0.29,0.23" EndPoint="0.74,0.9">
+                        <GradientStop Offset="0" Color="#7b5cff"/>
+                        <GradientStop Offset="0.55" Color="#3a2b8f"/>
+                        <GradientStop Offset="1" Color="#140f3d"/>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="lining" StartPoint="0.33,0.31" EndPoint="0.64,0.84">
+                        <GradientStop Offset="0" Color="#a58cff"/>
+                        <GradientStop Offset="1" Color="#2b1f6a"/>
+                    </LinearGradientBrush>
+                </Grid.Resources>
+
+                <Path Data="M168 178 C168 126,212 86,256 86 C300 86,344 126,344 178 C344 206,334 228,322 246 C356 284,392 352,396 430 C398 468,368 488,330 492 C292 496,274 478,256 478 C238 478,220 496,182 492 C144 488,114 468,116 430 C120 352,156 284,190 246 C178 228,168 206,168 178 Z"
+                      Fill="{StaticResource cloak}" Stroke="#0a0b10" StrokeThickness="10"/>
+
+                <Path Data="M206 190 C206 150,230 124,256 124 C282 124,306 150,306 190 C306 214,296 236,284 250 C272 264,266 272,256 272 C246 272,240 264,228 250 C216 236,206 214,206 190 Z"
+                      Fill="{StaticResource lining}" Stroke="#0a0b10" StrokeThickness="8"/>
+            </Grid>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Reusable item icon families -->
+    <DataTemplate x:Key="Icon.Potion.Health">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="150" Canvas.Top="422" Width="212" Height="34" Fill="#000000" Opacity="0.18"/>
+                <Rectangle Canvas.Left="218" Canvas.Top="82" Width="76" Height="86" RadiusX="14" RadiusY="14"
+                           Fill="#8a5a32" Stroke="#21150c" StrokeThickness="10"/>
+                <Rectangle Canvas.Left="204" Canvas.Top="116" Width="104" Height="44" RadiusX="16" RadiusY="16"
+                           Fill="#d6a56a" Stroke="#21150c" StrokeThickness="8"/>
+                <Path Data="M176 174 H336 L382 388 C388 422 362 444 328 444 H184 C150 444 124 422 130 388 Z"
+                      Fill="#b5212e" Stroke="#21070a" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M156 274 C206 246 286 248 356 280 L382 388 C388 422 362 444 328 444 H184 C150 444 124 422 130 388 Z"
+                      Fill="#e64250" Opacity="0.9"/>
+                <Path Data="M212 208 C234 188 278 188 300 210" Stroke="#ffd6d9" StrokeThickness="18"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.5"/>
+                <Path Data="M238 298 H274 V250 H302 V286 H350 V314 H302 V350 H274 V322 H238 Z"
+                      Fill="#ffe5e8" Stroke="#551018" StrokeThickness="8" StrokeLineJoin="Round"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Potion.Mana">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="150" Canvas.Top="422" Width="212" Height="34" Fill="#000000" Opacity="0.18"/>
+                <Rectangle Canvas.Left="218" Canvas.Top="82" Width="76" Height="86" RadiusX="14" RadiusY="14"
+                           Fill="#41506d" Stroke="#111827" StrokeThickness="10"/>
+                <Rectangle Canvas.Left="204" Canvas.Top="116" Width="104" Height="44" RadiusX="16" RadiusY="16"
+                           Fill="#98b6e8" Stroke="#111827" StrokeThickness="8"/>
+                <Path Data="M176 174 H336 L382 388 C388 422 362 444 328 444 H184 C150 444 124 422 130 388 Z"
+                      Fill="#1d4ed8" Stroke="#071429" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M156 286 C206 246 284 250 356 282 L382 388 C388 422 362 444 328 444 H184 C150 444 124 422 130 388 Z"
+                      Fill="#38bdf8" Opacity="0.85"/>
+                <Path Data="M214 214 C242 188 286 190 306 218" Stroke="#dff7ff" StrokeThickness="18"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Path Data="M270 236 C244 278 236 300 236 322 C236 354 262 374 292 362 C322 350 328 312 306 286 C292 270 280 252 270 236 Z"
+                      Fill="#e0f2fe" Stroke="#0e3a74" StrokeThickness="8" StrokeLineJoin="Round"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Blade.Dagger">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="142" Canvas.Top="426" Width="248" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M308 64 L354 110 L246 334 L178 376 L220 308 Z"
+                      Fill="#cfd8e3" Stroke="#111827" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M308 64 L326 132 L246 334 L220 308 Z" Fill="#f8fafc" Opacity="0.45"/>
+                <Path Data="M170 336 L238 404" Stroke="#c2883a" StrokeThickness="34"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M148 308 L268 428" Stroke="#2f1a0d" StrokeThickness="16"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M170 336 L238 404" Stroke="#f2c879" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Blade.Sword">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="116" Canvas.Top="430" Width="280" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M316 48 L374 106 L246 352 L188 410 L170 342 Z"
+                      Fill="#b9c5d3" Stroke="#0f172a" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M316 48 L334 132 L246 352 L214 330 Z" Fill="#f8fafc" Opacity="0.48"/>
+                <Path Data="M142 326 L262 446" Stroke="#b7791f" StrokeThickness="24"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M120 354 L218 452" Stroke="#1f2937" StrokeThickness="18"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M166 302 L286 422" Stroke="#d6a84f" StrokeThickness="28"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M190 326 L262 398" Stroke="#fff3c4" StrokeThickness="8"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.5"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Blade.Soul">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="124" Canvas.Top="430" Width="270" Height="34" Fill="#000000" Opacity="0.18"/>
+                <Path Data="M318 50 L382 112 L252 354 L184 418 L166 340 Z"
+                      Fill="#42526e" Stroke="#050712" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M320 72 C344 128 326 208 272 288 C250 320 222 350 190 382"
+                      Stroke="#86f7ff" StrokeThickness="14" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.7"/>
+                <Path Data="M152 314 L280 442" Stroke="#15151f" StrokeThickness="30"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M172 334 L252 414" Stroke="#7dd3fc" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.6"/>
+                <Ellipse Canvas.Left="250" Canvas.Top="190" Width="44" Height="44" Fill="#22d3ee" Opacity="0.45"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Weapon.Bow">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="428" Width="260" Height="34" Fill="#000000" Opacity="0.15"/>
+                <Path Data="M332 72 C214 138 166 258 186 438" Stroke="#8b4a24" StrokeThickness="34"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M332 72 C432 192 412 322 186 438" Stroke="#e7b56d" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Path Data="M332 72 C434 198 410 324 186 438" Stroke="#f8e7bd" StrokeThickness="5"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M164 242 H344" Stroke="#cbd5e1" StrokeThickness="8"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M336 242 L286 216 L294 242 L286 268 Z" Fill="#cbd5e1" Stroke="#111827" StrokeThickness="6" StrokeLineJoin="Round"/>
+                <Path Data="M162 242 L204 222 L198 242 L204 262 Z" Fill="#8b5a2b"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Weapon.Crossbow">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="112" Canvas.Top="426" Width="288" Height="34" Fill="#000000" Opacity="0.15"/>
+                <Path Data="M110 170 C170 116 230 122 256 182 C282 122 342 116 402 170"
+                      Stroke="#8b4a24" StrokeThickness="34" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M116 170 C176 196 214 206 256 206 C298 206 336 196 396 170"
+                      Stroke="#f6d18b" StrokeThickness="7" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M248 170 H264 L284 430 H228 Z"
+                      Fill="#7a3f22" Stroke="#1d130b" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M142 238 H370" Stroke="#cbd5e1" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M362 238 L314 212 L322 238 L314 264 Z" Fill="#e5e7eb" Stroke="#111827" StrokeThickness="6" StrokeLineJoin="Round"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Weapon.Mace">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="128" Canvas.Top="430" Width="260" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M160 388 L354 194" Stroke="#8b5a2b" StrokeThickness="42"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M180 368 L334 214" Stroke="#e0a45b" StrokeThickness="14"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Path Data="M306 88 L394 88 L432 166 L394 244 L306 244 L268 166 Z"
+                      Fill="#7c8794" Stroke="#111827" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M306 88 L336 166 L306 244 L268 166 Z" Fill="#cbd5e1" Opacity="0.32"/>
+                <Path Data="M394 88 L364 166 L394 244 L432 166 Z" Fill="#334155" Opacity="0.35"/>
+                <Path Data="M278 166 H422" Stroke="#e5e7eb" StrokeThickness="8" Opacity="0.35"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Weapon.Staff">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="130" Canvas.Top="430" Width="252" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M174 430 C230 300 276 174 318 78" Stroke="#7c3f1d" StrokeThickness="34"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M200 404 C254 274 290 172 320 92" Stroke="#d29a52" StrokeThickness="9"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Ellipse Canvas.Left="284" Canvas.Top="48" Width="90" Height="90" Fill="#f97316" Stroke="#421307" StrokeThickness="10"/>
+                <Path Data="M330 30 C362 72 350 112 314 132 C326 102 308 84 330 30 Z" Fill="#fed7aa" Opacity="0.75"/>
+                <Path Data="M286 138 C326 164 356 164 394 138" Stroke="#111827" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Weapon.Branch">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="430" Width="260" Height="34" Fill="#000000" Opacity="0.15"/>
+                <Path Data="M160 430 C220 318 264 198 318 72" Stroke="#7a4a28" StrokeThickness="34"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M242 250 C302 228 350 198 388 150" Stroke="#7a4a28" StrokeThickness="24"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M216 312 C178 292 146 260 122 220" Stroke="#7a4a28" StrokeThickness="22"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M342 144 C374 106 422 104 444 122 C416 156 374 166 342 144 Z" Fill="#4ade80" Stroke="#14532d" StrokeThickness="8"/>
+                <Path Data="M118 214 C86 184 88 142 108 118 C140 150 150 188 118 214 Z" Fill="#86efac" Stroke="#14532d" StrokeThickness="8"/>
+                <Path Data="M250 230 C284 202 324 202 344 222 C314 252 280 258 250 230 Z" Fill="#65a30d" Stroke="#14532d" StrokeThickness="8"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Weapon.Gauntlets">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="430" Width="260" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M164 166 H278 L320 246 V362 C320 406 286 440 242 440 H204 C164 440 132 408 132 368 V220 C132 190 142 166 164 166 Z"
+                      Fill="#8b5a2b" Stroke="#1f1309" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M264 170 C316 178 366 212 390 262 L348 294 C326 258 296 236 264 228 Z"
+                      Fill="#cbd5e1" Stroke="#111827" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M168 214 H282" Stroke="#e7b56d" StrokeThickness="16" StrokeStartLineCap="Round"/>
+                <Path Data="M158 262 H300" Stroke="#3f2412" StrokeThickness="12" StrokeStartLineCap="Round"/>
+                <Path Data="M174 316 H300" Stroke="#3f2412" StrokeThickness="12" StrokeStartLineCap="Round"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Tool.Axe">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="130" Canvas.Top="430" Width="252" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M160 426 L340 154" Stroke="#8b4a24" StrokeThickness="38"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M184 398 L318 186" Stroke="#e0a45b" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Path Data="M286 92 C370 82 426 122 444 190 C392 206 340 198 300 166 C286 146 280 122 286 92 Z"
+                      Fill="#cbd5e1" Stroke="#111827" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M278 102 C232 132 218 182 242 232 C292 232 332 206 354 164 C326 160 302 140 278 102 Z"
+                      Fill="#9ca3af" Stroke="#111827" StrokeThickness="10" StrokeLineJoin="Round"/>
+                <Path Data="M302 108 C348 112 386 136 410 178" Stroke="#f8fafc" StrokeThickness="8"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.5"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Armor.Metal">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="122" Canvas.Top="430" Width="268" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M172 120 L226 82 H286 L340 120 L404 180 L356 438 H156 L108 180 Z"
+                      Fill="#8b95a1" Stroke="#111827" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M226 82 L256 172 L286 82 Z" Fill="#dbe4ee" Opacity="0.48"/>
+                <Path Data="M156 178 L220 208 L196 438 H156 L108 180 Z" Fill="#5f6b78" Opacity="0.65"/>
+                <Path Data="M356 178 L292 208 L316 438 H356 L404 180 Z" Fill="#475569" Opacity="0.55"/>
+                <Path Data="M190 250 H322 M184 312 H328 M176 374 H336" Stroke="#111827" StrokeThickness="10" Opacity="0.45"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Armor.Leather">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="124" Canvas.Top="430" Width="264" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M176 122 L226 88 H286 L336 122 L390 186 L344 438 H168 L122 186 Z"
+                      Fill="#8b4a24" Stroke="#1f1309" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M226 88 L256 174 L286 88 Z" Fill="#c47a3d" Opacity="0.62"/>
+                <Path Data="M172 210 C218 236 294 236 340 210" Stroke="#d29a52" StrokeThickness="14"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M188 286 C232 310 282 310 324 286" Stroke="#3f2412" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Ellipse Canvas.Left="228" Canvas.Top="332" Width="20" Height="20" Fill="#e7b56d"/>
+                <Ellipse Canvas.Left="264" Canvas.Top="332" Width="20" Height="20" Fill="#e7b56d"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Armor.Robe">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="430" Width="260" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M176 150 C184 100 220 72 256 72 C292 72 328 100 336 150 L394 436 H302 C282 420 230 420 210 436 H118 Z"
+                      Fill="#667085" Stroke="#111827" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M210 174 C210 126 232 104 256 104 C280 104 302 126 302 174 C302 222 278 260 256 260 C234 260 210 222 210 174 Z"
+                      Fill="#cbd5e1" Stroke="#111827" StrokeThickness="8"/>
+                <Path Data="M178 222 C224 252 288 252 334 222" Stroke="#a7f3d0" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.75"/>
+                <Path Data="M256 272 V420" Stroke="#111827" StrokeThickness="10" Opacity="0.5"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Armor.Cloak">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="124" Canvas.Top="430" Width="264" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M156 440 C170 316 170 176 226 98 C246 74 266 74 286 98 C342 176 342 316 356 440 C320 418 292 416 256 438 C220 416 192 418 156 440 Z"
+                      Fill="#334155" Stroke="#0f172a" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M204 176 C206 126 230 102 256 102 C282 102 306 126 308 176 C288 160 224 160 204 176 Z"
+                      Fill="#0f172a" Stroke="#020617" StrokeThickness="8"/>
+                <Path Data="M178 226 C220 252 292 252 334 226" Stroke="#64748b" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M228 198 H284" Stroke="#d4af37" StrokeThickness="10" StrokeStartLineCap="Round"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Armor.Bone">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="122" Canvas.Top="430" Width="268" Height="34" Fill="#000000" Opacity="0.17"/>
+                <Path Data="M170 128 L226 84 H286 L342 128 L396 192 L352 438 H160 L116 192 Z"
+                      Fill="#51443c" Stroke="#120d0b" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M180 190 C218 156 294 156 332 190" Stroke="#d6c8a8" StrokeThickness="26"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M184 264 C220 236 292 236 328 264" Stroke="#d6c8a8" StrokeThickness="24"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M206 344 H306" Stroke="#d6c8a8" StrokeThickness="22" StrokeStartLineCap="Round"/>
+                <Path Data="M226 84 L256 172 L286 84 Z" Fill="#f1e6c9" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Accessory.Ring">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="142" Canvas.Top="422" Width="228" Height="36" Fill="#000000" Opacity="0.16"/>
+                <Ellipse Canvas.Left="148" Canvas.Top="148" Width="216" Height="216" Stroke="#d4af37" StrokeThickness="42" Fill="Transparent"/>
+                <Ellipse Canvas.Left="188" Canvas.Top="188" Width="136" Height="136" Stroke="#6f4e18" StrokeThickness="12" Fill="Transparent" Opacity="0.65"/>
+                <Path Data="M224 130 L256 84 L288 130 L274 174 H238 Z"
+                      Fill="#60a5fa" Stroke="#111827" StrokeThickness="8" StrokeLineJoin="Round"/>
+                <Path Data="M256 84 L256 174" Stroke="#dbeafe" StrokeThickness="8" Opacity="0.45"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Accessory.Charm">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="140" Canvas.Top="424" Width="232" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M180 128 C222 96 290 96 332 128" Stroke="#c7a46b" StrokeThickness="14"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M256 134 L338 208 L310 346 L256 420 L202 346 L174 208 Z"
+                      Fill="#b7791f" Stroke="#21150c" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M256 160 L304 218 L286 326 L256 374 L226 326 L208 218 Z"
+                      Fill="#facc15" Opacity="0.45"/>
+                <Path Data="M226 244 H286 M256 214 V322" Stroke="#fff7cc" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.75"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Accessory.Leaf">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="142" Canvas.Top="424" Width="228" Height="34" Fill="#000000" Opacity="0.14"/>
+                <Path Data="M118 302 C190 142 330 104 426 118 C408 246 318 376 144 402 C130 370 120 336 118 302 Z"
+                      Fill="#65a30d" Stroke="#14532d" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M144 382 C230 300 292 218 408 124" Stroke="#ecfccb" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.75"/>
+                <Path Data="M228 304 C214 260 196 226 162 198 M284 254 C278 214 282 178 306 138"
+                      Stroke="#ecfccb" StrokeThickness="8" StrokeStartLineCap="Round" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Accessory.Phylactery">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="136" Canvas.Top="424" Width="240" Height="36" Fill="#000000" Opacity="0.18"/>
+                <Path Data="M256 66 L338 118 L386 214 L354 374 L256 446 L158 374 L126 214 L174 118 Z"
+                      Fill="#2e1065" Stroke="#07030f" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M256 96 L316 136 L350 218 L326 344 L256 396 L186 344 L162 218 L196 136 Z"
+                      Fill="#581c87" Stroke="#c084fc" StrokeThickness="8" StrokeLineJoin="Round" Opacity="0.9"/>
+                <Ellipse Canvas.Left="216" Canvas.Top="198" Width="80" Height="80" Fill="#22d3ee" Opacity="0.85"/>
+                <Path Data="M198 284 C228 320 284 320 314 284" Stroke="#f5d0fe" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.65"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Fang">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="142" Canvas.Top="426" Width="228" Height="34" Fill="#000000" Opacity="0.15"/>
+                <Path Data="M188 86 C292 130 360 234 344 412 C274 354 218 266 188 86 Z"
+                      Fill="#f4ead0" Stroke="#2a2116" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M224 144 C282 190 314 270 314 346" Stroke="#c8b990" StrokeThickness="12"
+                      StrokeStartLineCap="Round" Opacity="0.7"/>
+                <Path Data="M206 104 C226 118 242 134 254 154" Stroke="#ffffff" StrokeThickness="10"
+                      StrokeStartLineCap="Round" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Meat">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="130" Canvas.Top="424" Width="252" Height="36" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M128 274 C142 178 230 122 314 148 C402 176 434 274 384 348 C336 420 218 428 158 366 C134 342 124 310 128 274 Z"
+                      Fill="#9f1239" Stroke="#2a0711" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M190 234 C224 188 290 180 332 216 C370 248 366 314 326 344 C278 380 198 358 174 306 C164 282 170 256 190 234 Z"
+                      Fill="#fda4af" Opacity="0.65"/>
+                <Ellipse Canvas.Left="274" Canvas.Top="246" Width="58" Height="58" Fill="#fff1f2" Stroke="#7f1d1d" StrokeThickness="8"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Leather">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="424" Width="260" Height="36" Fill="#000000" Opacity="0.15"/>
+                <Path Data="M138 178 C192 138 224 172 256 146 C294 114 332 142 374 170 C350 228 386 270 356 330 C320 402 214 410 158 352 C110 302 144 242 138 178 Z"
+                      Fill="#9a5b2f" Stroke="#1f1309" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M176 214 C232 238 286 222 338 196" Stroke="#d29a52" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Path Data="M168 306 C224 334 290 326 340 290" Stroke="#4a2b17" StrokeThickness="10"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Ellipse Canvas.Left="230" Canvas.Top="262" Width="20" Height="20" Fill="#e0a45b" Opacity="0.7"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Essence">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="140" Canvas.Top="424" Width="232" Height="36" Fill="#000000" Opacity="0.14"/>
+                <Path Data="M256 86 L360 154 L390 276 L326 398 L256 438 L186 398 L122 276 L152 154 Z"
+                      Fill="#365314" Stroke="#0f1f08" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M256 120 L320 174 L342 270 L302 354 L256 386 L210 354 L170 270 L192 174 Z"
+                      Fill="#84cc16" Opacity="0.55"/>
+                <Path Data="M188 278 C222 248 290 248 324 278" Stroke="#ecfccb" StrokeThickness="14"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.65"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Stone">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="124" Canvas.Top="426" Width="264" Height="34" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M144 196 L222 116 L336 136 L402 232 L366 356 L266 420 L154 374 L110 266 Z"
+                      Fill="#64748b" Stroke="#111827" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M222 116 L212 214 L144 196 Z" Fill="#94a3b8" Opacity="0.55"/>
+                <Path Data="M336 136 L300 218 L212 214 L222 116 Z" Fill="#475569" Opacity="0.7"/>
+                <Path Data="M402 232 L300 218 L366 356 Z" Fill="#334155" Opacity="0.65"/>
+                <Path Data="M154 374 L230 294 L266 420 Z" Fill="#7b8794" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.FireAsh">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="422" Width="260" Height="42" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M178 394 C214 330 166 282 218 212 C242 180 246 126 226 82 C320 138 358 206 344 280 C394 256 410 210 402 166 C460 246 430 360 350 410 C292 446 220 438 178 394 Z"
+                      Fill="#7f1d1d" Stroke="#180606" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M228 386 C256 334 232 296 266 252 C282 232 286 200 274 172 C332 218 346 274 326 326 C354 316 372 290 376 260 C408 328 354 408 286 414 C262 416 242 406 228 386 Z"
+                      Fill="#f97316" Opacity="0.85"/>
+                <Path Data="M164 406 C220 430 296 438 366 406" Stroke="#9ca3af" StrokeThickness="18"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Wind">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="134" Canvas.Top="424" Width="244" Height="34" Fill="#000000" Opacity="0.10"/>
+                <Path Data="M104 194 C190 130 306 132 376 194 C414 228 414 278 378 300 C342 322 292 302 270 264"
+                      Stroke="#a7f3d0" StrokeThickness="28" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M128 292 C214 232 312 238 372 292 C398 316 396 356 364 374 C326 396 274 374 254 338"
+                      Stroke="#67e8f9" StrokeThickness="24" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Path Data="M166 380 C222 352 286 354 338 388" Stroke="#e0f2fe" StrokeThickness="18"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.8"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Water">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="140" Canvas.Top="424" Width="232" Height="36" Fill="#000000" Opacity="0.14"/>
+                <Path Data="M256 76 C328 166 372 248 372 320 C372 386 322 438 256 438 C190 438 140 386 140 320 C140 248 184 166 256 76 Z"
+                      Fill="#0ea5e9" Stroke="#082f49" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M196 306 C230 334 290 336 322 306" Stroke="#e0f2fe" StrokeThickness="18"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.75"/>
+                <Path Data="M210 214 C224 174 246 134 262 112" Stroke="#e0f2fe" StrokeThickness="14"
+                      StrokeStartLineCap="Round" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Dust">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="134" Canvas.Top="424" Width="244" Height="36" Fill="#000000" Opacity="0.12"/>
+                <Ellipse Canvas.Left="164" Canvas.Top="220" Width="184" Height="184" Fill="#c4b5fd" Stroke="#2e1065" StrokeThickness="10" Opacity="0.75"/>
+                <Ellipse Canvas.Left="116" Canvas.Top="178" Width="58" Height="58" Fill="#ddd6fe" Stroke="#4c1d95" StrokeThickness="8"/>
+                <Ellipse Canvas.Left="354" Canvas.Top="182" Width="44" Height="44" Fill="#f5d0fe" Stroke="#701a75" StrokeThickness="8"/>
+                <Ellipse Canvas.Left="326" Canvas.Top="346" Width="62" Height="62" Fill="#a5f3fc" Stroke="#164e63" StrokeThickness="8"/>
+                <Ellipse Canvas.Left="184" Canvas.Top="132" Width="28" Height="28" Fill="#ffffff" Opacity="0.8"/>
+                <Ellipse Canvas.Left="286" Canvas.Top="122" Width="20" Height="20" Fill="#ffffff" Opacity="0.7"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.SoulShard">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="140" Canvas.Top="424" Width="232" Height="36" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M256 70 L338 210 L298 422 L256 452 L214 422 L174 210 Z"
+                      Fill="#164e63" Stroke="#04131a" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M256 70 L256 452" Stroke="#a5f3fc" StrokeThickness="10" Opacity="0.45"/>
+                <Path Data="M174 210 L256 250 L338 210" Stroke="#67e8f9" StrokeThickness="10" Opacity="0.55"/>
+                <Ellipse Canvas.Left="230" Canvas.Top="246" Width="52" Height="52" Fill="#22d3ee" Opacity="0.65"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Ingot">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="122" Canvas.Top="424" Width="268" Height="36" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M120 280 L192 168 H336 L406 280 L358 386 H166 Z"
+                      Fill="#a1aab7" Stroke="#111827" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M192 168 L238 280 H406 L336 168 Z" Fill="#dbe4ee" Opacity="0.55"/>
+                <Path Data="M120 280 H406" Stroke="#111827" StrokeThickness="10" Opacity="0.45"/>
+                <Path Data="M170 340 H356" Stroke="#f8fafc" StrokeThickness="10"
+                      StrokeStartLineCap="Round" Opacity="0.4"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Wood">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="120" Canvas.Top="424" Width="272" Height="36" Fill="#000000" Opacity="0.15"/>
+                <Path Data="M118 308 C190 240 276 194 392 144 L428 224 C330 264 236 322 158 394 Z"
+                      Fill="#8b4a24" Stroke="#1f1309" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M152 330 C236 284 310 238 402 188" Stroke="#d29a52" StrokeThickness="12"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" Opacity="0.55"/>
+                <Path Data="M220 294 C224 326 248 348 284 358 M304 246 C306 280 330 304 366 312"
+                      Stroke="#3f2412" StrokeThickness="9" StrokeStartLineCap="Round" Opacity="0.65"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Herb">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="140" Canvas.Top="424" Width="232" Height="34" Fill="#000000" Opacity="0.13"/>
+                <Path Data="M254 410 C252 308 250 210 256 106" Stroke="#365314" StrokeThickness="18"
+                      StrokeStartLineCap="Round"/>
+                <Path Data="M250 260 C198 192 154 176 100 198 C142 260 194 282 250 260 Z"
+                      Fill="#84cc16" Stroke="#14532d" StrokeThickness="8"/>
+                <Path Data="M260 220 C310 152 360 132 420 154 C378 222 322 250 260 220 Z"
+                      Fill="#a3e635" Stroke="#14532d" StrokeThickness="8"/>
+                <Path Data="M254 346 C210 308 170 302 124 324 C164 374 210 386 254 346 Z"
+                      Fill="#65a30d" Stroke="#14532d" StrokeThickness="8"/>
+                <Path Data="M276 342 C322 296 368 286 414 308 C374 364 326 384 276 342 Z"
+                      Fill="#bef264" Stroke="#14532d" StrokeThickness="8"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Material.Cloth">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="426" Width="260" Height="34" Fill="#000000" Opacity="0.14"/>
+                <Path Data="M128 184 C202 144 284 152 384 190 L354 392 C270 360 202 360 128 398 Z"
+                      Fill="#d6c8a8" Stroke="#2b2115" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M150 238 C222 206 292 208 368 238 M142 300 C214 270 288 272 360 304"
+                      Stroke="#8b7355" StrokeThickness="10" StrokeStartLineCap="Round" Opacity="0.55"/>
+                <Path Data="M210 158 C196 222 188 294 184 380 M294 164 C284 230 276 306 272 374"
+                      Stroke="#f8f0dc" StrokeThickness="8" StrokeStartLineCap="Round" Opacity="0.55"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon.Weapon.Tome">
+        <Viewbox>
+            <Canvas Width="512" Height="512">
+                <Ellipse Canvas.Left="126" Canvas.Top="424" Width="260" Height="36" Fill="#000000" Opacity="0.16"/>
+                <Path Data="M134 118 H326 C358 118 382 142 382 174 V416 H176 C148 416 124 392 124 364 V148 C124 132 130 122 134 118 Z"
+                      Fill="#4c1d95" Stroke="#12051f" StrokeThickness="12" StrokeLineJoin="Round"/>
+                <Path Data="M176 118 V416" Stroke="#c4b5fd" StrokeThickness="12" Opacity="0.65"/>
+                <Rectangle Canvas.Left="212" Canvas.Top="170" Width="114" Height="114" RadiusX="12" RadiusY="12"
+                           Fill="#facc15" Stroke="#2b2115" StrokeThickness="8"/>
+                <Path Data="M232 228 H306 M268 190 V266" Stroke="#4c1d95" StrokeThickness="10"
+                      StrokeStartLineCap="Round"/>
+                <Path Data="M218 332 H332 M218 366 H316" Stroke="#ddd6fe" StrokeThickness="10"
+                      StrokeStartLineCap="Round" Opacity="0.8"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Item ID aliases -->
+    <DataTemplate x:Key="Icon.t1_healing_potion"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Potion.Health}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.t1_mana_potion"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Potion.Mana}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.soulbound_phylactery"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Phylactery}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.starter_dagger"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Blade.Dagger}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.rogue_cloak"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Cloak}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.crit_band"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Ring}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.steel_sword"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Blade.Sword}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.starter_armor"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Metal}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.iron_band"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Ring}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.fur_vest"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Leather}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.power_charm"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Charm}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.leather_bow"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Weapon.Bow}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.archer_garb"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Leather}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.focus_band"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Ring}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.starter_crossbow"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Weapon.Crossbow}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.hunter_coat"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Cloak}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.starter_gauntlets"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Weapon.Gauntlets}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.padded_armor"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Leather}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.fighter_token"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Charm}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.starter_mace"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Weapon.Mace}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.prayer_robes"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Robe}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.faith_charm"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Charm}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.tracker_band"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Ring}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.flamecaster_staff"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Weapon.Staff}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.storm_robes"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Robe}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.starter_branch"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Weapon.Branch}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.nature_robe"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Robe}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.life_leaf"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Leaf}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.crystal_focus_band"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Ring}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.mana_ring"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Ring}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.souls_blade"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Blade.Soul}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.bone_plate"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Bone}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.soul_shard"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.SoulShard}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.beast_fang"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Fang}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.beast_flesh"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Meat}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.feral_leather"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Leather}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.earth_essence"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Essence}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.stone_fragment"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Stone}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.fire_ash"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.FireAsh}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.wind_whisper"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Wind}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.water_bead"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Water}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.spirit_dust"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Dust}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.iron_ingot"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Ingot}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.iron_sword"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Blade.Sword}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.chain_armor"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Metal}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.woodcutter_axe"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Tool.Axe}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.wood"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Wood}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.sunleaf"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Herb}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.cured_leather"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Leather}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.leather_vest"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Leather}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.bolt_of_cloth"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Material.Cloth}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.linen_robe"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Armor.Robe}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.imbued_ring"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Accessory.Ring}"/></DataTemplate>
+    <DataTemplate x:Key="Icon.mages_tome"><ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource Icon.Weapon.Tome}"/></DataTemplate>
+
+    <!-- Shared Icon Switcher Style -->
+    <Style x:Key="IconSwitcherStyle" TargetType="ContentControl">
+        <Setter Property="ContentTemplateSelector" Value="{StaticResource ItemIconTemplateSelector}"/>
+    </Style>
+
+</ResourceDictionary>

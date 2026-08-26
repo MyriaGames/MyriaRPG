@@ -1,0 +1,256 @@
+<Page x:Class="Myria.Wpf.View.Pages.Settings.Page_SettingsGame"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="820"
+      d:DesignWidth="1280"
+      Background="Transparent"
+      Title="Page_SettingsGame">
+
+    <Page.Resources>
+        <DropShadowEffect x:Key="GameGoldGlow" BlurRadius="18" ShadowDepth="0" Opacity="0.55" Color="{DynamicResource Color.Gold}"/>
+
+        <Style x:Key="GameHeaderText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="44"/>
+        </Style>
+
+        <Style x:Key="GameSectionTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="25"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="GameBodyText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="GameSettingsPanel" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Brush.MainPanelGradient}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Padding" Value="26"/>
+            <Setter Property="Effect" Value="{StaticResource Effect.PanelShadow}"/>
+        </Style>
+
+        <Style x:Key="GameTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource Brush.BlueActive}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="14,0"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brush.GoldSoft}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GameToggleSwitch" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
+            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <DockPanel LastChildFill="False">
+                            <Border x:Name="SwitchTrack"
+                                    DockPanel.Dock="Left"
+                                    Width="52"
+                                    Height="26"
+                                    Background="{DynamicResource Brush.PanelDark}"
+                                    BorderBrush="{DynamicResource Brush.Gold}"
+                                    BorderThickness="1"
+                                    CornerRadius="13"
+                                    VerticalAlignment="Center">
+                                <Grid>
+                                    <Ellipse x:Name="SwitchThumb"
+                                             Width="18"
+                                             Height="18"
+                                             Fill="{DynamicResource Brush.Muted}"
+                                             HorizontalAlignment="Left"
+                                             Margin="4,0,0,0"/>
+                                </Grid>
+                            </Border>
+                            <ContentPresenter DockPanel.Dock="Left"
+                                              Margin="12,0,0,0"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </DockPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SwitchTrack" Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+                                <Setter TargetName="SwitchThumb" Property="Fill" Value="{DynamicResource Brush.GoldSoft}"/>
+                                <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right"/>
+                                <Setter TargetName="SwitchThumb" Property="Margin" Value="0,0,4,0"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SwitchTrack" Property="BorderBrush" Value="{DynamicResource Brush.GoldSoft}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Border Background="{DynamicResource Brush.WindowBackgroundGradient}"
+            BorderBrush="{DynamicResource Brush.Gold}"
+            BorderThickness="1">
+
+        <Grid Margin="34,24,34,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Ellipse Grid.RowSpan="2"
+                     Width="420"
+                     Height="420"
+                     Stroke="{DynamicResource Brush.Gold}"
+                     StrokeThickness="1"
+                     Opacity="0.22"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Top"
+                     Margin="0,-120,-80,0"/>
+            <Ellipse Grid.RowSpan="2"
+                     Width="280"
+                     Height="280"
+                     Stroke="{DynamicResource Brush.Gold}"
+                     StrokeThickness="1"
+                     Opacity="0.17"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Top"
+                     Margin="0,-52,-8,0"/>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="{Binding TblGameTitle}" Style="{StaticResource GameHeaderText}"/>
+                <TextBlock Text="{Binding TblGameDescription}"
+                           Foreground="{DynamicResource Brush.GoldSoft}"
+                           FontFamily="Georgia"
+                           FontStyle="Italic"
+                           FontSize="17"
+                           Margin="34,8,0,0"/>
+                <Grid Width="440" HorizontalAlignment="Left" Margin="18,14,0,0">
+                    <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.65"/>
+                    <TextBlock Text="&#x25C7;"
+                               Foreground="{DynamicResource Brush.GoldSoft}"
+                               FontFamily="Segoe UI Symbol"
+                               FontSize="24"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="0,-17,0,0"/>
+                </Grid>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="0,0,12,0">
+                <StackPanel>
+                    <Border Style="{StaticResource GameSettingsPanel}" Margin="0,0,0,18">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,18">
+                                <TextBlock Text="&#x2726;"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Segoe UI Symbol"
+                                           FontSize="34"
+                                           DockPanel.Dock="Left"
+                                           Margin="0,0,18,0"/>
+                                <TextBlock Text="{Binding TblServerSection}"
+                                           Style="{StaticResource GameSectionTitle}"
+                                           VerticalAlignment="Center"/>
+                            </DockPanel>
+
+                            <Grid Margin="0,0,0,18">
+                                <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.65" VerticalAlignment="Center"/>
+                                <TextBlock Text="&#x25C7;"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Segoe UI Symbol"
+                                           FontSize="18"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0,-13,0,0"/>
+                            </Grid>
+
+                            <TextBlock Text="{Binding TblServerAddress}" Style="{StaticResource GameBodyText}" Margin="0,0,0,10"/>
+
+                            <TextBox Style="{StaticResource GameTextBox}"
+                                     Width="420"
+                                     HorizontalAlignment="Left"
+                                     Text="{Binding ServerAddress, UpdateSourceTrigger=LostFocus}"/>
+
+                            <TextBlock Text="{Binding TblServerHint}"
+                                       FontFamily="Georgia"
+                                       FontSize="12"
+                                       Opacity="0.75"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Brush.Muted}"
+                                       Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource GameSettingsPanel}" Margin="0,0,0,18">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,18">
+                                <TextBlock Text="&#x21BA;"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Segoe UI Symbol"
+                                           FontSize="34"
+                                           DockPanel.Dock="Left"
+                                           Margin="0,0,18,0"/>
+                                <TextBlock Text="{Binding TblUpdateSection}"
+                                           Style="{StaticResource GameSectionTitle}"
+                                           VerticalAlignment="Center"/>
+                            </DockPanel>
+
+                            <Grid Margin="0,0,0,18">
+                                <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.65" VerticalAlignment="Center"/>
+                                <TextBlock Text="&#x25C7;"
+                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                           FontFamily="Segoe UI Symbol"
+                                           FontSize="18"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0,-13,0,0"/>
+                            </Grid>
+
+                            <CheckBox Content="{Binding TblAutoUpdate}"
+                                      Style="{StaticResource GameToggleSwitch}"
+                                      IsChecked="{Binding AutoUpdateEnabled, Mode=TwoWay}"
+                                      HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Page>
