@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -15,19 +18,37 @@ namespace Myria.Wpf.Services
     public record UpdateProgress(UpdateStatus Status, double? PercentComplete = null);
 
     /// <summary>
-    /// Checks a public "releases" repo for a newer alpha build and silently reinstalls if found.
-    /// Mirrors ServerApiService's static-HttpClient, swallow-all-exceptions pattern - a failed
-    /// or slow check must never block or crash startup. Every step is logged to Data/Misc/update.log
-    /// so a silent failure (e.g. an AV false-positive deleting the downloaded installer) is at
-    /// least diagnosable after the fact, since nothing about a failed check is ever shown in-app.
+    /// Checks this repo's own GitHub Releases for a newer alpha build and silently reinstalls if
+    /// found. Mirrors ServerApiService's static-HttpClient, swallow-all-exceptions pattern - a
+    /// failed or slow check must never block or crash startup. Every step is logged to
+    /// Data/Misc/update.log so a silent failure (e.g. an AV false-positive deleting the downloaded
+    /// installer) is at least diagnosable after the fact, since nothing about a failed check is
+    /// ever shown in-app.
+    ///
+    /// Previously this checked a hand-maintained version.json in a separate rllyben/MyriaRPG-releases
+    /// repo. Now that releases are published directly on this repo (MyriaGames/MyriaRPG), the
+    /// GitHub Releases API is the source of truth instead - no separate manifest file to keep in
+    /// sync. The release's tag name (e.g. "v0.2.15" or "0.2.15") is the version, and the installer
+    /// is whichever release asset looks like "MyriaRPG_Setup*.exe" (the exact filename varies by
+    /// version - see Setup/release.ps1).
     /// </summary>
     public static class UpdateService
     {
-        private const string ManifestUrl =
-            "https://raw.githubusercontent.com/rllyben/MyriaRPG-releases/main/version.json";
+        private const string LatestReleaseApiUrl =
+            "https://api.github.com/repos/MyriaGames/MyriaRPG/releases/latest";
 
-        private static readonly HttpClient _http = new();
+        private static readonly HttpClient _http = CreateHttpClient();
         private static readonly JsonSerializerOptions _jsonOpts = new() { PropertyNameCaseInsensitive = true };
+
+        private static HttpClient CreateHttpClient()
+        {
+            var client = new HttpClient();
+            // The GitHub API rejects requests with no User-Agent (unlike raw.githubusercontent.com,
+            // which the old version.json-based check used and didn't need one for).
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("MyriaRPG-UpdateChecker");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+            return client;
+        }
 
         /// <summary>Returns true if an installer was launched and the caller should stop its own
         /// startup immediately (Shutdown() has already been requested internally).</summary>
@@ -38,17 +59,24 @@ namespace Myria.Wpf.Services
                 Log("Checking for updates...");
                 progress?.Report(new UpdateProgress(UpdateStatus.Checking));
 
-                var manifest = await _http.GetFromJsonAsync<VersionManifest>(ManifestUrl, _jsonOpts);
-                if (manifest is null || string.IsNullOrWhiteSpace(manifest.Version) || string.IsNullOrWhiteSpace(manifest.InstallerUrl))
+                var release = await _http.GetFromJsonAsync<GitHubRelease>(LatestReleaseApiUrl, _jsonOpts);
+                var installerAsset = release?.Assets?.FirstOrDefault(a =>
+                    a.Name is not null &&
+                    a.Name.StartsWith("MyriaRPG_Setup", StringComparison.OrdinalIgnoreCase) &&
+                    a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+
+                if (release is null || string.IsNullOrWhiteSpace(release.TagName) || installerAsset?.BrowserDownloadUrl is null)
                 {
-                    Log("Manifest missing or incomplete - aborting.");
+                    Log("Latest release missing, has no tag, or has no matching installer asset - aborting.");
                     progress?.Report(new UpdateProgress(UpdateStatus.Failed));
                     return false;
                 }
 
-                if (!Version.TryParse(manifest.Version, out var latest))
+                var installerUrl = installerAsset.BrowserDownloadUrl;
+                var versionText = release.TagName.TrimStart('v', 'V');
+                if (!Version.TryParse(versionText, out var latest))
                 {
-                    Log($"Could not parse manifest version '{manifest.Version}' - aborting.");
+                    Log($"Could not parse release tag '{release.TagName}' as a version - aborting.");
                     progress?.Report(new UpdateProgress(UpdateStatus.Failed));
                     return false;
                 }
@@ -68,11 +96,11 @@ namespace Myria.Wpf.Services
                 // to a temp name and only publishing it under its real name once complete also
                 // means a half-written file is never mistaken for a finished download.
                 var installerPath = Path.Combine(Path.GetTempPath(),
-                    $"MyriaRPG_Setup_{manifest.Version}_{Environment.ProcessId}.exe");
-                Log($"Downloading {manifest.InstallerUrl} -> {installerPath}");
+                    $"MyriaRPG_Setup_{versionText}_{Environment.ProcessId}.exe");
+                Log($"Downloading {installerUrl} -> {installerPath}");
                 progress?.Report(new UpdateProgress(UpdateStatus.Downloading, 0));
 
-                using (var response = await _http.GetAsync(manifest.InstallerUrl, HttpCompletionOption.ResponseHeadersRead))
+                using (var response = await _http.GetAsync(installerUrl, HttpCompletionOption.ResponseHeadersRead))
                 {
                     response.EnsureSuccessStatusCode();
                     var totalBytes = response.Content.Headers.ContentLength;
@@ -136,11 +164,21 @@ namespace Myria.Wpf.Services
             }
         }
 
-        private sealed class VersionManifest
+        // Minimal subset of GitHub's "Get the latest release" API response
+        // (https://docs.github.com/en/rest/releases/releases#get-the-latest-release) - only the
+        // fields this class actually reads.
+        private sealed class GitHubRelease
         {
-            public string? Version { get; set; }
-            public string? InstallerUrl { get; set; }
-            public string? Notes { get; set; }
+            [JsonPropertyName("tag_name")]
+            public string? TagName { get; set; }
+            public List<GitHubReleaseAsset>? Assets { get; set; }
+        }
+
+        private sealed class GitHubReleaseAsset
+        {
+            public string? Name { get; set; }
+            [JsonPropertyName("browser_download_url")]
+            public string? BrowserDownloadUrl { get; set; }
         }
     }
 }
