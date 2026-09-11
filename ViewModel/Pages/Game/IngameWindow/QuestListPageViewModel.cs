@@ -7,7 +7,9 @@ using Myria.Lib.Core.Systems.Enums;
 using Myria.Wpf.Model;
 using Myria.Wpf.Utils;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -209,6 +211,14 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         // Data
         public ObservableCollection<QuestListItemVm> Quests { get; } = new();
+
+        /// <summary>Groups <see cref="Quests"/> by category (Main/Side/Faction) for the quest list
+        /// UI (Q14) - wraps the same collection, so it stays in sync automatically whenever
+        /// UpdateMode() clears/repopulates Quests, with no separate refresh needed. Grouped by the
+        /// localized CategoryLabel (what the header actually displays) but sorted by the numeric
+        /// CategoryOrder first, so groups always render Main/Side/Faction regardless of the order
+        /// quests happen to appear in the underlying list.</summary>
+        public ICollectionView GroupedQuests { get; }
         private QuestListItemVm? _selectedQuest;
         public QuestListItemVm? SelectedQuest
         {
@@ -275,6 +285,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             AcceptQuestCommand        = new RelayCommand<QuestListItemVm?>(AcceptQuest);
             SelectActiveTabCommand    = new RelayCommand(() => ShowActive    = true);
             SelectAvailableTabCommand = new RelayCommand(() => ShowAvailable = true);
+
+            GroupedQuests = CollectionViewSource.GetDefaultView(Quests);
+            GroupedQuests.SortDescriptions.Add(new SortDescription(nameof(QuestListItemVm.CategoryOrder), ListSortDirection.Ascending));
+            GroupedQuests.GroupDescriptions.Add(new PropertyGroupDescription(nameof(QuestListItemVm.CategoryLabel)));
 
             UpdateMode();
         }
@@ -402,6 +416,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
                 Title            = LocalizationText.LocalizeQuestText(quest.Name),
                 Level            = quest.RequiredLevel,
                 Status           = quest.Status,
+                Category         = quest.Category,
                 IsRepeatable     = quest.IsRepeatable,
                 GiverNpcId       = quest.GiverNpcId,
                 GiverNpcName     = ResolveNpcName(quest.GiverNpcId),
@@ -437,6 +452,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public string      Title            { get; set; } = "";
         public int         Level            { get; set; }
         public QuestStatus Status           { get; set; } = QuestStatus.InProgress;
+        public QuestCategory Category       { get; set; } = QuestCategory.Side;
         public bool        IsRepeatable     { get; set; }
         public string      GiverNpcId       { get; set; } = "";
         public string      GiverNpcName     { get; set; } = "";
@@ -449,6 +465,25 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public IEnumerable<string> Rewards    { get; set; } = Array.Empty<string>();
 
         public string SubtitleText => !string.IsNullOrEmpty(ProgressText) ? ProgressText : AreaName;
+
+        /// <summary>Sort key backing the Main/Side/Faction group order (Q14) - the property
+        /// GroupedQuests' SortDescription sorts by, independent of the localized CategoryLabel
+        /// text groups are actually keyed on, so group order never depends on string comparison.</summary>
+        public int CategoryOrder => Category switch
+        {
+            QuestCategory.Main    => 0,
+            QuestCategory.Side    => 1,
+            QuestCategory.Faction => 2,
+            _                     => 1,
+        };
+
+        /// <summary>Localized group header text (Q14) - what GroupedQuests actually groups by.</summary>
+        public string CategoryLabel => Category switch
+        {
+            QuestCategory.Main    => Myria.Lib.Core.Systems.Localization.T("pg.quests.category.main"),
+            QuestCategory.Faction => Myria.Lib.Core.Systems.Localization.T("pg.quests.category.faction"),
+            _                     => Myria.Lib.Core.Systems.Localization.T("pg.quests.category.side"),
+        };
 
         public Brush AccentBrush => Status switch
         {

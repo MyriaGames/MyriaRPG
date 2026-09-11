@@ -287,16 +287,56 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 LogLines.Add(LogLineVm.From(msg.Key,
                     Localization.T(msg.Key, LocalizationText.LocalizeMonsterArgs(msg.Args.Cast<object>()))));
 
-            for (int i = 0; i < snap.Characters.Count && i < GroupCharacters.Count; i++)
+            // Synced by identity (character name - globally unique per account, see the
+            // GlobalUniqueCharacterName DB migration) rather than raw index, unlike GroupMonsters
+            // just below: Monsters is a fixed-size roster set once at encounter creation (a
+            // monster only ever goes IsAlive=false, never added/removed), so index-based updates
+            // are still correct there. Characters can now grow (item 47's mid-fight join) or
+            // shrink (item 51's mid-fight flee) between updates, though - a party member leaving
+            // earlier in the roster used to make every later member's HP/IsAlive get written into
+            // the wrong (stale, now-misaligned) UI row, since this loop never resized to match
+            // (TODO.md item 68). Turn-gating itself (CurrentTurnCharacterName/IsMyTurn) was never
+            // affected - both are already matched by name string, not index.
+            foreach (var c in snap.Characters)
             {
-                GroupCharacters[i].Hp      = snap.Characters[i].Hp;
-                GroupCharacters[i].IsAlive = snap.Characters[i].IsAlive;
+                var vm = GroupCharacters.FirstOrDefault(g => string.Equals(g.RawName, c.Name, StringComparison.OrdinalIgnoreCase));
+                if (vm is null)
+                    GroupCharacters.Add(new GroupCombatantVm(c.Name, c.Hp, c.MaxHp, c.IsAlive));
+                else
+                {
+                    vm.Hp      = c.Hp;
+                    vm.IsAlive = c.IsAlive;
+                }
+            }
+            for (int i = GroupCharacters.Count - 1; i >= 0; i--)
+            {
+                if (!snap.Characters.Any(c => string.Equals(c.Name, GroupCharacters[i].RawName, StringComparison.OrdinalIgnoreCase)))
+                    GroupCharacters.RemoveAt(i);
             }
 
             for (int i = 0; i < snap.Monsters.Count && i < GroupMonsters.Count; i++)
             {
                 GroupMonsters[i].Hp      = snap.Monsters[i].Hp;
                 GroupMonsters[i].IsAlive = snap.Monsters[i].IsAlive;
+            }
+
+            // Fixes TODO.md item 50: the real multiplayer branch of AttackAsync/CastSkillAsync
+            // (ViewModel_PageFightMultiplayer, _isLocalGroupCombat false) never called anything
+            // that advanced SelectedMonsterIndex, unlike SyncFromGroupEncounter's identical check
+            // just below for the offline path - so once your current target died, every further
+            // Attack kept sending the same dead index, which the server correctly rejects
+            // (GroupCombatEncounter.CharacterAttack returns false for a dead target), and that
+            // rejection came back as an empty snapshot with no visible feedback at all. This
+            // handler is the one thing both the live per-turn broadcast AND the dead-target
+            // rejection's own resync fallback (ResyncGroupCombatStateAsync) already route
+            // through, so putting the same auto-advance here (mirroring SyncFromGroupEncounter's
+            // exact logic) fixes both: your own kill retargets you immediately, and a rejected
+            // attack's resync retargets you before your next click instead of needing a manual
+            // retarget click first.
+            if (SelectedMonsterIndex < GroupMonsters.Count && !GroupMonsters[SelectedMonsterIndex].IsAlive)
+            {
+                int next = GroupMonsters.IndexOf(GroupMonsters.FirstOrDefault(m => m.IsAlive));
+                if (next >= 0) SelectedMonsterIndex = next;
             }
 
             CurrentTurnCharacterName = snap.CurrentTurnCharacterName ?? "";
@@ -314,10 +354,31 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             // The server only ever sends one of "GroupCombatUpdated" or "GroupCombatFinished"
             // per turn, never both — so the finishing turn's HP values only ever arrive here.
-            for (int i = 0; i < snap.Characters.Count && i < GroupCharacters.Count; i++)
+            // Synced by identity (character name - globally unique per account, see the
+            // GlobalUniqueCharacterName DB migration) rather than raw index, unlike GroupMonsters
+            // just below: Monsters is a fixed-size roster set once at encounter creation (a
+            // monster only ever goes IsAlive=false, never added/removed), so index-based updates
+            // are still correct there. Characters can now grow (item 47's mid-fight join) or
+            // shrink (item 51's mid-fight flee) between updates, though - a party member leaving
+            // earlier in the roster used to make every later member's HP/IsAlive get written into
+            // the wrong (stale, now-misaligned) UI row, since this loop never resized to match
+            // (TODO.md item 68). Turn-gating itself (CurrentTurnCharacterName/IsMyTurn) was never
+            // affected - both are already matched by name string, not index.
+            foreach (var c in snap.Characters)
             {
-                GroupCharacters[i].Hp      = snap.Characters[i].Hp;
-                GroupCharacters[i].IsAlive = snap.Characters[i].IsAlive;
+                var vm = GroupCharacters.FirstOrDefault(g => string.Equals(g.RawName, c.Name, StringComparison.OrdinalIgnoreCase));
+                if (vm is null)
+                    GroupCharacters.Add(new GroupCombatantVm(c.Name, c.Hp, c.MaxHp, c.IsAlive));
+                else
+                {
+                    vm.Hp      = c.Hp;
+                    vm.IsAlive = c.IsAlive;
+                }
+            }
+            for (int i = GroupCharacters.Count - 1; i >= 0; i--)
+            {
+                if (!snap.Characters.Any(c => string.Equals(c.Name, GroupCharacters[i].RawName, StringComparison.OrdinalIgnoreCase)))
+                    GroupCharacters.RemoveAt(i);
             }
 
             for (int i = 0; i < snap.Monsters.Count && i < GroupMonsters.Count; i++)
