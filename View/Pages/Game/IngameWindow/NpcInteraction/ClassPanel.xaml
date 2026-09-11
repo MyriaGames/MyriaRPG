@@ -51,14 +51,14 @@
                     Foreground="{DynamicResource Brush.GoldSoft}"
                     Background="Transparent"
                     BorderThickness="0"
-                    FontFamily="Georgia"
+                    FontFamily="{StaticResource Font.Body}"
                     FontSize="16"
                     Cursor="Hand"
                     Padding="4,0,12,0"/>
 
             <TextBlock Grid.Column="1"
                        Text="{Binding Title}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="15"
                        FontWeight="Bold"
                        Foreground="{DynamicResource Brush.GoldSoft}"
@@ -82,16 +82,16 @@
                     VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding CurrentClass}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="11"
                                Foreground="{DynamicResource Brush.Accent}"
                                FontWeight="SemiBold"/>
                     <TextBlock Text=" · "
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="11"
                                Foreground="{DynamicResource Brush.Muted}"/>
                     <TextBlock Text="{Binding CurrentLevel}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="11"
                                Foreground="{DynamicResource Brush.Muted}"/>
                 </StackPanel>
@@ -101,18 +101,18 @@
         <!-- Notices -->
         <StackPanel Grid.Row="2">
             <TextBlock Text="{Binding PenaltyInfo}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="12"
                        Foreground="{DynamicResource Brush.Muted}"
                        TextWrapping="Wrap"/>
             <TextBlock Text="{Binding TransferInfo}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="12"
                        Foreground="{DynamicResource Brush.Muted}"
                        TextWrapping="Wrap"
                        Margin="0,3,0,0"/>
             <TextBlock Text="{Binding CooldownText}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="12"
                        Foreground="Salmon"
                        TextWrapping="Wrap"
@@ -143,7 +143,7 @@
                                 <StackPanel Grid.Column="0">
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                         <TextBlock Text="{Binding Name}"
-                                                   FontFamily="Georgia"
+                                                   FontFamily="{StaticResource Font.Body}"
                                                    FontSize="13"
                                                    FontWeight="SemiBold"
                                                    Foreground="{DynamicResource Brush.Foreground}"/>
@@ -155,7 +155,7 @@
                                                 Margin="8,0,0,0"
                                                 VerticalAlignment="Center">
                                             <TextBlock Text="{Binding GroupLabel}"
-                                                       FontFamily="Georgia"
+                                                       FontFamily="{StaticResource Font.Body}"
                                                        FontSize="9"
                                                        Foreground="{DynamicResource Brush.Muted}"/>
                                         </Border>
@@ -179,12 +179,12 @@
                                                  Margin="0,0,0,3"/>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="{Binding ClassLevel, StringFormat='Lv. {0}'}"
-                                                   FontFamily="Georgia"
+                                                   FontFamily="{StaticResource Font.Body}"
                                                    FontSize="10"
                                                    Foreground="{DynamicResource Brush.Accent}"
                                                    Margin="0,0,8,0"/>
                                         <TextBlock Text="{Binding ProgressText}"
-                                                   FontFamily="Georgia"
+                                                   FontFamily="{StaticResource Font.Body}"
                                                    FontSize="10"
                                                    Foreground="{DynamicResource Brush.Muted}"/>
                                     </StackPanel>
@@ -193,7 +193,7 @@
                                 <!-- Forbidden label / Select button -->
                                 <Grid Grid.Column="2" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding ForbiddenLabel}"
-                                               FontFamily="Georgia"
+                                               FontFamily="{StaticResource Font.Body}"
                                                FontSize="11"
                                                Foreground="{DynamicResource Brush.Muted}"
                                                VerticalAlignment="Center">
@@ -212,7 +212,7 @@
                                     <Button Command="{Binding SelectCommand}"
                                             Cursor="Hand"
                                             Padding="12,6"
-                                            FontFamily="Georgia"
+                                            FontFamily="{StaticResource Font.Body}"
                                             FontSize="12">
                                         <Button.Style>
                                             <Style TargetType="Button">
@@ -256,7 +256,7 @@
                                             </ControlTemplate>
                                         </Button.Template>
                                         <TextBlock Text="{Binding ButtonLabel}"
-                                                   FontFamily="Georgia"
+                                                   FontFamily="{StaticResource Font.Body}"
                                                    FontSize="12"
                                                    Foreground="{DynamicResource Brush.Foreground}"/>
                                     </Button>

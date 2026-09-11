@@ -70,7 +70,7 @@
                     <TextBlock Grid.Column="0"
                                Text="{Binding PartnerOfferLabel}"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia" FontSize="11" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <Rectangle Grid.Column="1" Height="1"
                                Fill="{DynamicResource Brush.Gold}" Opacity="0.35"
@@ -91,7 +91,7 @@
                             </Style>
                         </Border.Style>
                         <TextBlock Text="{Binding TheirReadyText}"
-                                   FontFamily="Georgia" FontSize="10">
+                                   FontFamily="{StaticResource Font.Body}" FontSize="10">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="{DynamicResource Brush.Muted}"/>
@@ -112,7 +112,7 @@
                                FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <TextBlock Text="{Binding TheirGoldText}"
                                Foreground="{DynamicResource Brush.Foreground}"
-                               FontFamily="Georgia" FontSize="12" VerticalAlignment="Center"/>
+                               FontFamily="{StaticResource Font.Body}" FontSize="12" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Their items -->
@@ -128,11 +128,11 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding Name}"
                                                Foreground="{DynamicResource Brush.Foreground}"
-                                               FontFamily="Georgia" FontSize="12"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Quantity, StringFormat=' ×{0}'}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="11"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="11"
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
@@ -143,7 +143,7 @@
                 <!-- Empty state -->
                 <TextBlock Text="— nothing offered yet —"
                            Foreground="{DynamicResource Brush.Muted}"
-                           FontFamily="Georgia" FontSize="11" FontStyle="Italic"
+                           FontFamily="{StaticResource Font.Body}" FontSize="11" FontStyle="Italic"
                            Margin="2,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -182,7 +182,7 @@
                     <TextBlock Grid.Column="0"
                                Text="{Binding MyOfferLabel}"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia" FontSize="11" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <Rectangle Grid.Column="1" Height="1"
                                Fill="{DynamicResource Brush.Gold}" Opacity="0.35"
@@ -203,7 +203,7 @@
                             </Style>
                         </Border.Style>
                         <TextBlock Text="{Binding ImReadyText}"
-                                   FontFamily="Georgia" FontSize="10">
+                                   FontFamily="{StaticResource Font.Body}" FontSize="10">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="{DynamicResource Brush.Muted}"/>
@@ -233,7 +233,7 @@
                              Background="{DynamicResource Brush.PanelDark}"
                              Foreground="{DynamicResource Brush.Foreground}"
                              BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
-                             FontFamily="Georgia" FontSize="12"
+                             FontFamily="{StaticResource Font.Body}" FontSize="12"
                              Padding="6,3"/>
                     <Button Grid.Column="2"
                             Content="{Binding SetLabel}"
@@ -242,7 +242,7 @@
                             Background="{DynamicResource Brush.PanelDark}"
                             Foreground="{DynamicResource Brush.GoldSoft}"
                             BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
-                            FontFamily="Georgia" FontSize="11" Cursor="Hand"/>
+                            FontFamily="{StaticResource Font.Body}" FontSize="11" Cursor="Hand"/>
                 </Grid>
 
                 <!-- My items (with remove buttons) -->
@@ -258,11 +258,11 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding Name}"
                                                Foreground="{DynamicResource Brush.Foreground}"
-                                               FontFamily="Georgia" FontSize="12"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Quantity, StringFormat=' ×{0}'}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="11"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="11"
                                                VerticalAlignment="Center" Margin="0,0,6,0"/>
                                     <Button Content="✕"
                                             Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=Page}}"
@@ -294,7 +294,7 @@
                     </Border.Style>
                     <TextBlock Text="↑ Drag items from your inventory here"
                                Foreground="{DynamicResource Brush.Muted}"
-                               FontFamily="Georgia" FontSize="11" FontStyle="Italic"
+                               FontFamily="{StaticResource Font.Body}" FontSize="11" FontStyle="Italic"
                                HorizontalAlignment="Center">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -330,7 +330,7 @@
                     <TextBlock Grid.Column="0"
                                Text="Your Inventory"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia" FontSize="11" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <Rectangle Grid.Column="1" Height="1"
                                Fill="{DynamicResource Brush.Gold}" Opacity="0.35"
@@ -388,7 +388,7 @@
                                                 Visibility="{Binding IsStack, Converter={StaticResource BoolToVis}}">
                                             <TextBlock Text="{Binding Item.StackSize}"
                                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"/>
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"/>
                                         </Border>
                                     </Grid>
                                 </Border>
@@ -423,7 +423,7 @@
                            VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <TextBlock Text="{Binding ResultMessage}"
                            Foreground="{DynamicResource Brush.Foreground}"
-                           FontFamily="Georgia" FontSize="11"
+                           FontFamily="{StaticResource Font.Body}" FontSize="11"
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </DockPanel>
         </Border>
@@ -443,7 +443,7 @@
                     Background="{DynamicResource Brush.BlueActive}"
                     Foreground="{DynamicResource Brush.GoldSoft}"
                     BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
-                    FontFamily="Georgia" FontSize="13" FontWeight="Bold" Cursor="Hand"/>
+                    FontFamily="{StaticResource Font.Body}" FontSize="13" FontWeight="Bold" Cursor="Hand"/>
 
             <Button Grid.Column="2"
                     Content="{Binding CancelTradeLabel}"
@@ -452,7 +452,7 @@
                     Background="Transparent"
                     Foreground="{DynamicResource Brush.Muted}"
                     BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
-                    FontFamily="Georgia" FontSize="13" Cursor="Hand"/>
+                    FontFamily="{StaticResource Font.Body}" FontSize="13" Cursor="Hand"/>
         </Grid>
 
     </Grid>

@@ -65,7 +65,7 @@
 
                             <TextBlock Text="{Binding Char.Name}"
                                        Foreground="{DynamicResource Brush.Foreground}"
-                                       FontFamily="Georgia" FontSize="12" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="SemiBold"
                                        VerticalAlignment="Center"/>
 
                             <Grid Grid.Row="1" VerticalAlignment="Center">
@@ -76,12 +76,12 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Lv."
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                            VerticalAlignment="Bottom" Margin="0,0,0,1"/>
                                 <TextBlock Grid.Column="2"
                                            Text="{Binding Char.Level}"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia" FontSize="18"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="18"
                                            VerticalAlignment="Center"/>
                             </Grid>
                         </Grid>
@@ -97,7 +97,7 @@
 
                             <TextBlock Text="XP"
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                        VerticalAlignment="Center"/>
 
                             <StackPanel Grid.Column="1">
@@ -118,7 +118,7 @@
                                 </Border>
                                 <TextBlock Text="{Binding Char.XpPercent, StringFormat={}{0}%}"
                                            Foreground="{DynamicResource Brush.Foreground}"
-                                           FontFamily="Georgia" FontSize="8"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="8"
                                            HorizontalAlignment="Right" Margin="0,2,0,0"/>
                             </StackPanel>
                         </Grid>
@@ -142,7 +142,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="HP"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="♥"
                                            Foreground="#E07568" FontSize="10"
@@ -166,7 +166,7 @@
                                 <TextBlock Grid.Column="3"
                                            Text="{Binding Char.HpDisplay}"
                                            Foreground="{DynamicResource Brush.Foreground}"
-                                           FontFamily="Georgia" FontSize="8"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="8"
                                            HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
 
@@ -180,7 +180,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="MP"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="♦"
                                            Foreground="#65B5E8" FontSize="9"
@@ -204,7 +204,7 @@
                                 <TextBlock Grid.Column="3"
                                            Text="{Binding Char.ManaDisplay}"
                                            Foreground="{DynamicResource Brush.Foreground}"
-                                           FontFamily="Georgia" FontSize="8"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="8"
                                            HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                         </Grid>
@@ -306,7 +306,7 @@
                                                Visibility="{Binding IsLeader, Converter={StaticResource BoolToVis}}"/>
                                     <TextBlock Text="{Binding Username}"
                                                Foreground="{DynamicResource Brush.Foreground}"
-                                               FontFamily="Georgia"
+                                               FontFamily="{StaticResource Font.Body}"
                                                FontSize="11"
                                                FontWeight="SemiBold"
                                                VerticalAlignment="Center"/>
@@ -329,7 +329,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="HP"
                                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                                   FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                                   FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                                    VerticalAlignment="Center"/>
                                         <Border Grid.Column="1" Height="6"
                                                 BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
@@ -349,7 +349,7 @@
                                         </Border>
                                         <TextBlock Grid.Column="2" Text="{Binding HpDisplay}"
                                                    Foreground="{DynamicResource Brush.Foreground}"
-                                                   FontFamily="Georgia" FontSize="9"
+                                                   FontFamily="{StaticResource Font.Body}" FontSize="9"
                                                    VerticalAlignment="Center" Margin="4,0,0,0"/>
                                     </Grid>
 
@@ -362,7 +362,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="MP"
                                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                                   FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                                   FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                                    VerticalAlignment="Center"/>
                                         <Border Grid.Column="1" Height="6"
                                                 BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
@@ -382,7 +382,7 @@
                                         </Border>
                                         <TextBlock Grid.Column="2" Text="{Binding ManaDisplay}"
                                                    Foreground="{DynamicResource Brush.Foreground}"
-                                                   FontFamily="Georgia" FontSize="9"
+                                                   FontFamily="{StaticResource Font.Body}" FontSize="9"
                                                    VerticalAlignment="Center" Margin="4,0,0,0"/>
                                     </Grid>
                                 </Grid>
@@ -479,7 +479,7 @@
                         </Grid.RowDefinitions>
                         <TextBlock Text="{Binding CurrentFight.ActiveMonsterName}"
                                    Foreground="{DynamicResource Brush.Foreground}"
-                                   FontFamily="Georgia" FontSize="11" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="SemiBold"
                                    VerticalAlignment="Center"
                                    TextTrimming="CharacterEllipsis"/>
                         <Grid Grid.Row="1" VerticalAlignment="Center">
@@ -490,12 +490,12 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Lv."
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                        VerticalAlignment="Bottom" Margin="0,0,0,1"/>
                             <TextBlock Grid.Column="2"
                                        Text="{Binding CurrentFight.EnemyLevel}"
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia" FontSize="18"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="18"
                                        VerticalAlignment="Center"/>
                         </Grid>
                     </Grid>
@@ -519,7 +519,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="HP"
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                        VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" Text="♥"
                                        Foreground="#E07568" FontSize="10"
@@ -542,7 +542,7 @@
                             </Border>
                             <TextBlock Grid.Column="3"
                                        Foreground="{DynamicResource Brush.Foreground}"
-                                       FontFamily="Georgia" FontSize="8"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="8"
                                        HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0}/{1}">
@@ -563,7 +563,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="MP"
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                        VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" Text="✦"
                                        Foreground="#5B8CDD" FontSize="8"
@@ -586,7 +586,7 @@
                             </Border>
                             <TextBlock Grid.Column="3"
                                        Foreground="{DynamicResource Brush.Foreground}"
-                                       FontFamily="Georgia" FontSize="8"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="8"
                                        HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0}/{1}">
@@ -662,15 +662,15 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="{Binding Name}"
                                            Foreground="{DynamicResource Brush.Foreground}"
-                                           FontFamily="Georgia" FontSize="12" FontWeight="SemiBold"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="SemiBold"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Grid.Column="1" Text="Lv."
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                            VerticalAlignment="Bottom" Margin="0,0,0,1"/>
                                 <TextBlock Grid.Column="3" Text="{Binding Level}"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia" FontSize="16"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="16"
                                            VerticalAlignment="Center"/>
                             </Grid>
 
@@ -684,7 +684,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="HP"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia" FontSize="9" FontWeight="Bold"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" Text="♥"
                                            Foreground="#E07568" FontSize="10"
@@ -708,7 +708,7 @@
                                 <TextBlock Grid.Column="3"
                                            Text="{Binding HpText}"
                                            Foreground="{DynamicResource Brush.Foreground}"
-                                           FontFamily="Georgia" FontSize="8"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="8"
                                            HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                         </Grid>
@@ -745,7 +745,7 @@
                     <TextBlock Grid.Column="0"
                                Text="{Binding TblAlsoHere}"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia" FontSize="10" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <Rectangle Grid.Column="1" Height="1"
                                Fill="{DynamicResource Brush.Gold}"
@@ -757,7 +757,7 @@
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}"
                                        Foreground="{DynamicResource Brush.Foreground}"
-                                       FontFamily="Georgia" FontSize="11"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="11"
                                        Margin="0,2"
                                        Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
                                 <TextBlock.ContextMenu>
@@ -815,7 +815,7 @@
                     <TextBlock Grid.Column="0"
                                Text="{Binding TblShopsHere}"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia" FontSize="10" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <Rectangle Grid.Column="1" Height="1"
                                Fill="{DynamicResource Brush.Gold}"
@@ -833,7 +833,7 @@
                         Foreground="{DynamicResource Brush.GoldSoft}"
                         BorderBrush="{DynamicResource Brush.Gold}"
                         BorderThickness="1"
-                        FontFamily="Georgia" FontSize="11"
+                        FontFamily="{StaticResource Font.Body}" FontSize="11"
                         Cursor="Hand"/>
 
                 <!-- Capped the same way the NPC list is (Page_Room.xaml) so a room with many
@@ -852,7 +852,7 @@
                                         Background="Transparent"
                                         BorderThickness="0"
                                         Foreground="{DynamicResource Brush.Foreground}"
-                                        FontFamily="Georgia" FontSize="11"
+                                        FontFamily="{StaticResource Font.Body}" FontSize="11"
                                         Cursor="Hand"
                                         Command="{Binding Tag.VisitCharacterShopCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         CommandParameter="{Binding}"/>
@@ -926,7 +926,7 @@
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Text}"
                                                Foreground="{Binding Foreground}"
-                                               FontFamily="Georgia" FontSize="13"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="13"
                                                TextWrapping="Wrap" Margin="0,2"
                                                Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
                                         <TextBlock.ContextMenu>
@@ -970,13 +970,13 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="☽  To:"
                                    Foreground="#CE93D8"
-                                   FontFamily="Georgia" FontSize="13"
+                                   FontFamily="{StaticResource Font.Body}" FontSize="13"
                                    VerticalAlignment="Center" Margin="0,0,8,0"/>
                         <TextBox Grid.Column="1"
                                  Text="{Binding WhisperTarget, UpdateSourceTrigger=PropertyChanged}"
                                  Background="{DynamicResource Brush.PanelDark}"
                                  BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
-                                 Foreground="#CE93D8" FontFamily="Georgia" FontSize="13"
+                                 Foreground="#CE93D8" FontFamily="{StaticResource Font.Body}" FontSize="13"
                                  Padding="8,3"/>
                     </Grid>
 
@@ -1001,7 +1001,7 @@
                                  Background="{DynamicResource Brush.PanelDark}"
                                  BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
                                  Foreground="{DynamicResource Brush.Foreground}"
-                                 FontFamily="Georgia" FontSize="14"
+                                 FontFamily="{StaticResource Font.Body}" FontSize="14"
                                  Padding="12,0" VerticalContentAlignment="Center">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding SendChatCommand}"/>
@@ -1014,7 +1014,7 @@
                                 Background="{DynamicResource Brush.BlueActive}"
                                 BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
                                 Foreground="{DynamicResource Brush.GoldSoft}"
-                                FontFamily="Georgia" FontSize="14"
+                                FontFamily="{StaticResource Font.Body}" FontSize="14"
                                 Margin="8,0,0,0"/>
                     </Grid>
                 </Grid>

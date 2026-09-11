@@ -52,7 +52,7 @@
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding Text}"
                                                    Foreground="{Binding Color}"
-                                                   FontFamily="Georgia" FontSize="12"
+                                                   FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                    TextWrapping="Wrap"/>
                                     </Grid>
                                 </DataTemplate>
@@ -117,19 +117,19 @@
                                                             HorizontalAlignment="Left"
                                                             Visibility="{Binding HasTag, Converter={StaticResource BoolToVis}}">
                                                         <TextBlock Text="{Binding Tag}"
-                                                                   FontFamily="Georgia" FontSize="10" FontWeight="SemiBold"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="10" FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource Brush.GoldSoft}"/>
                                                     </Border>
                                                     <TextBlock Text="{Binding Name}"
-                                                               FontFamily="Georgia" FontSize="13" FontWeight="SemiBold"
+                                                               FontFamily="{StaticResource Font.Body}" FontSize="13" FontWeight="SemiBold"
                                                                Foreground="{DynamicResource Brush.GoldSoft}"
                                                                Margin="0,0,0,3"/>
                                                     <TextBlock Text="{Binding Description}"
-                                                               FontFamily="Georgia" FontSize="11"
+                                                               FontFamily="{StaticResource Font.Body}" FontSize="11"
                                                                Foreground="{DynamicResource Brush.Foreground}"
                                                                TextWrapping="Wrap" Opacity="0.85"/>
                                                     <TextBlock Text="{Binding ManaCostText}"
-                                                               FontFamily="Georgia" FontSize="10"
+                                                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                                                Foreground="#65B5E8"
                                                                Margin="0,4,0,0"/>
                                                 </StackPanel>
@@ -137,11 +137,11 @@
                                         </Button.ToolTip>
                                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding ButtonLabel}"
-                                                       FontFamily="Georgia" FontSize="11" FontWeight="Bold"
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="Bold"
                                                        Foreground="{DynamicResource Brush.GoldSoft}"
                                                        HorizontalAlignment="Center"/>
                                             <TextBlock Text="{Binding ManaCost}"
-                                                       FontFamily="Georgia" FontSize="9"
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="9"
                                                        Foreground="#65B5E8"
                                                        HorizontalAlignment="Center"
                                                        Margin="0,2,0,0"/>

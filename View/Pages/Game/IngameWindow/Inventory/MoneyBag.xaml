@@ -24,7 +24,7 @@
             <!-- Label -->
             <TextBlock Grid.Column="0"
                        Text="{Binding MoneyBagTitle}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="11"
                        FontWeight="Bold"
                        Foreground="{DynamicResource Brush.GoldSoft}"
@@ -47,7 +47,7 @@
                            VerticalAlignment="Center"
                            Margin="0,0,6,0"/>
                 <TextBlock Text="{Binding MoneyDisplay}"
-                           FontFamily="Georgia"
+                           FontFamily="{StaticResource Font.Body}"
                            FontSize="16"
                            FontWeight="Bold"
                            Foreground="{DynamicResource Brush.Gold}"

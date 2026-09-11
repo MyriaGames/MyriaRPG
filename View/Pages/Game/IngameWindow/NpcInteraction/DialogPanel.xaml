@@ -25,7 +25,7 @@
             <!-- Dialog text -->
             <TextBlock Text="{Binding DialogText}"
                        Foreground="{DynamicResource Brush.Foreground}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="14"
                        TextWrapping="Wrap"
                        VerticalAlignment="Top"/>
@@ -54,7 +54,7 @@
                                 MinWidth="160">
                             <StackPanel>
                                 <TextBlock Text="{Binding Text}"
-                                           FontFamily="Georgia"
+                                           FontFamily="{StaticResource Font.Body}"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource Brush.GoldSoft}"/>
                             </StackPanel>

@@ -14,20 +14,20 @@
 
         <Style x:Key="VisualHeaderText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
             <Setter Property="FontSize" Value="44"/>
         </Style>
 
         <Style x:Key="VisualSectionTitle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
             <Setter Property="FontSize" Value="25"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
 
         <Style x:Key="VisualBodyText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
@@ -47,7 +47,7 @@
             <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -85,7 +85,7 @@
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="Padding" Value="14,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -97,7 +97,7 @@
                         <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
                         <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="Padding" Value="14,10"/>
-                        <Setter Property="FontFamily" Value="Georgia"/>
+                        <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
                         <Setter Property="FontSize" Value="18"/>
                         <Setter Property="Template">
                             <Setter.Value>
@@ -150,7 +150,7 @@
                                                            HorizontalAlignment="Left"
                                                            VerticalAlignment="Center"
                                                            Foreground="{DynamicResource Brush.Foreground}"
-                                                           FontFamily="Georgia"
+                                                           FontFamily="{StaticResource Font.Body}"
                                                            FontSize="18"
                                                            Text="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
                                                 <Path Data="M 0 0 L 5 5 L 10 0 Z"
@@ -221,7 +221,7 @@
                 <TextBlock Text="{Binding TblVisualsTitle}" Style="{StaticResource VisualHeaderText}"/>
                 <TextBlock Text="{Binding TblVisualsDescription}"
                            Foreground="{DynamicResource Brush.GoldSoft}"
-                           FontFamily="Georgia"
+                           FontFamily="{StaticResource Font.Body}"
                            FontStyle="Italic"
                            FontSize="17"
                            Margin="34,8,0,0"/>

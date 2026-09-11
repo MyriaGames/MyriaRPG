@@ -55,7 +55,7 @@
                             <TextBlock Grid.Column="0"
                                        Text="{Binding Title}"
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia"
+                                       FontFamily="{StaticResource Font.Body}"
                                        FontSize="15"
                                        FontStyle="Italic"
                                        VerticalAlignment="Center"

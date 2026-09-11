@@ -160,6 +160,8 @@
   <ItemGroup>
     <Resource Include="Assets\App.ico" />
     <Resource Include="Assets\Fonts\MyriacScript.ttf" />
+    <Resource Include="Assets\Fonts\Cinzel-Regular.ttf" />
+    <Resource Include="Assets\Fonts\Cinzel-Bold.ttf" />
   </ItemGroup>
 
 </Project>

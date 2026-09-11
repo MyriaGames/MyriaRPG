@@ -16,7 +16,7 @@
             <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="FontWeight"      Value="Bold"/>
             <Setter Property="Cursor"          Value="Hand"/>
@@ -47,7 +47,7 @@
             <Setter Property="Background"      Value="Transparent"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="11"/>
             <Setter Property="Cursor"          Value="Hand"/>
             <Setter Property="Template">
@@ -100,7 +100,7 @@
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                         <TextBlock Text="{Binding Name}"
                                    Foreground="{DynamicResource Brush.Foreground}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="13"
                                    FontWeight="SemiBold"/>
                         <TextBlock Text="{Binding TypeAndTarget}"
@@ -167,7 +167,7 @@
                                    Style="{StaticResource HeaderText}"/>
                         <TextBlock Text=" | Equip skills for battle."
                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontStyle="Italic"
                                    FontSize="13"
                                    VerticalAlignment="Center"
@@ -178,7 +178,7 @@
                                 VerticalAlignment="Center" Margin="0,0,0,10">
                         <TextBlock Text="{Binding SlotCountText}"
                                    Style="{StaticResource MutedText}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="13"
                                    VerticalAlignment="Center"
                                    Margin="0,0,14,0"/>
@@ -291,7 +291,7 @@
                                                             HorizontalAlignment="Center">
                                                         <TextBlock Text="{Binding SlotNumber}"
                                                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                                                   FontFamily="Georgia"
+                                                                   FontFamily="{StaticResource Font.Body}"
                                                                    FontSize="11"
                                                                    FontWeight="Bold"
                                                                    HorizontalAlignment="Center"
@@ -304,7 +304,7 @@
                                                                 Margin="4,0,8,0">
                                                         <TextBlock Text="{Binding SkillName}"
                                                                    Foreground="{DynamicResource Brush.Foreground}"
-                                                                   FontFamily="Georgia"
+                                                                   FontFamily="{StaticResource Font.Body}"
                                                                    FontSize="13"
                                                                    FontWeight="SemiBold"/>
                                                         <TextBlock Text="{Binding SourceTag}"

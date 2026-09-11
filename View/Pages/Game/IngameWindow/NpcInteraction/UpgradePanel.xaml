@@ -24,7 +24,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0"
                        Text="{Binding Title}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="11"
                        FontWeight="Bold"
                        Foreground="{DynamicResource Brush.GoldSoft}"
@@ -76,7 +76,7 @@
                                     <TextBlock Text="{Binding UpgradeLevel, StringFormat='+{0}'}"
                                                Foreground="{DynamicResource Brush.Gold}"
                                                FontSize="11"
-                                               FontFamily="Georgia"/>
+                                               FontFamily="{StaticResource Font.Body}"/>
                                 </Border>
                             </Grid>
                         </DataTemplate>
@@ -107,7 +107,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0"
                                    Text="{Binding SelectedName}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="13"
                                    FontWeight="Bold"
                                    Foreground="{DynamicResource Brush.GoldSoft}"
@@ -123,16 +123,16 @@
                     <!-- Stats -->
                     <StackPanel Grid.Row="1">
                         <TextBlock Text="{Binding SelectedLevel}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="13"
                                    Foreground="{DynamicResource Brush.Foreground}"
                                    Margin="0,0,0,6"/>
                         <TextBlock Text="{Binding UpgradeCost}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="13"
                                    Foreground="{DynamicResource Brush.GoldSoft}"/>
                         <TextBlock Text="{Binding StatusMessage}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="12"
                                    Foreground="{DynamicResource Brush.Muted}"
                                    Margin="0,8,0,0"

@@ -25,7 +25,7 @@
 
         <Style x:Key="ShopSectionHeader" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -34,13 +34,13 @@
 
         <Style x:Key="ShopBodyText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="12"/>
         </Style>
 
         <Style x:Key="ShopMutedText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Muted}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
@@ -51,7 +51,7 @@
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Padding" Value="6,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -64,7 +64,7 @@
             <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Padding" Value="10,0"/>
@@ -124,7 +124,7 @@
                                         Visibility="{Binding IsStack, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="{Binding Item.StackSize}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="9" FontWeight="Bold"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="9" FontWeight="Bold"/>
                                 </Border>
                             </Grid>
                         </Border>
@@ -160,7 +160,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{Binding Title}"
                        Foreground="{DynamicResource Brush.GoldSoft}"
-                       FontFamily="Georgia" FontSize="16" FontWeight="Bold"
+                       FontFamily="{StaticResource Font.Heading}" FontSize="16" FontWeight="Bold"
                        VerticalAlignment="Center"/>
             <Button Grid.Column="2" Content="{Binding ToggleShopLabel}"
                     Command="{Binding ToggleShopCommand}"
@@ -293,10 +293,10 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="{Binding ItemId}" Style="{StaticResource ShopBodyText}" VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='×{0}'}"
-                                               Foreground="{DynamicResource Brush.Muted}" FontFamily="Georgia" FontSize="11"
+                                               Foreground="{DynamicResource Brush.Muted}" FontFamily="{StaticResource Font.Body}" FontSize="11"
                                                VerticalAlignment="Center" Margin="8,0"/>
                                     <TextBlock Grid.Column="2" Text="{Binding PriceText}"
-                                               Foreground="{DynamicResource Brush.Gold}" FontFamily="Georgia" FontSize="11"
+                                               Foreground="{DynamicResource Brush.Gold}" FontFamily="{StaticResource Font.Body}" FontSize="11"
                                                VerticalAlignment="Center"/>
                                 </Grid>
                             </Border>

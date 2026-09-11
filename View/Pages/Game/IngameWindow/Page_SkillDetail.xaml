@@ -10,7 +10,7 @@
         <StackPanel>
 
             <TextBlock Text="{Binding Name}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="22"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource Brush.GoldSoft}"
@@ -53,7 +53,7 @@
 
             <TextBlock Text="Description"
                        FontWeight="SemiBold"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="13"
                        Foreground="{DynamicResource Brush.SecondaryText}"
                        Margin="0,0,0,6"/>

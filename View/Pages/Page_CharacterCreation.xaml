@@ -19,7 +19,7 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.Muted}"/>
             <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontFamily"       Value="Georgia"/>
+            <Setter Property="FontFamily"       Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"         Value="13"/>
             <Setter Property="Cursor"           Value="Hand"/>
             <Setter Property="Template">
@@ -55,7 +55,7 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.GoldSoft}"/>
             <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontFamily"       Value="Georgia"/>
+            <Setter Property="FontFamily"       Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"         Value="13"/>
             <Setter Property="FontWeight"       Value="Bold"/>
             <Setter Property="Cursor"           Value="Hand"/>
@@ -94,7 +94,7 @@
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding"         Value="10,7"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="13"/>
             <Setter Property="CaretBrush"      Value="{DynamicResource Brush.GoldSoft}"/>
             <Setter Property="SelectionBrush"  Value="{DynamicResource Brush.BlueActive}"/>
@@ -126,7 +126,7 @@
         <!-- Select button inside race/class cards -->
         <Style x:Key="RaceSelectBtn" TargetType="Button">
             <Setter Property="Padding"    Value="8,3"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"   Value="10"/>
             <Setter Property="Cursor"     Value="Hand"/>
             <Setter Property="Template">
@@ -193,7 +193,7 @@
                                    Style="{StaticResource HeaderText}"
                                    FontSize="26"/>
                         <TextBlock Foreground="{DynamicResource Brush.Muted}"
-                                   FontFamily="Georgia" FontSize="13" Margin="0,3,0,0">
+                                   FontFamily="{StaticResource Font.Body}" FontSize="13" Margin="0,3,0,0">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Text" Value="{Binding TblSubtitle}"/>
@@ -253,7 +253,7 @@
                             <!-- Validation -->
                             <TextBlock Text="{Binding ValidationText}"
                                        Foreground="{DynamicResource Brush.Error}"
-                                       FontFamily="Georgia" FontSize="12"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="12"
                                        TextWrapping="Wrap"
                                        Margin="0,0,0,16"/>
 
@@ -275,26 +275,26 @@
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <TextBlock Text="{Binding TblShowName}"
                                                Foreground="{DynamicResource Brush.Muted}"
-                                               FontFamily="Georgia" FontSize="12"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12"/>
                                     <TextBlock Text="{Binding CharacterName}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="12" FontWeight="Bold"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="Bold"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <TextBlock Text="{Binding TblShowRace}"
                                                Foreground="{DynamicResource Brush.Muted}"
-                                               FontFamily="Georgia" FontSize="12"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12"/>
                                     <TextBlock Text="{Binding PreviewRaceName}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="12" FontWeight="Bold"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="Bold"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <TextBlock Text="{Binding TblShowClass}"
                                                Foreground="{DynamicResource Brush.Muted}"
-                                               FontFamily="Georgia" FontSize="12"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12"/>
                                     <TextBlock Text="{Binding PreviewClassName}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="12" FontWeight="Bold"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="Bold"/>
                                 </StackPanel>
 
                             </StackPanel>
@@ -366,7 +366,7 @@
                                                                 <ColumnDefinition Width="Auto"/>
                                                             </Grid.ColumnDefinitions>
                                                             <TextBlock Grid.Column="0" Text="{Binding Name}"
-                                                                       FontFamily="Georgia" FontSize="13" FontWeight="Bold"
+                                                                       FontFamily="{StaticResource Font.Body}" FontSize="13" FontWeight="Bold"
                                                                        Foreground="{DynamicResource Brush.GoldSoft}"
                                                                        VerticalAlignment="Center"/>
                                                             <Button Grid.Column="1" Command="{Binding SelectCommand}"
@@ -378,7 +378,7 @@
                                                         <Rectangle Grid.Row="2" Height="1"
                                                                    Fill="{DynamicResource Brush.Gold}" Opacity="0.2"/>
                                                         <TextBlock Grid.Row="4" Text="{Binding Description}"
-                                                                   FontFamily="Georgia" FontSize="11" TextWrapping="Wrap"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="11" TextWrapping="Wrap"
                                                                    Foreground="{DynamicResource Brush.Muted}"/>
                                                         <Border Grid.Row="6"
                                                                 Background="{DynamicResource Brush.Panel}"
@@ -386,7 +386,7 @@
                                                                 BorderThickness="1"
                                                                 CornerRadius="2" Padding="6,3">
                                                             <TextBlock Text="{Binding StatGrowthLabel}"
-                                                                       FontFamily="Georgia" FontSize="9"
+                                                                       FontFamily="{StaticResource Font.Body}" FontSize="9"
                                                                        Foreground="{DynamicResource Brush.SecondaryText}"/>
                                                         </Border>
                                                     </Grid>
@@ -454,7 +454,7 @@
                                                             <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding Name}"
-                                                                   FontFamily="Georgia" FontSize="12" FontWeight="Bold"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="Bold"
                                                                    Foreground="{DynamicResource Brush.GoldSoft}"
                                                                    VerticalAlignment="Center"/>
                                                         <Button Grid.Column="1" Command="{Binding SelectCommand}"
@@ -472,7 +472,7 @@
                                                             BorderThickness="1"
                                                             CornerRadius="2" Padding="4,2">
                                                         <TextBlock Text="{Binding StatGrowthLabel}"
-                                                                   FontFamily="Georgia" FontSize="9" TextWrapping="Wrap"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="9" TextWrapping="Wrap"
                                                                    Foreground="{DynamicResource Brush.SecondaryText}"/>
                                                     </Border>
                                                 </Grid>

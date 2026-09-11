@@ -17,7 +17,7 @@
             <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="13"/>
             <Setter Property="FontWeight"      Value="Bold"/>
             <Setter Property="Cursor"          Value="Hand"/>
@@ -67,7 +67,7 @@
             <Setter Property="Foreground"              Value="{DynamicResource Brush.Foreground}"/>
             <Setter Property="BorderBrush"             Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness"         Value="1"/>
-            <Setter Property="FontFamily"              Value="Georgia"/>
+            <Setter Property="FontFamily"              Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"                Value="14"/>
             <Setter Property="Padding"                 Value="10,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -105,7 +105,7 @@
                         <!-- Guild name when in guild -->
                         <TextBlock Visibility="{Binding IsInGuild, Converter={StaticResource BoolToVis}}"
                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                   FontFamily="Georgia" FontStyle="Italic" FontSize="13"
+                                   FontFamily="{StaticResource Font.Body}" FontStyle="Italic" FontSize="13"
                                    VerticalAlignment="Center" Margin="18,6,0,0">
                             <Run Text=" | "/>
                             <Run Text="{Binding GuildName, Mode=OneWay}"/>
@@ -119,14 +119,14 @@
                                 Background="{DynamicResource Brush.PanelDark}"
                                 BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
                                 CornerRadius="2" Padding="8,2" Margin="12,6,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding MyRank}" FontFamily="Georgia" FontSize="11"
+                            <TextBlock Text="{Binding MyRank}" FontFamily="{StaticResource Font.Body}" FontSize="11"
                                        Foreground="{DynamicResource Brush.GoldSoft}" FontWeight="Bold"/>
                         </Border>
 
                         <!-- Counts -->
                         <TextBlock Visibility="{Binding IsInGuild, Converter={StaticResource BoolToVis}}"
                                    Foreground="{DynamicResource Brush.Muted}"
-                                   FontFamily="Georgia" FontSize="12"
+                                   FontFamily="{StaticResource Font.Body}" FontSize="12"
                                    VerticalAlignment="Center" Margin="12,6,0,0">
                             <Run Text="{Binding MemberCount, Mode=OneWay}"/>
                             <Run Text="/50 members ·"/>
@@ -166,12 +166,12 @@
                                    Text="{Binding StatusMessage}"
                                    Visibility="{Binding HasStatus, Converter={StaticResource BoolToVis}}"
                                    Foreground="{DynamicResource Brush.Error}"
-                                   FontFamily="Georgia" FontSize="13"
+                                   FontFamily="{StaticResource Font.Body}" FontSize="13"
                                    Margin="0,0,0,10"/>
 
                         <!-- Pending invites -->
                         <StackPanel Grid.Row="1">
-                            <TextBlock Text="PENDING INVITES" FontFamily="Georgia" FontSize="12"
+                            <TextBlock Text="PENDING INVITES" FontFamily="{StaticResource Font.Body}" FontSize="12"
                                        FontWeight="Bold" Foreground="{DynamicResource Brush.GoldSoft}"
                                        Margin="0,0,0,8"/>
 
@@ -188,14 +188,14 @@
                                                     </Grid.ColumnDefinitions>
 
                                                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                        <TextBlock FontFamily="Georgia" FontSize="15"
+                                                        <TextBlock FontFamily="{StaticResource Font.Body}" FontSize="15"
                                                                    Foreground="{DynamicResource Brush.Foreground}">
                                                             <Run Text="["/><Run Text="{Binding GuildTag}"/><Run Text="] "/>
                                                             <Run Text="{Binding GuildName}" FontWeight="Bold"/>
                                                         </TextBlock>
                                                         <TextBlock Text="{Binding TypeLabel}"
                                                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                                                   FontFamily="Georgia" FontSize="11"/>
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="11"/>
                                                     </StackPanel>
 
                                                     <Button Grid.Column="1" Content="ACCEPT"
@@ -213,7 +213,7 @@
                             </ScrollViewer>
 
                             <TextBlock Text="No pending guild invites."
-                                       FontFamily="Georgia" FontSize="13" FontStyle="Italic"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="13" FontStyle="Italic"
                                        Foreground="{DynamicResource Brush.Muted}"
                                        Margin="0,8,0,0">
                                 <TextBlock.Style>
@@ -252,23 +252,23 @@
                                     BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
                                     CornerRadius="2" Padding="18">
                                 <StackPanel>
-                                    <TextBlock Text="CREATE GUILD" FontFamily="Georgia" FontSize="13"
+                                    <TextBlock Text="CREATE GUILD" FontFamily="{StaticResource Font.Body}" FontSize="13"
                                                FontWeight="Bold" Foreground="{DynamicResource Brush.GoldSoft}"
                                                Margin="0,0,0,12"/>
 
-                                    <TextBlock Text="Name" FontFamily="Georgia" FontSize="12"
+                                    <TextBlock Text="Name" FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                Foreground="{DynamicResource Brush.Muted}" Margin="0,0,0,4"/>
                                     <TextBox Text="{Binding CreateName, UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource PrimaryInput}" Margin="0,0,0,10"
                                              MaxLength="60"/>
 
-                                    <TextBlock Text="Tag (up to 5 letters)" FontFamily="Georgia" FontSize="12"
+                                    <TextBlock Text="Tag (up to 5 letters)" FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                Foreground="{DynamicResource Brush.Muted}" Margin="0,0,0,4"/>
                                     <TextBox Text="{Binding CreateTag, UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource PrimaryInput}" Margin="0,0,0,10"
                                              MaxLength="5" Width="120" HorizontalAlignment="Left"/>
 
-                                    <TextBlock Text="Description (optional)" FontFamily="Georgia" FontSize="12"
+                                    <TextBlock Text="Description (optional)" FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                Foreground="{DynamicResource Brush.Muted}" Margin="0,0,0,4"/>
                                     <TextBox Text="{Binding CreateDesc, UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource PrimaryInput}" Margin="0,0,0,10"
@@ -276,7 +276,7 @@
 
                                     <TextBlock Text="{Binding CreateError}"
                                                Foreground="{DynamicResource Brush.Error}"
-                                               FontFamily="Georgia" FontSize="12"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                Visibility="{Binding HasCreateError, Converter={StaticResource BoolToVis}}"
                                                Margin="0,0,0,8"/>
 
@@ -306,7 +306,7 @@
                                    Text="{Binding StatusMessage}"
                                    Visibility="{Binding HasStatus, Converter={StaticResource BoolToVis}}"
                                    Foreground="{DynamicResource Brush.Error}"
-                                   FontFamily="Georgia" FontSize="13" Margin="0,0,0,8"/>
+                                   FontFamily="{StaticResource Font.Body}" FontSize="13" Margin="0,0,0,8"/>
 
                         <!-- Invite panel (officer+) -->
                         <Grid Grid.Row="1" Margin="0,0,0,10"
@@ -374,12 +374,12 @@
                                         <RadioButton Content="Member"
                                                      IsChecked="{Binding InviteAsMember}"
                                                      Foreground="{DynamicResource Brush.Foreground}"
-                                                     FontFamily="Georgia" FontSize="13"
+                                                     FontFamily="{StaticResource Font.Body}" FontSize="13"
                                                      Margin="0,0,16,0"/>
                                         <RadioButton Content="Rookie"
                                                      IsChecked="{Binding InviteAsRookie}"
                                                      Foreground="{DynamicResource Brush.Foreground}"
-                                                     FontFamily="Georgia" FontSize="13"/>
+                                                     FontFamily="{StaticResource Font.Body}" FontSize="13"/>
                                     </StackPanel>
 
                                     <!-- Rookie level note -->
@@ -387,7 +387,7 @@
                                                Text="⚠ Rookie invites are only accepted by characters below level 20."
                                                Visibility="{Binding ShowRookieLevelNote, Converter={StaticResource BoolToVis}}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="11" FontStyle="Italic"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="11" FontStyle="Italic"
                                                Margin="0,0,0,6"/>
 
                                     <!-- Invite error -->
@@ -395,7 +395,7 @@
                                                Text="{Binding InviteError}"
                                                Visibility="{Binding HasInviteError, Converter={StaticResource BoolToVis}}"
                                                Foreground="{DynamicResource Brush.Error}"
-                                               FontFamily="Georgia" FontSize="12"/>
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12"/>
                                 </Grid>
                             </Border>
                         </Grid>
@@ -466,7 +466,7 @@
                                                             BorderBrush="{Binding RankBrush}"
                                                             BorderThickness="2" CornerRadius="17">
                                                         <TextBlock Text="{Binding AvatarInitial}"
-                                                                   FontFamily="Georgia" FontSize="14"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="14"
                                                                    Foreground="{DynamicResource Brush.Foreground}"
                                                                    HorizontalAlignment="Center"
                                                                    VerticalAlignment="Center"/>
@@ -481,13 +481,13 @@
                                                                        FontSize="10" Margin="0,0,6,0"
                                                                        VerticalAlignment="Center"/>
                                                             <TextBlock Text="{Binding Name}"
-                                                                       FontFamily="Georgia" FontSize="14"
+                                                                       FontFamily="{StaticResource Font.Body}" FontSize="14"
                                                                        Foreground="{DynamicResource Brush.Foreground}"
                                                                        FontWeight="Bold"/>
                                                         </StackPanel>
                                                         <TextBlock Text="{Binding Rank}"
                                                                    Foreground="{Binding RankBrush}"
-                                                                   FontFamily="Georgia" FontSize="11"/>
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="11"/>
                                                     </StackPanel>
 
                                                     <!-- Promote / Demote (officer+) -->
@@ -542,7 +542,7 @@
                                                             BorderBrush="{DynamicResource Brush.Muted}"
                                                             BorderThickness="2" CornerRadius="17">
                                                         <TextBlock Text="{Binding AvatarInitial}"
-                                                                   FontFamily="Georgia" FontSize="14"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="14"
                                                                    Foreground="{DynamicResource Brush.Foreground}"
                                                                    HorizontalAlignment="Center"
                                                                    VerticalAlignment="Center"/>
@@ -556,13 +556,13 @@
                                                                        FontSize="10" Margin="0,0,6,0"
                                                                        VerticalAlignment="Center"/>
                                                             <TextBlock Text="{Binding Name}"
-                                                                       FontFamily="Georgia" FontSize="14"
+                                                                       FontFamily="{StaticResource Font.Body}" FontSize="14"
                                                                        Foreground="{DynamicResource Brush.Foreground}"
                                                                        FontWeight="Bold"/>
                                                         </StackPanel>
                                                         <TextBlock Text="Rookie"
                                                                    Foreground="{DynamicResource Brush.Muted}"
-                                                                   FontFamily="Georgia" FontSize="11"/>
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="11"/>
                                                     </StackPanel>
 
                                                     <!-- Promote to member -->
@@ -593,7 +593,7 @@
                                             Margin="0,8,0,0">
 
                                     <TextBlock Text="Your guild does not own a property."
-                                               FontFamily="Georgia" FontSize="13" FontStyle="Italic"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="13" FontStyle="Italic"
                                                Foreground="{DynamicResource Brush.Muted}" Margin="0,0,0,16"/>
 
                                     <!-- Buy House (leader only) -->
@@ -604,15 +604,15 @@
                                             Visibility="{Binding IsLeader, Converter={StaticResource BoolToVis}}">
                                         <StackPanel>
                                             <TextBlock Text="GUILD HOUSE"
-                                                       FontFamily="Georgia" FontSize="12" FontWeight="Bold"
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="Bold"
                                                        Foreground="{DynamicResource Brush.GoldSoft}"
                                                        Margin="0,0,0,4"/>
                                             <TextBlock Text="Purchase a house at a city location. Cost scales with the city's prestige level."
-                                                       FontFamily="Georgia" FontSize="12"
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                        Foreground="{DynamicResource Brush.Muted}" Margin="0,0,0,10"/>
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="City Room ID"
-                                                           FontFamily="Georgia" FontSize="12"
+                                                           FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                            Foreground="{DynamicResource Brush.Muted}"
                                                            VerticalAlignment="Center" Margin="0,0,10,0"/>
                                                 <TextBox Text="{Binding BuyHouseIdInput, UpdateSourceTrigger=PropertyChanged}"
@@ -625,7 +625,7 @@
                                             <TextBlock Text="{Binding BuyHouseError}"
                                                        Visibility="{Binding HasBuyHouseError, Converter={StaticResource BoolToVis}}"
                                                        Foreground="{DynamicResource Brush.Error}"
-                                                       FontFamily="Georgia" FontSize="12" Margin="0,6,0,0"/>
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="12" Margin="0,6,0,0"/>
                                         </StackPanel>
                                     </Border>
 
@@ -636,19 +636,19 @@
                                             Visibility="{Binding IsLeader, Converter={StaticResource BoolToVis}}">
                                         <StackPanel>
                                             <TextBlock Text="GUILD BASE"
-                                                       FontFamily="Georgia" FontSize="12" FontWeight="Bold"
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="Bold"
                                                        Foreground="{DynamicResource Brush.GoldSoft}"
                                                        Margin="0,0,0,4"/>
                                             <TextBlock Text="Claim your current room as the guild's permanent base. Rooms are built using materials."
-                                                       FontFamily="Georgia" FontSize="12"
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                        Foreground="{DynamicResource Brush.Muted}" Margin="0,0,0,10"/>
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                                 <TextBlock Text="Current room:"
-                                                           FontFamily="Georgia" FontSize="12"
+                                                           FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                            Foreground="{DynamicResource Brush.Muted}"
                                                            VerticalAlignment="Center" Margin="0,0,6,0"/>
                                                 <TextBlock Text="{Binding CurrentRoomLabel}"
-                                                           FontFamily="Georgia" FontSize="12" FontWeight="Bold"
+                                                           FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="Bold"
                                                            Foreground="{DynamicResource Brush.Foreground}"
                                                            VerticalAlignment="Center"/>
                                             </StackPanel>
@@ -658,13 +658,13 @@
                                             <TextBlock Text="{Binding EstablishBaseError}"
                                                        Visibility="{Binding HasEstablishBaseError, Converter={StaticResource BoolToVis}}"
                                                        Foreground="{DynamicResource Brush.Error}"
-                                                       FontFamily="Georgia" FontSize="12" Margin="0,6,0,0"/>
+                                                       FontFamily="{StaticResource Font.Body}" FontSize="12" Margin="0,6,0,0"/>
                                         </StackPanel>
                                     </Border>
 
                                     <!-- Non-leader note -->
                                     <TextBlock Text="Only the guild leader can acquire a property."
-                                               FontFamily="Georgia" FontSize="12" FontStyle="Italic"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="12" FontStyle="Italic"
                                                Foreground="{DynamicResource Brush.Muted}">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
@@ -686,9 +686,9 @@
                                     <!-- Header -->
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
                                         <TextBlock Text="{Binding PropertyType}"
-                                                   FontFamily="Georgia" FontSize="15" FontWeight="Bold"
+                                                   FontFamily="{StaticResource Font.Heading}" FontSize="15" FontWeight="Bold"
                                                    Foreground="{DynamicResource Brush.Gold}" Margin="0,0,12,0"/>
-                                        <TextBlock FontFamily="Georgia" FontSize="12"
+                                        <TextBlock FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                    Foreground="{DynamicResource Brush.Muted}"
                                                    VerticalAlignment="Center">
                                             <Run Text="acquired"/>
@@ -697,7 +697,7 @@
                                     </StackPanel>
 
                                     <TextBlock Text="ROOMS"
-                                               FontFamily="Georgia" FontSize="11" FontWeight="Bold"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="Bold"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
                                                Margin="0,0,0,8"/>
 
@@ -713,17 +713,17 @@
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0"
                                                                    Text="{Binding DisplayName}"
-                                                                   FontFamily="Georgia" FontSize="13"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="13"
                                                                    Foreground="{DynamicResource Brush.Foreground}"
                                                                    VerticalAlignment="Center"/>
                                                         <TextBlock Grid.Column="1"
-                                                                   FontFamily="Georgia" FontSize="11"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="11"
                                                                    Foreground="{DynamicResource Brush.Muted}"
                                                                    VerticalAlignment="Center" Margin="16,0">
                                                             <Run Text="{Binding MinRankRequired, Mode=OneWay}"/><Run Text="+"/>
                                                         </TextBlock>
                                                         <TextBlock Grid.Column="2"
-                                                                   FontFamily="Georgia" FontSize="12"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="12"
                                                                    VerticalAlignment="Center"
                                                                    HorizontalAlignment="Right">
                                                             <TextBlock.Style>
@@ -761,7 +761,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0"
-                                           FontFamily="Georgia" FontSize="12"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="12"
                                            Foreground="{DynamicResource Brush.Muted}"
                                            VerticalAlignment="Center">
                                     <Run Text="Danger zone · "/>

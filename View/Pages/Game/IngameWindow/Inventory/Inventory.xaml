@@ -44,7 +44,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
                                Text="{Binding InventoryTitle}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="11"
                                FontWeight="Bold"
                                Foreground="{DynamicResource Brush.GoldSoft}"
@@ -78,7 +78,7 @@
                                    VerticalAlignment="Center" Margin="0,0,8,0"/>
                         <TextBlock Text="{Binding NotificationMessage}"
                                    Foreground="{DynamicResource Brush.Foreground}"
-                                   FontFamily="Georgia" FontSize="11"
+                                   FontFamily="{StaticResource Font.Body}" FontSize="11"
                                    TextWrapping="Wrap" VerticalAlignment="Center"/>
                     </DockPanel>
                 </Border>
@@ -151,7 +151,7 @@
                                             Padding="3,1">
                                         <TextBlock Text="{Binding Item.StackSize}"
                                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                                   FontFamily="Georgia"
+                                                   FontFamily="{StaticResource Font.Body}"
                                                    FontSize="10"
                                                    FontWeight="Bold"/>
                                     </Border>
@@ -181,23 +181,23 @@
                     Effect="{StaticResource Effect.HudShadow}">
                 <StackPanel DataContext="{Binding CurrentTooltip}">
                     <TextBlock Text="{Binding ItemName}"
-                               FontFamily="Georgia" FontSize="13" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="13" FontWeight="Bold"
                                Foreground="{DynamicResource Brush.Foreground}"
                                TextWrapping="Wrap" Margin="0,0,0,3"/>
                     <TextBlock Text="{Binding ItemRarity}"
-                               FontFamily="Georgia" FontSize="10" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10" FontWeight="Bold"
                                Foreground="{Binding RarityColor}" Margin="0,0,0,2"/>
                     <TextBlock Text="{Binding ItemType}"
-                               FontFamily="Georgia" FontSize="10"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                Foreground="{DynamicResource Brush.GoldSoft}" Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding ClassText}"
                                Visibility="{Binding HasClassInfo, Converter={StaticResource BoolToVisibilityConverter}}"
                                Foreground="{Binding ClassColor}"
-                               FontFamily="Georgia" FontSize="10"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                TextWrapping="Wrap" Margin="0,0,0,6"/>
                     <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.3" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding ItemStats}"
-                               FontFamily="Georgia" FontSize="10"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                Foreground="{DynamicResource Brush.Foreground}"
                                TextWrapping="Wrap"/>
                 </StackPanel>

@@ -53,14 +53,14 @@
                     Foreground="{DynamicResource Brush.GoldSoft}"
                     Background="Transparent"
                     BorderThickness="0"
-                    FontFamily="Georgia"
+                    FontFamily="{StaticResource Font.Body}"
                     FontSize="16"
                     Cursor="Hand"
                     Padding="4,0,12,0"/>
 
             <TextBlock Grid.Column="1"
                        Text="{Binding JobName}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="15"
                        FontWeight="Bold"
                        Foreground="{DynamicResource Brush.GoldSoft}"
@@ -83,7 +83,7 @@
                     Padding="8,3"
                     VerticalAlignment="Center">
                 <TextBlock Text="{Binding JobType}"
-                           FontFamily="Georgia"
+                           FontFamily="{StaticResource Font.Body}"
                            FontSize="11"
                            Foreground="{DynamicResource Brush.Muted}"/>
             </Border>
@@ -92,7 +92,7 @@
         <!-- Description -->
         <TextBlock Grid.Row="2"
                    Text="{Binding JobDescription}"
-                   FontFamily="Georgia"
+                   FontFamily="{StaticResource Font.Body}"
                    FontSize="13"
                    Foreground="{DynamicResource Brush.Muted}"
                    TextWrapping="Wrap"/>
@@ -117,7 +117,7 @@
                     Effect="{StaticResource Effect.PanelShadow}">
                 <StackPanel>
                     <TextBlock Text="{Binding SkillLabel}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Accent}"
@@ -128,7 +128,7 @@
                                  Style="{StaticResource AspectBar}"
                                  Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding SkillProgress}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="10"
                                Foreground="{DynamicResource Brush.Muted}"/>
                 </StackPanel>
@@ -144,7 +144,7 @@
                     Effect="{StaticResource Effect.PanelShadow}">
                 <StackPanel>
                     <TextBlock Text="{Binding KnowledgeLabel}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Accent}"
@@ -155,7 +155,7 @@
                                  Style="{StaticResource AspectBar}"
                                  Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding KnowledgeProgress}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="10"
                                Foreground="{DynamicResource Brush.Muted}"/>
                 </StackPanel>
@@ -171,7 +171,7 @@
                     Effect="{StaticResource Effect.PanelShadow}">
                 <StackPanel>
                     <TextBlock Text="{Binding FameLabel}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Gold}"
@@ -182,7 +182,7 @@
                                  Style="{StaticResource AspectBar}"
                                  Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding FameProgress}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="10"
                                Foreground="{DynamicResource Brush.Muted}"/>
                 </StackPanel>
@@ -196,7 +196,7 @@
                 HorizontalAlignment="Right"
                 Cursor="Hand"
                 Padding="16,8"
-                FontFamily="Georgia"
+                FontFamily="{StaticResource Font.Body}"
                 FontSize="13">
             <Button.Template>
                 <ControlTemplate TargetType="Button">

@@ -14,6 +14,14 @@
     <FontFamily x:Key="Font.Ui">Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Monospace">Consolas</FontFamily>
     <FontFamily x:Key="Font.Myriac">/Assets/Fonts/MyriacScript.ttf#MyriacScript</FontFamily>
+    <!-- Fantasy display font (AR4) - Regular+Bold both sit in Assets/Fonts/, so this folder-form
+         URI (no filename before the #) resolves "Cinzel" to two real embedded faces instead of a
+         single file, meaning FontWeight="Bold" renders true Cinzel-Bold rather than a synthetic/
+         faux-bold of Cinzel-Regular. Falls back to Georgia/Segoe UI for any glyph Cinzel lacks. -->
+    <FontFamily x:Key="Font.Heading">/Assets/Fonts/#Cinzel, Georgia, Segoe UI</FontFamily>
+    <!-- Georgia was already the app's de facto body font (333 hardcoded literals across 47 files
+         before AR4) - this just gives the existing choice a name so it's centrally swappable. -->
+    <FontFamily x:Key="Font.Body">Georgia, Segoe UI</FontFamily>
 
     <!-- Window baseline -->
     <Style TargetType="{x:Type Window}">
@@ -33,34 +41,93 @@
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
     
-    <Style x:Key="NpcDialogButton" TargetType="Button">
-        <Setter Property="Height"          Value="46"/>
-        <Setter Property="Foreground"      Value="{DynamicResource Brush.Muted}"/>
-        <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
-        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontFamily"      Value="Georgia"/>
-        <Setter Property="FontSize"        Value="13"/>
-        <Setter Property="FontWeight"      Value="Bold"/>
-        <Setter Property="Cursor"          Value="Hand"/>
+    <!-- ── Shared gold-button templates (AR4) ──────────────────────────────────
+         Two structural families used across the app's button styles, previously
+         reimplemented near-identically ~10 times each with an inconsistent CornerRadius
+         mix (2/4/6/10/0). TargetType is deliberately ButtonBase (not Button) so a
+         RadioButton (CharacterSelectButton) can also derive from GoldBarButtonBase - Button
+         and RadioButton are siblings under ButtonBase, not parent/child.
+         Each derived style below keeps its own colors AND its own full IsMouseOver/IsPressed/
+         IsEnabled Style.Triggers block, rather than inheriting shared trigger defaults - hover
+         treatment varies too much in KIND (background swap vs borderbrush swap vs opacity fade
+         vs no-op) across the original styles to safely default, and BasedOn concatenates
+         Style.Triggers rather than replacing them, so an inherited default trigger can't be
+         "cancelled" by a derived style that doesn't want it - only safely added to. -->
+    <Style x:Key="GoldButtonBase" TargetType="{x:Type ButtonBase}">
+        <Setter Property="BorderThickness"            Value="1"/>
+        <Setter Property="FontFamily"                 Value="{StaticResource Font.Body}"/>
+        <Setter Property="Cursor"                      Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment"   Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2" Padding="5">
-                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource Radius.Item}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Bar-accent family: Grid with BarLeft/BarRight accent rectangles that fade in on hover -
+         this fade behavior is identical across all 3 derived styles so it's safely baked into
+         the shared template itself (unlike GoldButtonBase's hover colors, which vary by style). -->
+    <Style x:Key="GoldBarButtonBase" TargetType="{x:Type ButtonBase}">
+        <Setter Property="Cursor"                     Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment"   Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="4"/>
+                            </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="BarLeft" Fill="{DynamicResource Brush.Gold}"
+                                       RadiusX="2" RadiusY="2" Opacity="0"/>
+                            <ContentPresenter Grid.Column="1"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <Rectangle x:Name="BarRight" Grid.Column="2" Fill="{DynamicResource Brush.Gold}"
+                                       RadiusX="2" RadiusY="2" Opacity="0"/>
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+                            <Setter TargetName="BarLeft"  Property="Opacity" Value="1"/>
+                            <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="NpcDialogButton" TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+        <Setter Property="Height"      Value="46"/>
+        <Setter Property="Padding"     Value="5"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Brush.Muted}"/>
+        <Setter Property="Background"  Value="{DynamicResource Brush.PanelDark}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+        <Setter Property="FontSize"    Value="13"/>
+        <Setter Property="FontWeight"  Value="Bold"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <!-- Rounded Button (layout-only; colors via DynamicResource brushes) -->
     <Style TargetType="{x:Type Button}">
@@ -104,152 +171,72 @@
     </Style>
 
     <!-- Menu item button: transparent, full-width, accent bars on hover -->
-    <Style x:Key="IngameMenuItem" TargetType="Button">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="FontSize" Value="15"/>
-        <Setter Property="Cursor" Value="Hand"/>
+    <Style x:Key="IngameMenuItem" TargetType="Button" BasedOn="{StaticResource GoldBarButtonBase}">
+        <Setter Property="Background"          Value="Transparent"/>
+        <Setter Property="Foreground"          Value="{DynamicResource Brush.Foreground}"/>
+        <Setter Property="BorderThickness"     Value="0"/>
+        <Setter Property="FontSize"            Value="15"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="0,11">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="4"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="4"/>
-                            </Grid.ColumnDefinitions>
-                            <Rectangle x:Name="BarLeft" Fill="{DynamicResource Brush.Accent}"
-                                       RadiusX="2" RadiusY="2" Opacity="0"/>
-                            <ContentPresenter Grid.Column="1"
-                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="BarRight" Grid.Column="2" Fill="{DynamicResource Brush.Accent}"
-                                       RadiusX="2" RadiusY="2" Opacity="0"/>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.TileBackground}"/>
-                            <Setter TargetName="BarLeft" Property="Opacity" Value="1"/>
-                            <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.75"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.35"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Padding"             Value="0,11"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.TileBackground}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Opacity" Value="0.75"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.35"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Startup menu button -->
-    <Style x:Key="StartupMenuButton" TargetType="Button">
-        <Setter Property="MinHeight"               Value="54"/>
-        <Setter Property="Foreground"              Value="{DynamicResource Brush.GoldSoft}"/>
-        <Setter Property="Background"              Value="{DynamicResource Brush.PanelDark}"/>
-        <Setter Property="BorderBrush"             Value="{DynamicResource Brush.Gold}"/>
-        <Setter Property="BorderThickness"         Value="1"/>
-        <Setter Property="FontFamily"              Value="Georgia"/>
-        <Setter Property="FontSize"                Value="18"/>
-        <Setter Property="Cursor"                  Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment"   Value="Center"/>
-        <Setter Property="Padding"                 Value="14,0"/>
-        <Setter Property="Margin"                  Value="0,0,0,10"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="2">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="4"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="4"/>
-                            </Grid.ColumnDefinitions>
-                            <Rectangle x:Name="BarLeft"  Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
-                            <ContentPresenter Grid.Column="1"
-                                              Margin="{TemplateBinding Padding}"
-                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              RecognizesAccessKey="True"/>
-                            <Rectangle x:Name="BarRight" Grid.Column="2" Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"           Value="{DynamicResource Brush.NavHover}"/>
-                            <Setter TargetName="BarLeft"  Property="Opacity" Value="1"/>
-                            <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.35"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style x:Key="StartupMenuButton" TargetType="Button" BasedOn="{StaticResource GoldBarButtonBase}">
+        <Setter Property="MinHeight"       Value="54"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
+        <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
+        <Setter Property="FontSize"        Value="18"/>
+        <Setter Property="Padding"         Value="14,0"/>
+        <Setter Property="Margin"          Value="0,0,0,10"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.35"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Character selection toggle: same look as IngameMenuItem, stays highlighted when checked -->
-    <Style x:Key="CharacterSelectButton" TargetType="RadioButton">
+    <Style x:Key="CharacterSelectButton" TargetType="RadioButton" BasedOn="{StaticResource GoldBarButtonBase}">
         <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
         <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
         <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontFamily"      Value="Georgia"/>
+        <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
         <Setter Property="FontSize"        Value="14"/>
-        <Setter Property="Cursor"          Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="RadioButton">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="4"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="4"/>
-                            </Grid.ColumnDefinitions>
-                            <Rectangle x:Name="BarLeft"  Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
-                            <ContentPresenter Grid.Column="1" Margin="10,10"
-                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Rectangle x:Name="BarRight" Grid.Column="2" Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.NavHover}"/>
-                            <Setter TargetName="BarLeft"  Property="Opacity" Value="1"/>
-                            <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
-                        </Trigger>
-                        <!-- IsChecked comes after IsMouseOver so the selected state always wins -->
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Bd" Property="Background"   Value="{DynamicResource Brush.BlueActive}"/>
-                            <Setter TargetName="Bd" Property="BorderBrush"  Value="{DynamicResource Brush.Gold}"/>
-                            <Setter TargetName="BarLeft"  Property="Opacity" Value="1"/>
-                            <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.75"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Padding"         Value="10,10"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.NavHover}"/>
+            </Trigger>
+            <!-- IsChecked comes after IsMouseOver so the selected state always wins -->
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background"  Value="{DynamicResource Brush.BlueActive}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Opacity" Value="0.75"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Optional: simple panel look -->
@@ -829,41 +816,24 @@
     </Style>
 
     <!-- Shop secondary button (−, +, Max, Back) -->
-    <Style x:Key="ShopQtyButton" TargetType="Button">
-        <Setter Property="Height"          Value="30"/>
-        <Setter Property="Padding"         Value="8,0"/>
-        <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
-        <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
-        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontFamily"      Value="Georgia"/>
-        <Setter Property="FontSize"        Value="14"/>
-        <Setter Property="Cursor"          Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="4"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.35"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style x:Key="ShopQtyButton" TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+        <Setter Property="Height"      Value="30"/>
+        <Setter Property="Padding"     Value="8,0"/>
+        <Setter Property="Background"  Value="{DynamicResource Brush.PanelDark}"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Brush.GoldSoft}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+        <Setter Property="FontSize"    Value="14"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Opacity" Value="0.7"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.35"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Shop quantity text box — matches ShopQtyButton height and palette -->
@@ -904,43 +874,80 @@
         </Setter>
     </Style>
 
-    <!-- Shop primary action button (Buy / Repurchase) -->
-    <Style x:Key="ShopPrimaryButton" TargetType="Button">
-        <Setter Property="Padding"         Value="15,10"/>
-        <Setter Property="Background"      Value="{DynamicResource Brush.BlueActive}"/>
-        <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
+    <!-- Flush gold-bordered form inputs - promoted from Page_Account.xaml's page-local
+         AccTextBox/AccPasswordBox (AR4 consolidation), echoing the same look ShopQtyTextBox
+         already used ad hoc, as a first-class shared "form input" pair. -->
+    <Style x:Key="GoldTextBox" TargetType="{x:Type TextBox}">
+        <Setter Property="Height"          Value="36"/>
+        <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Brush.Foreground}"/>
         <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontFamily"      Value="Georgia"/>
+        <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
         <Setter Property="FontSize"        Value="13"/>
-        <Setter Property="FontWeight"      Value="Bold"/>
-        <Setter Property="Cursor"          Value="Hand"/>
-        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Padding"         Value="10,0"/>
+        <Setter Property="Margin"          Value="0,0,0,8"/>
+        <Setter Property="CaretBrush"      Value="{DynamicResource Brush.Foreground}"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="4"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"/>
                     </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.8"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.65"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.35"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="GoldPasswordBox" TargetType="{x:Type PasswordBox}">
+        <Setter Property="Height"          Value="36"/>
+        <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Brush.Foreground}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
+        <Setter Property="FontSize"        Value="13"/>
+        <Setter Property="Padding"         Value="10,0"/>
+        <Setter Property="Margin"          Value="0,0,0,8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type PasswordBox}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Shop primary action button (Buy / Repurchase) -->
+    <Style x:Key="ShopPrimaryButton" TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+        <Setter Property="Padding"             Value="15,10"/>
+        <Setter Property="Background"          Value="{DynamicResource Brush.BlueActive}"/>
+        <Setter Property="Foreground"          Value="{DynamicResource Brush.GoldSoft}"/>
+        <Setter Property="BorderBrush"         Value="{DynamicResource Brush.Gold}"/>
+        <Setter Property="FontSize"            Value="13"/>
+        <Setter Property="FontWeight"          Value="Bold"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Opacity" Value="0.8"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Opacity" Value="0.65"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.35"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Shared NPC-panel list item (upgrade / craft list boxes) -->
@@ -1246,38 +1253,10 @@
         </Style.Triggers>
     </Style>
 
-    <!-- small Window close button -->
-    <Style x:Key="WindowCloseButtonSmall" TargetType="Button">
-        <Setter Property="Width"           Value="35"/>
-        <Setter Property="Height"          Value="35"/>
-        <Setter Property="Margin"          Value="8"/>
-        <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
-        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
-        <Setter Property="FontFamily"      Value="Segoe UI Symbol"/>
-        <Setter Property="FontSize"        Value="20"/>
-        <Setter Property="Cursor"          Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#5A1D1D"/>
-                <Setter Property="Foreground" Value="White"/>
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#7B2020"/>
-            </Trigger>
-        </Style.Triggers>
+    <!-- small Window close button - identical to WindowCloseButton except size -->
+    <Style x:Key="WindowCloseButtonSmall" TargetType="Button" BasedOn="{StaticResource WindowCloseButton}">
+        <Setter Property="Width"  Value="35"/>
+        <Setter Property="Height" Value="35"/>
     </Style>
     <!-- ── RPG Game UI ──────────────────────────────────────────────────────── -->
 
@@ -1297,23 +1276,95 @@
         <Setter Property="Effect"          Value="{StaticResource Effect.PanelShadow}"/>
     </Style>
 
+    <!-- ── Decorative ornaments (AR4) ───────────────────────────────────────────
+         Pure vector Path/Geometry inside a Viewbox, same technique Icons.xaml's 96 item icons
+         already use - no bitmap art. First applied to Window_InitError.xaml and a few
+         Page_Account.xaml panels only (see TODO.md AR4) - not a global GoldBorder replacement. -->
+
+    <!-- One small "rune stone + tendril" motif, drawn once for the top-left corner and reused at
+         the other three corners via RotateTransform in OrnateGoldFrame below - keeps this DRY
+         instead of drawing four near-duplicate geometries. -->
+    <DataTemplate x:Key="Ornament.CornerFlourish">
+        <Viewbox Width="20" Height="20" Stretch="Uniform">
+            <Canvas Width="24" Height="24">
+                <!-- Tendrils radiate from the stone along both edges -->
+                <Path Data="M 11,6 Q 18,4 24,2" Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1.4" Fill="{x:Null}"/>
+                <Path Data="M 6,11 Q 4,18 2,24"  Stroke="{DynamicResource Brush.Gold}" StrokeThickness="1.4" Fill="{x:Null}"/>
+                <!-- Diamond "rune stone" at the corner apex -->
+                <Path Data="M 6,1 L 11,6 L 6,11 L 1,6 Z"
+                      Fill="{DynamicResource Brush.Gold}"
+                      Stroke="{DynamicResource Brush.GoldSoft}"
+                      StrokeThickness="0.6"/>
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
+    <!-- Drop-in replacement for <Border Style="{StaticResource GoldBorder}"> that adds the corner
+         flourish above at all four corners. Uses a plain ContentControl (same technique the
+         existing EquipmentSlot style already uses) - no new C# class needed. -->
+    <Style x:Key="OrnateGoldFrame" TargetType="{x:Type ContentControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                    <Grid>
+                        <Border BorderBrush="{DynamicResource Brush.Gold}"
+                                BorderThickness="1"
+                                CornerRadius="2"
+                                Background="{DynamicResource Brush.Background}"
+                                Effect="{StaticResource Effect.PanelShadow}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ContentControl ContentTemplate="{StaticResource Ornament.CornerFlourish}"
+                                         HorizontalAlignment="Left" VerticalAlignment="Top"
+                                         Margin="-2,-2,0,0" IsHitTestVisible="False"/>
+                        <ContentControl ContentTemplate="{StaticResource Ornament.CornerFlourish}"
+                                         HorizontalAlignment="Right" VerticalAlignment="Top"
+                                         Margin="0,-2,-2,0" IsHitTestVisible="False"
+                                         RenderTransformOrigin="0.5,0.5">
+                            <ContentControl.RenderTransform>
+                                <RotateTransform Angle="90"/>
+                            </ContentControl.RenderTransform>
+                        </ContentControl>
+                        <ContentControl ContentTemplate="{StaticResource Ornament.CornerFlourish}"
+                                         HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                         Margin="0,0,-2,-2" IsHitTestVisible="False"
+                                         RenderTransformOrigin="0.5,0.5">
+                            <ContentControl.RenderTransform>
+                                <RotateTransform Angle="180"/>
+                            </ContentControl.RenderTransform>
+                        </ContentControl>
+                        <ContentControl ContentTemplate="{StaticResource Ornament.CornerFlourish}"
+                                         HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                         Margin="-2,0,0,-2" IsHitTestVisible="False"
+                                         RenderTransformOrigin="0.5,0.5">
+                            <ContentControl.RenderTransform>
+                                <RotateTransform Angle="270"/>
+                            </ContentControl.RenderTransform>
+                        </ContentControl>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- RPG Typography -->
     <Style x:Key="HeaderText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-        <Setter Property="FontFamily" Value="Georgia"/>
+        <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
         <Setter Property="FontSize"   Value="38"/>
     </Style>
 
     <Style x:Key="SectionTitle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-        <Setter Property="FontFamily" Value="Georgia"/>
+        <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
         <Setter Property="FontSize"   Value="15"/>
         <Setter Property="FontWeight" Value="Bold"/>
     </Style>
 
     <Style x:Key="BodyText" TargetType="TextBlock">
         <Setter Property="Foreground"        Value="{DynamicResource Brush.Foreground}"/>
-        <Setter Property="FontFamily"        Value="Georgia"/>
+        <Setter Property="FontFamily"        Value="{StaticResource Font.Body}"/>
         <Setter Property="FontSize"          Value="14"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
@@ -1323,69 +1374,51 @@
         <Setter Property="FontSize"   Value="13"/>
     </Style>
 
+    <!-- Error/validation text - promoted from Page_Account.xaml's page-local AccMessageText,
+         since form-validation text is a generically reusable pattern (AR4 consolidation). -->
+    <Style x:Key="ErrorText" TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
+        <Setter Property="Foreground"    Value="{DynamicResource Brush.Error}"/>
+        <Setter Property="TextWrapping"  Value="Wrap"/>
+    </Style>
+
     <!-- Sidebar nav button (Character page tabs) -->
-    <Style x:Key="NavBtn" TargetType="Button">
+    <Style x:Key="NavBtn" TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
         <Setter Property="Background"                 Value="Transparent"/>
         <Setter Property="BorderBrush"                Value="{DynamicResource Brush.Border}"/>
         <Setter Property="BorderThickness"            Value="0,0,0,1"/>
         <Setter Property="Foreground"                 Value="{DynamicResource Brush.GoldSoft}"/>
-        <Setter Property="Cursor"                     Value="Hand"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="Padding"                    Value="14,0"/>
         <Setter Property="Height"                     Value="46"/>
-        <Setter Property="FontFamily"                 Value="Georgia"/>
         <Setter Property="FontSize"                   Value="13"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="Center"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background"  Value="{DynamicResource Brush.NavHover}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background"  Value="{DynamicResource Brush.NavHover}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Stat +/− button (Character page attribute editing) -->
-    <Style x:Key="StatBtn" TargetType="Button">
-        <Setter Property="Width"      Value="22"/>
-        <Setter Property="Height"     Value="22"/>
-        <Setter Property="Padding"    Value="0"/>
-        <Setter Property="FontSize"   Value="13"/>
-        <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-        <Setter Property="Cursor"     Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd" Background="{DynamicResource Brush.PanelDark}"
-                            BorderBrush="{DynamicResource Brush.Gold}"
-                            BorderThickness="1" CornerRadius="3">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.35"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style x:Key="StatBtn" TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+        <Setter Property="Width"       Value="22"/>
+        <Setter Property="Height"      Value="22"/>
+        <Setter Property="Padding"     Value="0"/>
+        <Setter Property="FontSize"    Value="13"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Brush.Foreground}"/>
+        <Setter Property="Background"  Value="{DynamicResource Brush.PanelDark}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Opacity" Value="0.7"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.35"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Gradient progress bar with rounded corners -->
@@ -1409,75 +1442,43 @@
     </Style>
 
     <!-- Chat channel tab button -->
-    <Style x:Key="ChatTabBtn" TargetType="Button">
-        <Setter Property="Height"          Value="32"/>
-        <Setter Property="Padding"         Value="14,0"/>
-        <Setter Property="Margin"          Value="0,0,6,0"/>
-        <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
-        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontFamily"      Value="Georgia"/>
-        <Setter Property="FontSize"        Value="13"/>
-        <Setter Property="Cursor"          Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="4">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          Margin="{TemplateBinding Padding}"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brush.GoldSoft}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.4"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style x:Key="ChatTabBtn" TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+        <Setter Property="Height"      Value="32"/>
+        <Setter Property="Padding"     Value="14,0"/>
+        <Setter Property="Margin"      Value="0,0,6,0"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Brush.GoldSoft}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+        <Setter Property="FontSize"    Value="13"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.GoldSoft}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Square icon button (game page top toolbar) -->
-    <Style x:Key="IconButton" TargetType="Button">
-        <Setter Property="Width"           Value="36"/>
-        <Setter Property="Height"          Value="36"/>
-        <Setter Property="Padding"         Value="0"/>
-        <Setter Property="Margin"          Value="3,0"/>
-        <Setter Property="Foreground"      Value="{DynamicResource Brush.Foreground}"/>
-        <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
-        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Cursor"          Value="Hand"/>
+    <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+        <Setter Property="Width"       Value="36"/>
+        <Setter Property="Height"      Value="36"/>
+        <Setter Property="Padding"     Value="0"/>
+        <Setter Property="Margin"      Value="3,0"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Brush.Foreground}"/>
+        <Setter Property="Background"  Value="{DynamicResource Brush.PanelDark}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
         <Setter Property="ToolTipService.ShowDuration" Value="60000"/>
-        <Setter Property="Effect"          Value="{StaticResource Effect.HudShadow}"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="2">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background"  Value="{DynamicResource Brush.BlueActive}"/>
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Effect"      Value="{StaticResource Effect.HudShadow}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background"  Value="{DynamicResource Brush.BlueActive}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Opacity" Value="0.7"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Small rounded button (party / invite panel) -->

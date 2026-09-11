@@ -17,7 +17,7 @@
 
         <Style x:Key="StartupTitleText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
             <Setter Property="FontSize" Value="64"/>
             <Setter Property="Effect" Value="{StaticResource StartupGlow}"/>
         </Style>
@@ -74,7 +74,7 @@
                                Margin="0,0,18,0"/>
                     <TextBlock Text="Myria"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="25"
                                FontWeight="Bold"
                                VerticalAlignment="Center"/>

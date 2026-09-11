@@ -24,7 +24,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0"
                        Text="{Binding Title}"
-                       FontFamily="Georgia"
+                       FontFamily="{StaticResource Font.Body}"
                        FontSize="11"
                        FontWeight="Bold"
                        Foreground="{DynamicResource Brush.GoldSoft}"
@@ -92,7 +92,7 @@
                         <TextBlock x:Name="RecipeNameText"
                                    Grid.Column="1"
                                    Text="{Binding SelectedName}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="13"
                                    FontWeight="Bold"
                                    Foreground="{DynamicResource Brush.GoldSoft}"
@@ -128,7 +128,7 @@
                                             <TextBlock x:Name="IngredientNameText"
                                                        Grid.Column="1"
                                                        Text="{Binding DisplayString}"
-                                                       FontFamily="Georgia"
+                                                       FontFamily="{StaticResource Font.Body}"
                                                        FontSize="13"
                                                        Foreground="{DynamicResource Brush.Foreground}"
                                                        VerticalAlignment="Center"
@@ -143,13 +143,13 @@
                     <!-- Quantity + craft button -->
                     <StackPanel Grid.Row="2" Margin="0,10,0,0">
                         <TextBlock Text="{Binding StatusMessage}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="12"
                                    Foreground="{DynamicResource Brush.Muted}"
                                    Margin="0,0,0,8"
                                    TextWrapping="Wrap"/>
                         <TextBlock Text="{Binding QuantityLabel}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontSize="12"
                                    Foreground="{DynamicResource Brush.GoldSoft}"
                                    Margin="0,0,0,5"/>

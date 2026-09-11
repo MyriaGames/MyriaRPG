@@ -21,7 +21,7 @@
             <Setter Property="Background"                  Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush"                 Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness"             Value="1"/>
-            <Setter Property="FontFamily"                  Value="Georgia"/>
+            <Setter Property="FontFamily"                  Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"                    Value="16"/>
             <Setter Property="Cursor"                      Value="Hand"/>
             <Setter Property="HorizontalContentAlignment"  Value="Center"/>
@@ -157,7 +157,7 @@
                                Margin="0,0,14,0"/>
                     <TextBlock Text="Select a Lobby"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="22"
                                FontWeight="Bold"
                                VerticalAlignment="Center"/>
@@ -178,7 +178,7 @@
                 <!-- Loading text -->
                 <TextBlock Text="Loading..."
                            Foreground="{DynamicResource Brush.Muted}"
-                           FontFamily="Georgia"
+                           FontFamily="{StaticResource Font.Body}"
                            FontSize="14"
                            HorizontalAlignment="Center"
                            Margin="0,8,0,16"
@@ -200,7 +200,7 @@
 
                                 <TextBlock Text="{Binding Name}"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                           FontFamily="Georgia"
+                                           FontFamily="{StaticResource Font.Body}"
                                            FontSize="17"
                                            VerticalAlignment="Center"/>
 

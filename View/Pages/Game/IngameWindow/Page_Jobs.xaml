@@ -55,7 +55,7 @@
             <Setter Property="Background"      Value="{DynamicResource Brush.BlueActive}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="14"/>
             <Setter Property="Cursor"          Value="Hand"/>
             <Setter Property="Template">
@@ -128,7 +128,7 @@
                     </Grid>
                     <TextBlock Text="{Binding TblSubtitle}"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia" FontStyle="Italic" FontSize="14"
+                               FontFamily="{StaticResource Font.Body}" FontStyle="Italic" FontSize="14"
                                HorizontalAlignment="Center" Margin="0,10,0,0"/>
                 </StackPanel>
             </Grid>
@@ -144,7 +144,7 @@
                     Visibility="{Binding IsOnCooldown, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="{Binding CooldownMessage}"
                            Foreground="{DynamicResource Brush.GoldSoft}"
-                           FontFamily="Georgia" FontStyle="Italic" FontSize="13"
+                           FontFamily="{StaticResource Font.Body}" FontStyle="Italic" FontSize="13"
                            TextWrapping="Wrap"/>
             </Border>
 
@@ -182,11 +182,11 @@
                                        FontSize="40" HorizontalAlignment="Center"/>
                             <TextBlock Text="{Binding TblNoActive}"
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia" FontSize="20"
+                                       FontFamily="{StaticResource Font.Body}" FontSize="20"
                                        HorizontalAlignment="Center" Margin="0,12,0,8"/>
                             <TextBlock Text="{Binding TblNoActiveHint}"
                                        Foreground="{DynamicResource Brush.Muted}"
-                                       FontFamily="Georgia" FontStyle="Italic" FontSize="14"
+                                       FontFamily="{StaticResource Font.Body}" FontStyle="Italic" FontSize="14"
                                        HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
                         </StackPanel>
 
@@ -221,14 +221,14 @@
                                 <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="8,0,0,0">
                                     <TextBlock Text="{Binding CurrentJob.Name}"
                                                Foreground="{DynamicResource Brush.Foreground}"
-                                               FontFamily="Georgia" FontSize="20"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="20"
                                                TextWrapping="Wrap"/>
                                     <Border Height="22" BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1"
                                             Background="{DynamicResource Brush.PanelDark}"
                                             HorizontalAlignment="Left" Margin="0,6,0,8" Padding="10,0">
                                         <TextBlock Text="{Binding CurrentJob.ActiveSkillLevelText}"
                                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                                   FontFamily="Georgia" FontSize="11"
+                                                   FontFamily="{StaticResource Font.Body}" FontSize="11"
                                                    VerticalAlignment="Center"/>
                                     </Border>
                                     <TextBlock Text="{Binding CurrentJob.Description}"
@@ -243,7 +243,7 @@
                                     <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.55" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding TblOverview}"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontFamily="Georgia" FontSize="13"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="13"
                                                Background="{DynamicResource Brush.Panel}"
                                                Padding="12,0" HorizontalAlignment="Center"/>
                                 </Grid>
@@ -383,7 +383,7 @@
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding Name}"
                                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                                               FontFamily="Georgia" FontSize="16"
+                                                               FontFamily="{StaticResource Font.Body}" FontSize="16"
                                                                VerticalAlignment="Center"/>
                                                     <Border Margin="6,0,0,0" Padding="6,1"
                                                             Background="{DynamicResource Brush.BlueActive}"
@@ -392,7 +392,7 @@
                                                             Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}">
                                                         <TextBlock Text="{Binding DataContext.TblActiveBadge, RelativeSource={RelativeSource AncestorType=Page}}"
                                                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                                                   FontFamily="Georgia" FontSize="9"/>
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="9"/>
                                                     </Border>
                                                 </StackPanel>
                                                 <Button Grid.Column="1"

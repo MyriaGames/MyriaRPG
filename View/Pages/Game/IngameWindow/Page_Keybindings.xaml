@@ -16,20 +16,20 @@
 
         <Style x:Key="KeybindHeaderText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
             <Setter Property="FontSize" Value="44"/>
         </Style>
 
         <Style x:Key="KeybindBodyText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="17"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
         <Style x:Key="KeybindColumnHeaderText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="TextAlignment" Value="Center"/>
@@ -44,7 +44,7 @@
             <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -105,7 +105,7 @@
             <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -162,7 +162,7 @@
                 <TextBlock Text="{Binding WindowTitle}" Style="{StaticResource KeybindHeaderText}"/>
                 <TextBlock Text="{Binding TblDescription}"
                            Foreground="{DynamicResource Brush.GoldSoft}"
-                           FontFamily="Georgia"
+                           FontFamily="{StaticResource Font.Body}"
                            FontStyle="Italic"
                            FontSize="17"
                            Margin="34,8,0,0"/>

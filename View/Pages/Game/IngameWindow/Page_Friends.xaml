@@ -21,7 +21,7 @@
             <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="13"/>
             <Setter Property="FontWeight"      Value="Bold"/>
             <Setter Property="Cursor"          Value="Hand"/>
@@ -53,7 +53,7 @@
             <Setter Property="Background"              Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush"             Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness"         Value="1"/>
-            <Setter Property="FontFamily"              Value="Georgia"/>
+            <Setter Property="FontFamily"              Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"                Value="15"/>
             <Setter Property="Cursor"                  Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -117,7 +117,7 @@
             <Setter Property="Foreground"              Value="{DynamicResource Brush.Foreground}"/>
             <Setter Property="BorderBrush"             Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness"         Value="1"/>
-            <Setter Property="FontFamily"              Value="Georgia"/>
+            <Setter Property="FontFamily"              Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"                Value="15"/>
             <Setter Property="Padding"                 Value="12,0"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -160,7 +160,7 @@
                         <TextBlock Text="FRIENDS"
                                    Style="{StaticResource HeaderText}"/>
                         <TextBlock Foreground="{DynamicResource Brush.GoldSoft}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontStyle="Italic"
                                    FontSize="13"
                                    VerticalAlignment="Center"
@@ -259,7 +259,7 @@
                                                                 VerticalAlignment="Center">
                                                             <TextBlock Text="{Binding AvatarInitial}"
                                                                        Foreground="White"
-                                                                       FontFamily="Georgia"
+                                                                       FontFamily="{StaticResource Font.Body}"
                                                                        FontSize="17"
                                                                        FontWeight="Bold"
                                                                        HorizontalAlignment="Center"
@@ -270,7 +270,7 @@
                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
                                                             <TextBlock Text="{Binding Username}"
                                                                        Foreground="{DynamicResource Brush.Foreground}"
-                                                                       FontFamily="Georgia"
+                                                                       FontFamily="{StaticResource Font.Body}"
                                                                        FontSize="16"
                                                                        FontWeight="Bold"/>
                                                             <TextBlock Text="{Binding LevelClassText}"
@@ -291,7 +291,7 @@
                                                                     HorizontalAlignment="Right">
                                                                 <TextBlock Text="{Binding StatusText}"
                                                                            Foreground="{Binding StatusForeground}"
-                                                                           FontFamily="Georgia"
+                                                                           FontFamily="{StaticResource Font.Body}"
                                                                            FontSize="11"
                                                                            FontWeight="Bold"/>
                                                             </Border>
@@ -391,7 +391,7 @@
                                                                     VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding AvatarInitial}"
                                                                            Foreground="{DynamicResource Brush.GoldSoft}"
-                                                                           FontFamily="Georgia"
+                                                                           FontFamily="{StaticResource Font.Body}"
                                                                            FontSize="17"
                                                                            FontWeight="Bold"
                                                                            HorizontalAlignment="Center"
@@ -401,7 +401,7 @@
                                                             <TextBlock Grid.Column="1"
                                                                        Text="{Binding FromUsername}"
                                                                        Foreground="{DynamicResource Brush.Foreground}"
-                                                                       FontFamily="Georgia"
+                                                                       FontFamily="{StaticResource Font.Body}"
                                                                        FontSize="16"
                                                                        FontWeight="Bold"
                                                                        VerticalAlignment="Center"
@@ -493,7 +493,7 @@
                                                                     VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding AvatarInitial}"
                                                                            Foreground="{DynamicResource Brush.Error}"
-                                                                           FontFamily="Georgia"
+                                                                           FontFamily="{StaticResource Font.Body}"
                                                                            FontSize="17"
                                                                            FontWeight="Bold"
                                                                            HorizontalAlignment="Center"
@@ -503,12 +503,12 @@
                                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
                                                                 <TextBlock Text="{Binding Username}"
                                                                            Foreground="{DynamicResource Brush.Foreground}"
-                                                                           FontFamily="Georgia"
+                                                                           FontFamily="{StaticResource Font.Body}"
                                                                            FontSize="16"
                                                                            FontWeight="Bold"/>
                                                                 <TextBlock Text="{Binding DataContext.TblBlockedLabel, RelativeSource={RelativeSource AncestorType=Page}}"
                                                                            Foreground="{DynamicResource Brush.Error}"
-                                                                           FontFamily="Georgia"
+                                                                           FontFamily="{StaticResource Font.Body}"
                                                                            FontSize="12"
                                                                            Margin="0,3,0,0"/>
                                                             </StackPanel>

@@ -45,23 +45,23 @@
                     Effect="{StaticResource Effect.HudShadow}">
                 <StackPanel DataContext="{Binding CurrentShopTooltip}">
                     <TextBlock Text="{Binding ItemName}"
-                               FontFamily="Georgia" FontSize="13" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="13" FontWeight="Bold"
                                Foreground="{DynamicResource Brush.Foreground}"
                                TextWrapping="Wrap" Margin="0,0,0,3"/>
                     <TextBlock Text="{Binding ItemRarity}"
-                               FontFamily="Georgia" FontSize="10" FontWeight="Bold"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10" FontWeight="Bold"
                                Foreground="{Binding RarityColor}" Margin="0,0,0,2"/>
                     <TextBlock Text="{Binding ItemType}"
-                               FontFamily="Georgia" FontSize="10"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                Foreground="{DynamicResource Brush.GoldSoft}" Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding ClassText}"
                                Visibility="{Binding HasClassInfo, Converter={StaticResource BoolToVisibilityConverter}}"
                                Foreground="{Binding ClassColor}"
-                               FontFamily="Georgia" FontSize="10"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                TextWrapping="Wrap" Margin="0,0,0,6"/>
                     <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.3" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding ItemStats}"
-                               FontFamily="Georgia" FontSize="10"
+                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                Foreground="{DynamicResource Brush.Foreground}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
@@ -81,7 +81,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0"
                                Text="{Binding Title}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="11"
                                FontWeight="Bold"
                                Foreground="{DynamicResource Brush.GoldSoft}"
@@ -89,7 +89,7 @@
                                Margin="0,0,10,0"/>
                     <TextBlock Grid.Column="1"
                                Text="{Binding CharacterMoneyText}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="11"
                                FontWeight="Bold"
                                Foreground="{DynamicResource Brush.Gold}"
@@ -128,7 +128,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0"
                                            Text="{Binding StockLabel}"
-                                           FontFamily="Georgia"
+                                           FontFamily="{StaticResource Font.Body}"
                                            FontSize="11"
                                            FontWeight="Bold"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
@@ -241,11 +241,11 @@
                                               MouseLeave="ShopItem_MouseLeave">
                                             <StackPanel>
                                                 <TextBlock Text="{Binding Name}"
-                                                           FontFamily="Georgia"
+                                                           FontFamily="{StaticResource Font.Body}"
                                                            FontSize="12"
                                                            FontWeight="Bold"
                                                            Foreground="{DynamicResource Brush.GoldSoft}"/>
-                                                <TextBlock FontFamily="Georgia" FontSize="11" Foreground="{DynamicResource Brush.Gold}">
+                                                <TextBlock FontFamily="{StaticResource Font.Body}" FontSize="11" Foreground="{DynamicResource Brush.Gold}">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="{}{0}: {1}">
                                                             <Binding Path="DataContext.StockPriceLabel" RelativeSource="{RelativeSource AncestorType=ListBox}"/>
@@ -268,17 +268,17 @@
                                     Margin="0,0,0,10">
                                 <StackPanel>
                                     <TextBlock Text="{Binding SelectedStockName}"
-                                               FontFamily="Georgia"
+                                               FontFamily="{StaticResource Font.Body}"
                                                FontSize="12"
                                                FontWeight="Bold"
                                                Foreground="{DynamicResource Brush.Foreground}"
                                                Margin="0,0,0,6"/>
                                     <TextBlock Text="{Binding SelectedStockPrice}"
-                                               FontFamily="Georgia"
+                                               FontFamily="{StaticResource Font.Body}"
                                                FontSize="11"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
                                                Margin="0,0,0,6"/>
-                                    <TextBlock FontFamily="Georgia" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Brush.Gold}">
+                                    <TextBlock FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource Brush.Gold}">
                                         <TextBlock.Text>
                                             <MultiBinding StringFormat="{}{0}: {1}">
                                                 <Binding Path="TotalLabel"/>
@@ -293,7 +293,7 @@
                             <StackPanel Margin="0,0,0,10"
                                         Visibility="{Binding IsQuantityControlVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <TextBlock Text="{Binding QuantityLabel}"
-                                           FontFamily="Georgia"
+                                           FontFamily="{StaticResource Font.Body}"
                                            FontSize="11"
                                            Foreground="{DynamicResource Brush.GoldSoft}"
                                            Margin="0,0,0,6"/>
@@ -303,7 +303,7 @@
                                             Style="{StaticResource ShopQtyButton}"
                                             Width="30" Padding="0" Margin="0,0,5,0"/>
                                     <TextBlock Text="{Binding BuyQuantity}"
-                                               FontFamily="Georgia"
+                                               FontFamily="{StaticResource Font.Body}"
                                                FontSize="12"
                                                FontWeight="Bold"
                                                Foreground="{DynamicResource Brush.Foreground}"
@@ -349,7 +349,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding InventoryTitle}"
-                                                   FontFamily="Georgia"
+                                                   FontFamily="{StaticResource Font.Body}"
                                                    FontSize="11"
                                                    FontWeight="Bold"
                                                    Foreground="{DynamicResource Brush.GoldSoft}"
@@ -427,7 +427,7 @@
                                                                 Padding="3,1">
                                                             <TextBlock Text="{Binding Item.StackSize}"
                                                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                                                       FontFamily="Georgia"
+                                                                       FontFamily="{StaticResource Font.Body}"
                                                                        FontSize="10"
                                                                        FontWeight="Bold"/>
                                                         </Border>
@@ -455,7 +455,7 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding MoneyBagTitle}"
-                                               FontFamily="Georgia"
+                                               FontFamily="{StaticResource Font.Body}"
                                                FontSize="11"
                                                FontWeight="Bold"
                                                Foreground="{DynamicResource Brush.GoldSoft}"
@@ -463,7 +463,7 @@
                                                Margin="0,0,10,0"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding MoneyDisplay}"
-                                               FontFamily="Georgia"
+                                               FontFamily="{StaticResource Font.Body}"
                                                FontSize="16"
                                                FontWeight="Bold"
                                                Foreground="{DynamicResource Brush.Gold}"
@@ -489,23 +489,23 @@
                                     Effect="{StaticResource Effect.HudShadow}">
                                 <StackPanel DataContext="{Binding CurrentTooltip}">
                                     <TextBlock Text="{Binding ItemName}"
-                                               FontFamily="Georgia" FontSize="13" FontWeight="Bold"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="13" FontWeight="Bold"
                                                Foreground="{DynamicResource Brush.Foreground}"
                                                TextWrapping="Wrap" Margin="0,0,0,3"/>
                                     <TextBlock Text="{Binding ItemRarity}"
-                                               FontFamily="Georgia" FontSize="10" FontWeight="Bold"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="10" FontWeight="Bold"
                                                Foreground="{Binding RarityColor}" Margin="0,0,0,2"/>
                                     <TextBlock Text="{Binding ItemType}"
-                                               FontFamily="Georgia" FontSize="10"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                                Foreground="{DynamicResource Brush.GoldSoft}" Margin="0,0,0,4"/>
                                     <TextBlock Text="{Binding ClassText}"
                                                Visibility="{Binding HasClassInfo, Converter={StaticResource BoolToVisibilityConverter}}"
                                                Foreground="{Binding ClassColor}"
-                                               FontFamily="Georgia" FontSize="10"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                                TextWrapping="Wrap" Margin="0,0,0,6"/>
                                     <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.3" Margin="0,0,0,6"/>
                                     <TextBlock Text="{Binding ItemStats}"
-                                               FontFamily="Georgia" FontSize="10"
+                                               FontFamily="{StaticResource Font.Body}" FontSize="10"
                                                Foreground="{DynamicResource Brush.Foreground}"
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
@@ -523,7 +523,7 @@
                         Margin="0,12,0,0"
                         Effect="{StaticResource Effect.PanelShadow}">
                     <TextBlock Text="{Binding StatusMessage}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="12"
                                Foreground="{DynamicResource Brush.Muted}"
                                TextWrapping="Wrap"

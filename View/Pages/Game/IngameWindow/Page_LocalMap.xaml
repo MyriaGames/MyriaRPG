@@ -7,71 +7,9 @@
       mc:Ignorable="d"
       Title="Map">
 
-    <Page.Resources>
-        <Style x:Key="ZoomButton" TargetType="Button">
-            <Setter Property="Width"           Value="36"/>
-            <Setter Property="Height"          Value="36"/>
-            <Setter Property="Padding"         Value="0"/>
-            <Setter Property="Foreground"      Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
-            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
-            <Setter Property="FontSize"        Value="18"/>
-            <Setter Property="FontWeight"      Value="Bold"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2">
-                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+    <!-- ZoomButton/MapHeaderButton were page-local near-duplicates of the shared IconButton/
+         GoldButtonBase styles (AR4 consolidation) - removed, usages below now reuse those. -->
 
-        <Style x:Key="MapHeaderButton" TargetType="Button">
-            <Setter Property="MinWidth"         Value="76"/>
-            <Setter Property="Height"           Value="36"/>
-            <Setter Property="Padding"          Value="12,0"/>
-            <Setter Property="Foreground"       Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="Background"       Value="{DynamicResource Brush.PanelDark}"/>
-            <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Gold}"/>
-            <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontFamily"       Value="Georgia"/>
-            <Setter Property="FontSize"         Value="13"/>
-            <Setter Property="FontWeight"       Value="Bold"/>
-            <Setter Property="Cursor"           Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2">
-                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Page.Resources>
 
     <Grid Background="{DynamicResource Brush.WindowBackgroundGradient}">
 
@@ -110,7 +48,7 @@
                                    Style="{StaticResource HeaderText}"/>
                         <TextBlock Text=" | Navigate the world around you."
                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontStyle="Italic"
                                    FontSize="13"
                                    VerticalAlignment="Center"
@@ -123,22 +61,52 @@
                                 VerticalAlignment="Top"
                                 Margin="0,10,0,0">
                         <Button Content="Back"
-                                Style="{StaticResource MapHeaderButton}"
+                                MinWidth="76" Height="36" Padding="12,0"
+                                Foreground="{DynamicResource Brush.GoldSoft}"
+                                Background="{DynamicResource Brush.PanelDark}"
+                                BorderBrush="{DynamicResource Brush.Gold}"
+                                FontSize="13" FontWeight="Bold"
                                 Command="{Binding BackMapCommand}"
-                                ToolTip="Back to previous map"/>
+                                ToolTip="Back to previous map">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <Button Content="World"
-                                Style="{StaticResource MapHeaderButton}"
+                                MinWidth="76" Height="36" Padding="12,0"
+                                Foreground="{DynamicResource Brush.GoldSoft}"
+                                Background="{DynamicResource Brush.PanelDark}"
+                                BorderBrush="{DynamicResource Brush.Gold}"
+                                FontSize="13" FontWeight="Bold"
                                 Margin="6,0,12,0"
                                 Command="{Binding WorldMapCommand}"
-                                ToolTip="Show world map"/>
+                                ToolTip="Show world map">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource GoldButtonBase}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <Button x:Name="BtnZoomIn"
                                 Content="＋"
-                                Style="{StaticResource ZoomButton}"
+                                Style="{StaticResource IconButton}"
+                                FontSize="18" FontWeight="Bold"
                                 Click="BtnZoomIn_Click"
                                 ToolTip="Zoom in"/>
                         <Button x:Name="BtnZoomOut"
                                 Content="－"
-                                Style="{StaticResource ZoomButton}"
+                                Style="{StaticResource IconButton}"
+                                FontSize="18" FontWeight="Bold"
                                 Margin="6,0,0,0"
                                 Click="BtnZoomOut_Click"
                                 ToolTip="Zoom out"/>

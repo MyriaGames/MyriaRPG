@@ -16,7 +16,7 @@
             <Setter Property="Background"      Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="FontWeight"      Value="Bold"/>
             <Setter Property="Cursor"          Value="Hand"/>
@@ -47,7 +47,7 @@
             <Setter Property="Background"      Value="Transparent"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="Cursor"          Value="Hand"/>
             <Setter Property="Template">
@@ -113,7 +113,7 @@
                                    Style="{StaticResource HeaderText}"/>
                         <TextBlock Text=" | Inscribe the ancient words."
                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontStyle="Italic"
                                    FontSize="13"
                                    VerticalAlignment="Center"
@@ -191,14 +191,14 @@
                                                     <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="{Binding BaseName}"
                                                                    Foreground="{DynamicResource Brush.Foreground}"
-                                                                   FontFamily="Georgia"
+                                                                   FontFamily="{StaticResource Font.Body}"
                                                                    FontSize="15"
                                                                    FontWeight="SemiBold"/>
                                                     </StackPanel>
 
                                                     <TextBlock Text="{Binding WordsText}"
                                                                Foreground="{DynamicResource Brush.GoldSoft}"
-                                                               FontFamily="Georgia"
+                                                               FontFamily="{StaticResource Font.Body}"
                                                                FontStyle="Italic"
                                                                FontSize="11"
                                                                Margin="0,2,0,0"/>
@@ -216,7 +216,7 @@
                                                             HorizontalAlignment="Right"
                                                             Margin="14,0,0,0">
                                                     <TextBlock HorizontalAlignment="Right"
-                                                               FontFamily="Georgia" FontSize="13">
+                                                               FontFamily="{StaticResource Font.Body}" FontSize="13">
                                                         <Run Text="{Binding DataContext.TblMp, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=OneWay}"
                                                              Foreground="{DynamicResource Brush.Muted}"/>
                                                         <Run Text=" "/>
@@ -252,7 +252,7 @@
                                     Height="36" Width="46"/>
                             <TextBlock Text="{Binding PageText}"
                                        Foreground="{DynamicResource Brush.GoldSoft}"
-                                       FontFamily="Georgia"
+                                       FontFamily="{StaticResource Font.Body}"
                                        FontSize="15"
                                        VerticalAlignment="Center"
                                        Margin="16,0"/>

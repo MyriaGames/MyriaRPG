@@ -19,7 +19,7 @@
             <Setter Property="Background"                  Value="{DynamicResource Brush.PanelDark}"/>
             <Setter Property="BorderBrush"                 Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness"             Value="1"/>
-            <Setter Property="FontFamily"                  Value="Georgia"/>
+            <Setter Property="FontFamily"                  Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"                    Value="16"/>
             <Setter Property="Cursor"                      Value="Hand"/>
             <Setter Property="HorizontalContentAlignment"  Value="Center"/>
@@ -93,7 +93,7 @@
                                Margin="0,0,14,0"/>
                     <TextBlock Text="{Binding TblTitle}"
                                Foreground="{DynamicResource Brush.GoldSoft}"
-                               FontFamily="Georgia"
+                               FontFamily="{StaticResource Font.Body}"
                                FontSize="22"
                                FontWeight="Bold"
                                VerticalAlignment="Center"/>
@@ -101,7 +101,7 @@
 
                 <TextBlock Text="{Binding TblWelcome}"
                            Foreground="{DynamicResource Brush.Muted}"
-                           FontFamily="Georgia"
+                           FontFamily="{StaticResource Font.Body}"
                            FontSize="13"
                            Margin="0,0,0,16"/>
 

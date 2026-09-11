@@ -17,7 +17,7 @@
             <Setter Property="Background"      Value="Transparent"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily"      Value="Georgia"/>
+            <Setter Property="FontFamily"      Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="Cursor"          Value="Hand"/>
             <Setter Property="Template">
@@ -44,7 +44,7 @@
 
         <Style x:Key="ColHeader" TargetType="TextBlock">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Gold}"/>
-            <Setter Property="FontFamily"  Value="Georgia"/>
+            <Setter Property="FontFamily"  Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize"    Value="11"/>
             <Setter Property="FontWeight"  Value="SemiBold"/>
             <Setter Property="FontStyle"   Value="Italic"/>
@@ -74,7 +74,7 @@
                                    Style="{StaticResource HeaderText}"/>
                         <TextBlock Text=" | Words discovered in the world."
                                    Foreground="{DynamicResource Brush.GoldSoft}"
-                                   FontFamily="Georgia"
+                                   FontFamily="{StaticResource Font.Body}"
                                    FontStyle="Italic"
                                    FontSize="13"
                                    VerticalAlignment="Center"
@@ -166,7 +166,7 @@
                                                     <TextBox Text="{Binding EditLabel, UpdateSourceTrigger=PropertyChanged}"
                                                              MinWidth="120"
                                                              MaxWidth="200"
-                                                             FontFamily="Georgia"
+                                                             FontFamily="{StaticResource Font.Body}"
                                                              FontSize="13"
                                                              Padding="5,3"
                                                              Background="{DynamicResource Brush.PanelDark}"
@@ -191,7 +191,7 @@
                                                                 Visibility="{Binding IsOfficiallyLearned, Converter={StaticResource BoolToVis}}">
                                                         <TextBlock Text="{Binding OfficialTranslation}"
                                                                    Foreground="{DynamicResource Brush.Foreground}"
-                                                                   FontFamily="Georgia"
+                                                                   FontFamily="{StaticResource Font.Body}"
                                                                    FontSize="13"
                                                                    VerticalAlignment="Center"/>
                                                         <Border Background="{DynamicResource Brush.Success}"
@@ -209,7 +209,7 @@
                                                     <!-- not yet learned: dimmed placeholder -->
                                                     <TextBlock Text="— — —"
                                                                Foreground="{DynamicResource Brush.Muted}"
-                                                               FontFamily="Georgia"
+                                                               FontFamily="{StaticResource Font.Body}"
                                                                FontSize="13"
                                                                Opacity="0.4"
                                                                VerticalAlignment="Center">

@@ -8,9 +8,9 @@
         Width="560" SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="#070B0F"
-        Foreground="#E8D8B3"
-        FontFamily="Segoe UI"
+        Background="{DynamicResource Brush.Background}"
+        Foreground="{DynamicResource Brush.Foreground}"
+        FontFamily="{StaticResource Font.Ui}"
         Style="{x:Null}">
 
     <Window.Resources>
@@ -18,11 +18,11 @@
         <Style x:Key="ModWarnButton" TargetType="Button">
             <Setter Property="Height" Value="36"/>
             <Setter Property="MinWidth" Value="110"/>
-            <Setter Property="Foreground" Value="#E1C481"/>
-            <Setter Property="Background" Value="#0B1117"/>
-            <Setter Property="BorderBrush" Value="#C99A4A"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.PanelDark}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -43,22 +43,22 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="4"/>
                                 </Grid.ColumnDefinitions>
-                                <Rectangle x:Name="BarLeft" Fill="#C99A4A" Opacity="0"/>
+                                <Rectangle x:Name="BarLeft" Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
                                 <ContentPresenter Grid.Column="1"
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                   RecognizesAccessKey="True"/>
-                                <Rectangle x:Name="BarRight" Grid.Column="2" Fill="#C99A4A" Opacity="0"/>
+                                <Rectangle x:Name="BarRight" Grid.Column="2" Fill="{DynamicResource Brush.Gold}" Opacity="0"/>
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#11202D"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.NavHover}"/>
                                 <Setter TargetName="BarLeft" Property="Opacity" Value="1"/>
                                 <Setter TargetName="BarRight" Property="Opacity" Value="1"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#0F314D"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.BlueActive}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -67,11 +67,13 @@
         </Style>
     </Window.Resources>
 
-    <Border BorderBrush="#C99A4A" BorderThickness="1" Margin="1">
+    <Border BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1" Margin="1">
         <StackPanel Margin="28,24">
 
             <!-- Title row: amber warning icon + heading -->
             <DockPanel Margin="0,0,0,8">
+                <!-- Deliberately a fixed literal, not a theme brush - amber is a universal
+                     caution signal meant to read the same regardless of Light/Dark mode. -->
                 <TextBlock Text="&#x26A0;"
                            Foreground="#FFCC00"
                            FontFamily="Segoe UI Symbol"
@@ -80,8 +82,8 @@
                            DockPanel.Dock="Left"
                            Margin="0,0,12,0"/>
                 <TextBlock Text="{Binding TitleText}"
-                           Foreground="#E1C481"
-                           FontFamily="Georgia"
+                           Foreground="{DynamicResource Brush.GoldSoft}"
+                           FontFamily="{StaticResource Font.Heading}"
                            FontSize="22"
                            FontWeight="Bold"
                            VerticalAlignment="Center"/>
@@ -89,16 +91,16 @@
 
             <!-- Subtitle -->
             <TextBlock Text="{Binding SubtitleText}"
-                       Foreground="#9A8A68"
+                       Foreground="{DynamicResource Brush.Muted}"
                        FontSize="13"
                        TextWrapping="Wrap"
                        Margin="0,0,0,16"/>
 
             <!-- Gold divider -->
             <Grid Margin="0,0,0,16">
-                <Rectangle Height="1" Fill="#C99A4A" Opacity="0.55" VerticalAlignment="Center"/>
+                <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.55" VerticalAlignment="Center"/>
                 <TextBlock Text="&#x25C7;"
-                           Foreground="#E1C481"
+                           Foreground="{DynamicResource Brush.GoldSoft}"
                            FontFamily="Segoe UI Symbol"
                            FontSize="14"
                            HorizontalAlignment="Center"
@@ -108,20 +110,20 @@
 
             <!-- Details panel — only shown when there is change detail text -->
             <Border Visibility="{Binding HasDetails, Converter={StaticResource BoolToVis}}"
-                    Background="#0B1117"
-                    BorderBrush="#C99A4A"
+                    Background="{DynamicResource Brush.PanelDark}"
+                    BorderBrush="{DynamicResource Brush.Gold}"
                     BorderThickness="1"
                     CornerRadius="2"
                     Padding="14,10"
                     Margin="0,0,0,24">
                 <StackPanel>
                     <TextBlock Text="{Binding DetailsLabel}"
-                               Foreground="#9A8A68"
+                               Foreground="{DynamicResource Brush.Muted}"
                                FontSize="10"
                                Margin="0,0,0,3"/>
                     <ScrollViewer MaxHeight="160" HorizontalScrollBarVisibility="Disabled">
                         <TextBox Text="{Binding DetailsText, Mode=OneWay}"
-                                 Foreground="#E8D8B3"
+                                 Foreground="{DynamicResource Brush.Foreground}"
                                  Background="Transparent"
                                  BorderThickness="0"
                                  FontFamily="Consolas"
@@ -146,8 +148,8 @@
                         IsDefault="True"
                         Click="Continue_Click"
                         Style="{StaticResource ModWarnButton}"
-                        Background="#0F314D"
-                        BorderBrush="#4A90C9"/>
+                        Background="{DynamicResource Brush.BlueActive}"
+                        BorderBrush="{DynamicResource Brush.Accent}"/>
             </StackPanel>
 
         </StackPanel>

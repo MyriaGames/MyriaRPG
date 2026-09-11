@@ -14,20 +14,20 @@
 
         <Style x:Key="GameHeaderText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
             <Setter Property="FontSize" Value="44"/>
         </Style>
 
         <Style x:Key="GameSectionTitle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.GoldSoft}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Heading}"/>
             <Setter Property="FontSize" Value="25"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
 
         <Style x:Key="GameBodyText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
@@ -47,7 +47,7 @@
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Brush.Gold}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="CaretBrush" Value="{DynamicResource Brush.GoldSoft}"/>
             <Setter Property="SelectionBrush" Value="{DynamicResource Brush.BlueActive}"/>
@@ -75,7 +75,7 @@
 
         <Style x:Key="GameToggleSwitch" TargetType="CheckBox">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Foreground}"/>
-            <Setter Property="FontFamily" Value="Georgia"/>
+            <Setter Property="FontFamily" Value="{StaticResource Font.Body}"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -155,7 +155,7 @@
                 <TextBlock Text="{Binding TblGameTitle}" Style="{StaticResource GameHeaderText}"/>
                 <TextBlock Text="{Binding TblGameDescription}"
                            Foreground="{DynamicResource Brush.GoldSoft}"
-                           FontFamily="Georgia"
+                           FontFamily="{StaticResource Font.Body}"
                            FontStyle="Italic"
                            FontSize="17"
                            Margin="34,8,0,0"/>
@@ -209,7 +209,7 @@
                                      Text="{Binding ServerAddress, UpdateSourceTrigger=LostFocus}"/>
 
                             <TextBlock Text="{Binding TblServerHint}"
-                                       FontFamily="Georgia"
+                                       FontFamily="{StaticResource Font.Body}"
                                        FontSize="12"
                                        Opacity="0.75"
                                        TextWrapping="Wrap"

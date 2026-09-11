@@ -78,7 +78,7 @@ Myria RPG handles user accounts (username and password hash) via the Auth server
 
 ## License
 
-Licensed under the [MIT License](LICENSE).
+Licensed under the [MIT License](LICENSE). Bundled third-party assets (fonts) are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 ## Status
 
