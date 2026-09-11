@@ -465,7 +465,20 @@ namespace Myria.Wpf.ViewModel.UserControls
 
             if (ServerApiService.Token is not null)
             {
-                await ServerApiService.SaveCharacterAsync(player);
+                // Multiplayer: save through the hub's SaveSession, which persists the server's own
+                // authoritative session character (the same one every SlotSkill/UnslotSkill/etc.
+                // confirm actually mutates) - not a separate REST save of the client's local copy.
+                // The two used to race: this REST call ran first here, then DisconnectAsync() in
+                // OpenMainMenuAsync/SaveAndQuitAsync triggered the server's own OnDisconnectedAsync
+                // save moments later using ITS session state - if a recent fire-and-forget hub
+                // confirm (e.g. unslotting then immediately re-slotting a skill) hadn't reached the
+                // server yet when that ran, it would persist last and silently revert whatever this
+                // REST call had just written, looking exactly like "the change didn't stick after a
+                // relog". Routing through the hub instead removes the second, competing writer -
+                // and since SignalR processes invocations from one connection in order, awaiting
+                // this also naturally waits for any earlier fire-and-forget confirm from the same
+                // connection to land first.
+                await GameHubService.SaveSessionAsync();
                 return;
             }
 

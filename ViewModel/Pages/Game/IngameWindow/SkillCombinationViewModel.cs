@@ -137,6 +137,20 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             var ids = InputSlots.Where(s => s.IsSet).Select(s => s.SkillId!).ToList();
             if (ids.Count < 2) return;
 
+            // TryCreateForCharacter returns a bare null for several different reasons (bad
+            // input count, an unknown skill id, no recipe matches this skill set, or a genuine
+            // duplicate) with no way to tell them apart - every failure used to get reported as
+            // "this combination already exists" regardless of the real cause. Pre-checking with
+            // the lower-level Combine() (resolve-only, doesn't touch the character - also what
+            // Console's own combine command already previews with) isolates the "no matching
+            // recipe" case first, so by the time TryCreateForCharacter itself returns null below,
+            // it can only mean what it actually says: a genuine duplicate.
+            if (SkillCombinationService.Combine(ids) == null)
+            {
+                StatusText = Localization.T("pg.skill_combo.no_recipe");
+                return;
+            }
+
             var character = UserAccountService.CurrentCharacter;
             var result = SkillCombinationService.TryCreateForCharacter(character, ids);
 

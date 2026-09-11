@@ -303,7 +303,16 @@ namespace Myria.Wpf.ViewModel.Pages
             ValidationText = "";
             var name = (CharacterName ?? "").Trim();
 
-            if (name.Length < 2)
+            // Checked first so the whole rest of the creation flow doesn't waste the player's
+            // time on race/class/name choices they won't be able to submit anyway - see
+            // UserAccount.MaxCharacters for why this cap exists (only 5 fixed slots in
+            // Page_CharacterSelection's current design). Re-checked defensively here (not just
+            // gating the "Create" button back on Page_CharacterSelection) in case this page was
+            // reached with stale state.
+            int existingCount = UserAccountService.CurrentUser?.CharacterNames.Count ?? 0;
+            if (existingCount >= UserAccount.MaxCharacters)
+                ValidationText = Localization.T("pg.character.create.validation.max_reached", UserAccount.MaxCharacters);
+            else if (name.Length < 2)
                 ValidationText = Localization.T("pg.character.create.validation.name.short");
             else if (name.Any(ch => !char.IsLetterOrDigit(ch) && ch != '_' && ch != '-'))
                 ValidationText = Localization.T("pg.character.create.validation.name.invalid");
@@ -339,6 +348,27 @@ namespace Myria.Wpf.ViewModel.Pages
             StartingEquipmentService.GrantStartingEquipment(character);
             SkillFactory.UpdateSkills(character);
 
+            // Every load path (ServerApiService.LoadCharacterAsync, SqlCharacterRepository.LoadAsync
+            // used by the multiplayer hub, CharacterService.LoadCharacter) calls this to auto-fill
+            // SkillSlots from an empty list - this creation path never did. For multiplayer that's
+            // not just a cosmetic gap: the server independently loads/migrates this same character
+            // the moment it attaches a session (GameHub.LoadCharacter), so without this the two
+            // sides pick different starting slot state from the start - the server ends up with
+            // slot 1 already filled (from its own migration) while the client shows 0 slots used,
+            // so the very next skill the player tries to slot gets silently rejected (server is
+            // already at cap) and reverts client-side, looking like "it assigned then un-assigned
+            // itself" for every attempt until a relog re-syncs both sides to the same migrated state.
+            SkillSlotService.MigrateIfEmpty(character);
+
+            // Character's constructor snapshots CurrentHealth/CurrentMana from MaxHealth/MaxMana
+            // before this object initializer's Class assignment above has run - Class is still its
+            // default (Fighter) at that point, so the snapshot used the wrong class's HP/MP growth
+            // instead of EffectiveClass's. Re-synced here, after Class/gear are all final, so
+            // Current correctly starts at the character's real Max (same fix Myria.Mono already
+            // has in its own CharacterCreationScreen for this exact issue).
+            character.CurrentHealth = character.MaxHealth;
+            character.CurrentMana   = character.MaxMana;
+
             character.CurrentRoom = RoomService.GetRoomById(1);
             character.CurrentRoomId = character.CurrentRoom.Id;
 
@@ -350,6 +380,12 @@ namespace Myria.Wpf.ViewModel.Pages
                     ValidationText = $"Could not save character to server: {ServerApiService.LastError}";
                     return;
                 }
+
+                // Unlike the offline branch below, CurrentUser.CharacterNames here was fetched
+                // once from the Auth server at login and never refreshed since - without this,
+                // the new character exists server-side but is invisible on Page_CharacterSelection
+                // (which reads this same in-memory list) until a full relogin re-fetches it.
+                UserAccountService.CurrentUser.CharacterNames.Add(character.Name);
             }
             else
             {

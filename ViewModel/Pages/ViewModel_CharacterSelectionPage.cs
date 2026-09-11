@@ -1,4 +1,5 @@
 ﻿using Myria.Lib.Core.Entities.Characters;
+using Myria.Lib.Core.Models;
 using Myria.Lib.Core.Services;
 using Myria.Lib.Core.Services.Builder;
 using Myria.Lib.Core.Systems;
@@ -91,6 +92,12 @@ namespace Myria.Wpf.ViewModel.Pages
         public string btnCharacter4 { get; set; }
         public string btnCharacter5 { get; set; }
 
+        // Snapshot at construction, same as the character list itself (a new character always
+        // means a fresh instance of this page - see the Create/Delete navigation flows) - the
+        // fixed 5 named slots above have no room for a 6th character anyway, so this stops the
+        // player from ever reaching that state instead of just failing to display it.
+        public bool IsAtCharacterCap { get; }
+
         public bool IsConfirmingDelete
         {
             get => _isConfirmingDelete;
@@ -143,8 +150,11 @@ namespace Myria.Wpf.ViewModel.Pages
 
         public ViewModel_CharacterSelectionPage()
         {
+            var names = UserAccountService.CurrentUser?.CharacterNames ?? [];
+            IsAtCharacterCap = names.Count >= UserAccount.MaxCharacters;
+
             Join          = new RelayCommand(JoinAction, () => IsSelected() && !IsBusy);
-            Create        = new RelayCommand(CreateAction, () => !IsBusy);
+            Create        = new RelayCommand(CreateAction, () => !IsBusy && !IsAtCharacterCap);
             Delete        = new RelayCommand(DeleteAction, () => IsSelected() && !IsBusy);
             Back          = new RelayCommand(BackAction, () => !IsBusy);
             ConfirmDelete = new RelayCommand(ConfirmDeleteAction, () => !IsBusy);
@@ -157,7 +167,6 @@ namespace Myria.Wpf.ViewModel.Pages
 
             LocalizationAutoWire.Wire(this);
 
-            var names = UserAccountService.CurrentUser?.CharacterNames ?? [];
             for (int count = 0; count < names.Count; count++)
             {
                 switch (count)

@@ -114,11 +114,27 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         private static async Task SaveAsync()
         {
-            var user = UserAccountService.CurrentUser;
             var player = UserAccountService.CurrentCharacter;
+
             if (ServerApiService.Token is not null)
-                await ServerApiService.SaveCharacterAsync(player);
-            else
+            {
+                // Multiplayer: save through the hub's SaveSession, which persists the server's own
+                // authoritative session character (the same one every SlotSkill/UnslotSkill/etc.
+                // confirm actually mutates) - not a separate REST save of the client's local copy.
+                // The two used to race: this REST call ran first here, then MainMenuAction's
+                // DisconnectAsync() triggered the server's own OnDisconnectedAsync save moments
+                // later using ITS session state - if a recent fire-and-forget hub confirm (e.g.
+                // unslotting then immediately re-slotting a skill) hadn't reached the server yet
+                // when that ran, it would persist last and silently revert whatever this REST call
+                // had just written. Same bug, same fix as ViewModel_GameWindow.SaveAsync (item 41's
+                // original fix) - this sibling file had the identical dual-save-path shape but
+                // never got the port over (found in the 2026-09-10 security/robustness audit).
+                await GameHubService.SaveSessionAsync();
+                return;
+            }
+
+            var user = UserAccountService.CurrentUser;
+            if (user is not null)
                 CharacterService.SaveCharacter(user, player);
         }
     }

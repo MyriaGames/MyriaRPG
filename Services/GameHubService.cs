@@ -566,11 +566,16 @@ namespace Myria.Wpf.Services
             return false;
         }
 
-        public static async Task<bool> CombineSkillsAsync(List<string> skillIds)
+        // Returns null (not false) when the server was never actually asked - not connected, or
+        // the call itself failed/timed out - as opposed to a real "no" from the server (e.g. a
+        // genuine duplicate combination). The caller used to collapse both into the same "this
+        // combination already exists" message, which was actively misleading for the connectivity
+        // case: nothing about a dropped connection means the combination already exists.
+        public static async Task<bool?> CombineSkillsAsync(List<string> skillIds)
         {
             if (_connection?.State == HubConnectionState.Connected)
                 try { return await _connection.InvokeAsync<bool>("CombineSkills", skillIds); } catch { }
-            return false;
+            return null;
         }
 
         public static async Task AbandonCombatAsync()

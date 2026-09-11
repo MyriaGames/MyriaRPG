@@ -348,7 +348,7 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="20"/>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="48"/>
+                                            <ColumnDefinition Width="70"/>
                                             <ColumnDefinition Width="6"/>
                                             <ColumnDefinition Width="22"/>
                                             <ColumnDefinition Width="4"/>
@@ -373,7 +373,9 @@
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
-                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Base.STR_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis">
+                                            <Run Text="{Binding Base.STR_Display, Mode=OneWay}"/><Run Text="{Binding Base.STR_ClassText, Mode=OneWay}" Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                        </TextBlock>
                                         <Button Grid.Row="0" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="STR"/>
                                         <Button Grid.Row="0" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="STR"/>
 
@@ -388,7 +390,9 @@
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
-                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Base.DEX_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis">
+                                            <Run Text="{Binding Base.DEX_Display, Mode=OneWay}"/><Run Text="{Binding Base.DEX_ClassText, Mode=OneWay}" Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                        </TextBlock>
                                         <Button Grid.Row="1" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="DEX"/>
                                         <Button Grid.Row="1" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="DEX"/>
 
@@ -403,7 +407,9 @@
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
-                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Base.END_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis">
+                                            <Run Text="{Binding Base.END_Display, Mode=OneWay}"/><Run Text="{Binding Base.END_ClassText, Mode=OneWay}" Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                        </TextBlock>
                                         <Button Grid.Row="2" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="END"/>
                                         <Button Grid.Row="2" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="END"/>
 
@@ -418,7 +424,9 @@
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
-                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Base.INT_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis">
+                                            <Run Text="{Binding Base.INT_Display, Mode=OneWay}"/><Run Text="{Binding Base.INT_ClassText, Mode=OneWay}" Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                        </TextBlock>
                                         <Button Grid.Row="3" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="INT"/>
                                         <Button Grid.Row="3" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="INT"/>
 
@@ -433,7 +441,9 @@
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
-                                        <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding Base.SPR_Display}" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="2" Style="{StaticResource BodyText}" FontSize="13" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis">
+                                            <Run Text="{Binding Base.SPR_Display, Mode=OneWay}"/><Run Text="{Binding Base.SPR_ClassText, Mode=OneWay}" Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                        </TextBlock>
                                         <Button Grid.Row="4" Grid.Column="4" Content="−" Style="{StaticResource StatBtn}" Command="{Binding DecreaseStatCommand}" CommandParameter="SPR"/>
                                         <Button Grid.Row="4" Grid.Column="6" Content="+" Style="{StaticResource StatBtn}" Command="{Binding IncreaseStatCommand}" CommandParameter="SPR"/>
                                     </Grid>

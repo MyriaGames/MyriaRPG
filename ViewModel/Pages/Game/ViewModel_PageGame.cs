@@ -502,6 +502,20 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         public ViewModel_PageGame()
         {
+            // Nav.Room is a cached destination (see Navigation.Navigate), but this constructor
+            // itself calls InvalidateCache(Nav.Room) below - every character (re)load, relogin,
+            // or reconnect that reaches this constructor throws away the cache entry it just
+            // filled, guaranteeing the *next* return-to-room navigation builds a brand new
+            // ViewModel_PageGame instead of reusing this one. Without unsubscribing here first,
+            // every one of those old instances keeps every static GameHubService subscription
+            // below alive forever, so a single server broadcast (GroupCombatStarted, above all)
+            // fires once per surviving instance - each independently constructing its own
+            // Page_Fight and racing to become "the" fight page. That's what made the group-fight
+            // turn/action state fall out of sync for anyone who wasn't the very first-ever
+            // ViewModel_PageGame in the process: the button ends up bound to a stale, orphaned
+            // instance while ActiveFight (last-instance-wins) points at a different, live one.
+            _current?.Unsubscribe();
+
             Navigation.Current.FightStateChanged += OnFightStateChanged;
             ChatMessages = CollectionViewSource.GetDefaultView(_allMessages);
 
@@ -587,6 +601,36 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             {
                 Navigation.Current.Navigate(Nav.Room);
             }
+        }
+
+        /// <summary>
+        /// Removes every static-event subscription this instance made in its constructor. Called
+        /// on the outgoing "_current" instance right before a new ViewModel_PageGame takes over,
+        /// so a superseded instance stops reacting to server broadcasts (GroupCombatStarted above
+        /// all - see the comment in the constructor) instead of quietly living on forever.
+        /// </summary>
+        private void Unsubscribe()
+        {
+            Navigation.Current.FightStateChanged -= OnFightStateChanged;
+            GameEvents.RoomEntered -= OnRoomEnteredForShopGate;
+
+            GameHubService.ForceLoggedOut          -= OnForceLoggedOut;
+            GameHubService.ChatMessageReceived     -= OnChatMessage;
+            GameHubService.PartyInviteReceived     -= OnPartyInvite;
+            GameHubService.PartyUpdated            -= OnPartyUpdated;
+            GameHubService.PartyDisbanded          -= OnPartyDisbanded;
+            GameHubService.KickedFromParty         -= OnKickedFromParty;
+            GameHubService.PartyMemberStatsUpdated -= OnPartyMemberStats;
+            GameHubService.RoomCharactersReceived     -= OnRoomCharacters;
+            GameHubService.CharacterEntered           -= OnCharacterEntered;
+            GameHubService.CharacterLeft              -= OnCharacterLeft;
+            GameHubService.TradeProposed           -= OnTradeProposed;
+            GameHubService.TradeStarted            -= OnTradeStarted;
+            GameHubService.TradeCancelled          -= OnTradeCancelledWhilePending;
+            GameHubService.RoomShopsReceived       -= OnRoomShops;
+            GameHubService.ShopOpened              -= OnShopOpened;
+            GameHubService.ShopClosed              -= OnShopClosed;
+            GameHubService.GroupCombatStarted      -= OnGroupCombatStarted;
         }
 
         private async Task ConnectThenNavigateToRoomAsync()

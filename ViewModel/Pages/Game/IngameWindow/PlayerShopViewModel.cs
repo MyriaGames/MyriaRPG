@@ -169,6 +169,16 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             GameHubService.ShopSale          += OnShopSale;
             GameHubService.ShopBuyResult     += OnBuyResult;
             GameHubService.ShopErrorReceived += OnShopError;
+
+            // Unsubscribe was previously only reachable via Close() (an explicit UI click) - a
+            // disconnect mid-session (or a SignalR auto-reconnect, which gets a new connection id
+            // server-side, invalidating whatever shop-viewing state the old one had) left this
+            // instance's subscriptions alive forever with no way to close it. Any
+            // GameHubService.HubConnected firing after this instance already exists is always a
+            // genuine reconnect (the very first connect necessarily happened before this shop
+            // window could have opened) - reusing Close() closes the window and unsubscribes
+            // exactly like clicking the Close button would.
+            GameHubService.HubConnected += OnHubReconnectedWhileShopping;
         }
 
         // NOTE: GetMyShop returns an empty list both when there's no shop yet and when the shop
@@ -203,7 +213,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             GameHubService.ShopSale          -= OnShopSale;
             GameHubService.ShopBuyResult     -= OnBuyResult;
             GameHubService.ShopErrorReceived -= OnShopError;
+            GameHubService.HubConnected      -= OnHubReconnectedWhileShopping;
         }
+
+        private void OnHubReconnectedWhileShopping() => Close();
 
         private void OnMyShopUpdated(List<ShopListingVm> items)
         {

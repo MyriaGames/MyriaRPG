@@ -32,10 +32,10 @@ namespace Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction
 
         private void ShopItem_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (sender is Border border && border.DataContext is ShopItemVm shopItem
+            if (sender is FrameworkElement element && element.DataContext is ShopItemVm shopItem
                 && DataContext is ShopPanelViewModel vm)
             {
-                ShopItemTooltipPopup.PlacementTarget = border;
+                ShopItemTooltipPopup.PlacementTarget = element;
                 ShopItemTooltipPopup.CustomPopupPlacementCallback = (popupSize, targetSize, _) =>
                 {
                     double x = targetSize.Width + 4;

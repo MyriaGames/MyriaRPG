@@ -15,7 +15,20 @@ dotnet run
 dotnet build -c Release
 ```
 
-No test projects or linting configuration exist in this repo.
+### Tests
+
+```bash
+# Run every suite in the solution
+dotnet test Myria.slnx
+
+# Run one suite
+dotnet test Myria.Wpf.Tests
+```
+
+Five xUnit projects: `Myria.Lib.Tests`, `Myria.Server.Auth.Tests`, `Myria.Server.Realm.Tests`,
+`Myria.Console.Tests`, `Myria.Wpf.Tests`. See [TESTING.md](../TESTING.md) at the repo root for
+what each covers, what is deliberately not covered, and the conventions to follow when adding
+tests. No linting configuration exists in this repo.
 
 ## Project Structure
 

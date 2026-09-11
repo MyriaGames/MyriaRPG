@@ -349,8 +349,19 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         }
         private string _windowTitle = Localization.T("app.general.UI.character");
 
+        // A brand-new CharacterPageViewModel is constructed on every character-sheet open (see
+        // Page_Character.xaml.cs, ViewModel_PageGame.OpenCharacter, ViewModel_GameWindow, and
+        // JobsPageViewModel's back command - none of them reuse an existing instance), and until
+        // this fix nothing ever unsubscribed the constructor's GameHubService.HubConnected
+        // handler, so every past open kept SyncStatsToServer alive forever, each firing (and
+        // issuing a real redundant hub call) on every future reconnect. Same bug class, same
+        // fix shape as ViewModel_PageGame's own leak (see its Unsubscribe/_current comment).
+        private static CharacterPageViewModel? _current;
+
         public CharacterPageViewModel(Character character)
         {
+            _current?.Unsubscribe();
+
             _character = character;
             CharacterName = character.Name;
             Level = character.Level;
@@ -372,6 +383,17 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             // comes back, instead of leaving the server's session character (and therefore
             // MaxHealth/MaxMana) stale until the player happens to touch stat allocation again.
             GameHubService.HubConnected += SyncStatsToServer;
+
+            _current = this;
+        }
+
+        /// <summary>
+        /// Removes this instance's GameHubService.HubConnected subscription. Called on the
+        /// outgoing "_current" instance right before a new CharacterPageViewModel takes over.
+        /// </summary>
+        private void Unsubscribe()
+        {
+            GameHubService.HubConnected -= SyncStatsToServer;
         }
 
         protected override void OnLanguageChanged(object? sender, EventArgs e)
@@ -383,11 +405,11 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         private void RefreshStats()
         {
             Base = new BaseStatsVm(
-                _character.Stats.Strength, _character.Stats.StrengthAdded,
-                _character.Stats.Dexterity, _character.Stats.DexterityAdded,
-                _character.Stats.Endurance, _character.Stats.EnduranceAdded,
-                _character.Stats.Intelligence, _character.Stats.IntelligenceAdded,
-                _character.Stats.Spirit, _character.Stats.SpiritAdded,
+                _character.Stats.Strength, _character.Stats.StrengthAdded, ClassManager.GetClassBonusForStat(_character, "STR"),
+                _character.Stats.Dexterity, _character.Stats.DexterityAdded, ClassManager.GetClassBonusForStat(_character, "DEX"),
+                _character.Stats.Endurance, _character.Stats.EnduranceAdded, ClassManager.GetClassBonusForStat(_character, "END"),
+                _character.Stats.Intelligence, _character.Stats.IntelligenceAdded, ClassManager.GetClassBonusForStat(_character, "INT"),
+                _character.Stats.Spirit, _character.Stats.SpiritAdded, ClassManager.GetClassBonusForStat(_character, "SPR"),
                 _character.Stats.UnusedPoints);
 
             Derived = new DerivedStatsVm(_character);
@@ -464,25 +486,43 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
     }
 
     public record BaseStatsVm(
-        int STR, int STR_Added,
-        int DEX, int DEX_Added,
-        int END, int END_Added,
-        int INT, int INT_Added,
-        int SPR, int SPR_Added,
+        int STR, int STR_Added, int STR_Class,
+        int DEX, int DEX_Added, int DEX_Class,
+        int END, int END_Added, int END_Class,
+        int INT, int INT_Added, int INT_Class,
+        int SPR, int SPR_Added, int SPR_Class,
         int Unspent)
     {
-        public string STR_Display => Fmt(STR, STR_Added);
-        public string DEX_Display => Fmt(DEX, DEX_Added);
-        public string END_Display => Fmt(END, END_Added);
-        public string INT_Display => Fmt(INT, INT_Added);
-        public string SPR_Display => Fmt(SPR, SPR_Added);
+        // Class contribution (ClassManager.GetClassBonusForStat) is a separate, dynamically
+        // recomputed layer that's already used everywhere the effective stat actually matters
+        // (TotalSTR, MaxHealth, combat math, and the character-creation page's own preview) -
+        // this display was the one place still omitting it entirely.
+        //
+        // STR_Display folds the class bonus into the shown total (so the number matches what
+        // combat actually uses) but keeps the exact same "N (+added)" shape the pre-existing,
+        // width-proven layout already relied on - the ATTRIBUTES panel's value column is a fixed
+        // 48px in a 252px-wide sidebar, too narrow for a verbose "N (+2, +4 class)" string (an
+        // earlier version of this fix did that and got clipped down to only the class figure
+        // being visible). STR_ClassText is a short separate "+N" shown as its own colored Run in
+        // XAML instead - distinguished by color, not by spelling out the word "class".
+        public string STR_Display => Fmt(STR + STR_Class, STR_Added);
+        public string DEX_Display => Fmt(DEX + DEX_Class, DEX_Added);
+        public string END_Display => Fmt(END + END_Class, END_Added);
+        public string INT_Display => Fmt(INT + INT_Class, INT_Added);
+        public string SPR_Display => Fmt(SPR + SPR_Class, SPR_Added);
+
+        public string STR_ClassText => STR_Class > 0 ? $" +{STR_Class}" : "";
+        public string DEX_ClassText => DEX_Class > 0 ? $" +{DEX_Class}" : "";
+        public string END_ClassText => END_Class > 0 ? $" +{END_Class}" : "";
+        public string INT_ClassText => INT_Class > 0 ? $" +{INT_Class}" : "";
+        public string SPR_ClassText => SPR_Class > 0 ? $" +{SPR_Class}" : "";
+
         public bool HasUnspent => Unspent > 0;
 
-        private static string Fmt(int @base, int added)
+        private static string Fmt(int baseWithClass, int added)
         {
-            int total = @base + added;
-            if (added > 0) return $"{total} (+{added})";
-            return $"{@base}";
+            int total = baseWithClass + added;
+            return added > 0 ? $"{total} (+{added})" : $"{baseWithClass}";
         }
     }
 

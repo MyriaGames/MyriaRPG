@@ -122,6 +122,17 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             GameHubService.TradeUpdated   += OnUpdated;
             GameHubService.TradeCompleted += OnCompleted;
             GameHubService.TradeCancelled += OnCancelled;
+
+            // Unsubscribe was previously only reachable via OnCompleted/OnCancelled - both
+            // server-pushed events that can never arrive if the connection drops mid-trade, so a
+            // disconnect (or a SignalR auto-reconnect, which gets a new connection id server-side
+            // and so orphans this trade's server-side session just the same as a real drop) left
+            // this instance's subscriptions and its static Current reference alive forever. Any
+            // GameHubService.HubConnected firing after this instance already exists is always a
+            // genuine reconnect (the very first connect necessarily happened before any trade
+            // could have started) - reusing OnCancelled's existing generic-reason path closes the
+            // window and unsubscribes exactly like a server-cancelled trade would.
+            GameHubService.HubConnected += OnHubReconnectedWhileTrading;
         }
 
         protected override void OnLanguageChanged(object? sender, EventArgs e)
@@ -148,8 +159,11 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             GameHubService.TradeUpdated   -= OnUpdated;
             GameHubService.TradeCompleted -= OnCompleted;
             GameHubService.TradeCancelled -= OnCancelled;
+            GameHubService.HubConnected   -= OnHubReconnectedWhileTrading;
             if (Current == this) Current = null;
         }
+
+        private void OnHubReconnectedWhileTrading() => OnCancelled("connection_lost");
 
         private void OnUpdated(TradeSnapshot snap)
         {

@@ -234,7 +234,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             GameHubService.GuildMemberLeft     -= OnMemberLeft;
             GameHubService.GuildRankChanged    -= OnRankChanged;
             GameHubService.GuildLeaderChanged  -= OnLeaderChanged;
-            GameHubService.GuildRookieAdded    += OnRookieAdded;
+            GameHubService.GuildRookieAdded    -= OnRookieAdded;
             GameHubService.GuildDisbanded      -= OnGuildDisbanded;
             GameHubService.GuildLeft           -= OnGuildLeft;
             GameHubService.GuildKicked         -= OnGuildKicked;

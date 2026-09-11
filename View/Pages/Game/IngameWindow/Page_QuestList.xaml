@@ -3,7 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:conv="clr-namespace:Myria.Wpf.View.Converters"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="900"
       Title="Quests"
@@ -158,7 +157,6 @@
             </Setter>
         </Style>
 
-        <conv:TruncateAtWordConverter x:Key="TruncateAtWord"/>
         <BooleanToVisibilityConverter x:Key="BoolVis"/>
     </Page.Resources>
 
@@ -312,7 +310,8 @@
                                                             <TextBlock Text="{Binding Title}"
                                                                        Style="{StaticResource BodyText}"
                                                                        FontSize="15"
-                                                                       FontWeight="SemiBold"/>
+                                                                       FontWeight="SemiBold"
+                                                                       TextWrapping="Wrap"/>
                                                             <TextBlock Text="{Binding SubtitleText}"
                                                                        Style="{StaticResource MutedText}"
                                                                        FontSize="12"
@@ -459,10 +458,11 @@
                                             <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.45" Margin="0,0,0,10"/>
 
                                             <!-- Description preview -->
-                                            <TextBlock Text="{Binding SelectedQuest.Description, Converter={StaticResource TruncateAtWord}}"
+                                            <TextBlock Text="{Binding SelectedQuest.Description}"
                                                        Style="{StaticResource BodyText}"
                                                        FontSize="13"
-                                                       LineHeight="22"/>
+                                                       LineHeight="22"
+                                                       TextWrapping="Wrap"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>

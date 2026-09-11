@@ -231,6 +231,18 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         public ViewModel_PageRoom()
         {
+            // ViewModel_PageGame's own constructor forces the next room navigation to build a
+            // fresh ViewModel_PageRoom on every character switch/rejoin (see its
+            // Navigation.Current.InvalidateCache(Nav.Room) comment) - without this, every past
+            // instance's 9 static subscriptions below stayed alive forever, each independently
+            // reacting to every future server broadcast, and OnHubConnected re-firing a full
+            // EstablishServerSessionAsync (LoadCharacter/SetCharacterName/JoinRoom) per leaked
+            // instance on every future reconnect. Same bug class, same fix shape as
+            // ViewModel_PageGame's own leak (item 48) and CharacterPageViewModel's (item 57) -
+            // reuses the _instantce field this class already had for its "last instance wins"
+            // static callbacks, rather than adding a second one.
+            _instantce?.Unsubscribe();
+
             character = UserAccountService.CurrentCharacter;
 
             Npcs = new ObservableCollection<Npc>();
@@ -285,15 +297,60 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             // here (as ViewModel_PageGame now does), that event has already fired and this
             // subscription registered too late to ever catch it, leaving no session character on
             // the server at all.
-            _ = GameHubService.SetCharacterNameAsync(character.Name);
-            _ = GameHubService.JoinRoomAsync(currentRoom.Id);
-            _ = GameHubService.LoadCharacterOnServerAsync(character.Name);
+            _ = EstablishServerSessionAsync();
         }
+
+        /// <summary>
+        /// Removes this instance's 9 static-event subscriptions (GameLog + GameHubService).
+        /// Called on the outgoing "_instantce" right before a new ViewModel_PageRoom takes over -
+        /// same shape as ViewModel_PageGame.Unsubscribe and CharacterPageViewModel.Unsubscribe.
+        /// </summary>
+        private void Unsubscribe()
+        {
+            GameLog.EntryAdded -= OnGameLogEntry;
+
+            GameHubService.HubConnected -= OnHubConnected;
+            GameHubService.CharacterEntered -= OnCharacterEntered;
+            GameHubService.CharacterLeft -= OnCharacterLeft;
+            GameHubService.RoomCharactersReceived -= OnRoomCharacters;
+            GameHubService.CharacterGathering -= OnCharacterGathering;
+            GameHubService.CharacterCrafting -= OnCharacterCrafting;
+            GameHubService.CharacterUpgrading -= OnCharacterUpgrading;
+            GameHubService.CharacterInCombat -= OnCharacterInCombat;
+            GameHubService.CharacterCombatEnded -= OnCharacterCombatEnded;
+        }
+
         private void OnHubConnected()
         {
+            _ = EstablishServerSessionAsync();
+        }
+
+        // These three used to fire unawaited in parallel. LoadCharacterOnServerAsync is what
+        // actually attaches a live Character to this connection server-side (session.TryAdd in
+        // GameHub.LoadCharacter) - every other hub action (slotting a skill, attacking, etc.)
+        // looks that session up and silently no-ops/fails if it isn't there yet. Racing a fast
+        // player action against this call (e.g. opening the skill page and slotting something
+        // within the first second of joining) meant the action could reach the server before the
+        // session existed, fail, and get reverted client-side - looking like the assignment
+        // "didn't take" even though the client-side click was never actually at fault. Awaiting
+        // it first closes that window; SetCharacterName/JoinRoom stay fire-and-forget relative to
+        // each other since neither depends on the other, only on the session existing.
+        private async Task EstablishServerSessionAsync()
+        {
+            // Nothing else ever retries this if it fails outright (a transient hiccup right after
+            // connecting, DB replication lag right after a fresh character save, etc.) - previously
+            // that meant the whole rest of the session was stuck with no server-side Character at
+            // all, only fixable by a full relog (a fresh connection gets a fresh attempt). A few
+            // short retries here covers the transient case without needing that.
+            bool loaded = false;
+            for (int attempt = 0; attempt < 3 && !loaded; attempt++)
+            {
+                if (attempt > 0) await Task.Delay(400);
+                loaded = await GameHubService.LoadCharacterOnServerAsync(character.Name);
+            }
+
             _ = GameHubService.SetCharacterNameAsync(character.Name);
             _ = GameHubService.JoinRoomAsync(currentRoom.Id);
-            _ = GameHubService.LoadCharacterOnServerAsync(character.Name);
         }
 
         private void OnCharacterEntered(string username) =>

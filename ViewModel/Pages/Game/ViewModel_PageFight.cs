@@ -560,6 +560,22 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             OnPropertyChanged(nameof(CharacterMpText));
             OnPropertyChanged(nameof(TurnText));
             OnPropertyChanged(nameof(CanAct));
+
+            // CommandManager.InvalidateRequerySuggested() alone is not reliable here: WPF's
+            // ButtonBase syncs its effective IsEnabled from the bound Command's own CanExecute()
+            // result (on top of, and able to override, the explicit IsEnabled="{Binding CanAct}"
+            // binding in Page_Fight.xaml), and that sync only actually re-runs on the requery
+            // heuristic's own triggers (focus/keyboard/mouse activity in that window) - not
+            // immediately on every property change, and not at all for a window that isn't the
+            // foreground/focused one at that moment. That left a real party member's Attack
+            // button stuck disabled after their turn started: CanAct (and the plain-property-bound
+            // BtnAttack label) updated correctly and instantly, but the button's actual IsEnabled
+            // DP kept the stale prior CanExecute() result because nothing told these specific
+            // RelayCommands their CanExecute had changed. Raising it directly is synchronous and
+            // does not depend on window focus or input activity.
+            (AttackCommand as RelayCommand)?.RaiseCanExecuteChanged();
+            (CastSkillCommand as RelayCommand<FightSkillVm>)?.RaiseCanExecuteChanged();
+
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
             if (_encounter != null && EnemyHp < 1)
             {

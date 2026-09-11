@@ -207,24 +207,32 @@ namespace Myria.Wpf.View.UserControls
                 if (!node.IsGroupNode && !string.IsNullOrEmpty(node.NpcTooltip))
                     rect.ToolTip = node.NpcTooltip;
 
+                // The label used to be a separate Canvas sibling manually overlapped on top of
+                // rect via Canvas.Left/Top - since it's drawn dead center of the node (the most
+                // natural place to hover), it silently intercepted the hover before rect ever saw
+                // it, so rect's ToolTip (and, for group nodes, its Cursor/click handlers) never
+                // triggered wherever the label's own bounds covered it. Making it rect's actual
+                // Child fixes this properly: IsMouseOver bubbles from a visual child to its
+                // ancestor, so hovering the label now correctly counts as hovering rect too.
+                var lbl = new TextBlock
+                {
+                    Text                = node.Label,
+                    Foreground          = new SolidColorBrush(GetLabelColor(fillColor, node.IsGroupNode, labelNormal, labelGroup)),
+                    FontSize            = node.IsGroupNode ? 12 : 11,
+                    FontWeight          = node.IsGroupNode || node.IsCurrent ? FontWeights.Bold : FontWeights.Normal,
+                    TextAlignment       = TextAlignment.Center,
+                    TextWrapping        = TextWrapping.NoWrap,
+                    TextTrimming        = TextTrimming.CharacterEllipsis,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
+                    IsHitTestVisible    = false
+                };
+                rect.Padding = new Thickness(4, 0, 4, 0);
+                rect.Child   = lbl;
+
                 Canvas.SetLeft(rect, node.X);
                 Canvas.SetTop(rect,  node.Y);
                 Layer.Children.Add(rect);
-
-                var lbl = new TextBlock
-                {
-                    Text          = node.Label,
-                    Foreground    = new SolidColorBrush(GetLabelColor(fillColor, node.IsGroupNode, labelNormal, labelGroup)),
-                    FontSize      = node.IsGroupNode ? 12 : 11,
-                    FontWeight    = node.IsGroupNode || node.IsCurrent ? FontWeights.Bold : FontWeights.Normal,
-                    TextAlignment = TextAlignment.Center,
-                    TextWrapping  = TextWrapping.NoWrap,
-                    Width         = node.Width - 8,
-                    TextTrimming  = TextTrimming.CharacterEllipsis
-                };
-                Canvas.SetLeft(lbl, node.X + 4);
-                Canvas.SetTop(lbl,  node.Y + (node.Height - (node.IsGroupNode ? 18 : 16)) / 2);
-                Layer.Children.Add(lbl);
 
                 // ▶ marker left of current room node
                 if (node.IsCurrent)
