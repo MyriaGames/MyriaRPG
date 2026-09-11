@@ -38,7 +38,6 @@ $ErrorActionPreference = "Stop"
 
 $RepoRoot     = Resolve-Path "$PSScriptRoot\.."
 $CsprojPath   = Join-Path $RepoRoot "Myria.Wpf.csproj"
-$IsccPath    = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 $TimestampUrl = "http://timestamp.digicert.com"
 
 # ── 0. Preconditions ─────────────────────────────────────────────────────────
@@ -55,10 +54,30 @@ if (-not $SigningCert) {
 $Thumbprint = $SigningCert.Thumbprint
 Write-Host "Signing with cert thumbprint: $Thumbprint"
 
-if (-not (Test-Path $IsccPath)) {
-    Write-Host "Inno Setup compiler not found at $IsccPath - install Inno Setup 6." -ForegroundColor Red
+# Newest version wins if more than one is installed (e.g. mid-upgrade from 6 to 7) - the .iss
+# script itself has no version-specific syntax, so whichever ISCC compiles it is fine. Installer
+# location varies: the Inno Setup installer defaults to Program Files (x86) system-wide, but its
+# "install for me only" option (and newer per-user-by-default versions) puts it under
+# LocalAppData\Programs instead - check both rather than assuming either one.
+function Find-Iscc {
+    $candidates = @(
+        "$env:LOCALAPPDATA\Programs\Inno Setup 7\ISCC.exe",
+        "${env:ProgramFiles(x86)}\Inno Setup 7\ISCC.exe",
+        "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
+        "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+    )
+    foreach ($path in $candidates) {
+        if (Test-Path $path) { return $path }
+    }
+    return $null
+}
+
+$IsccPath = Find-Iscc
+if (-not $IsccPath) {
+    Write-Host "Inno Setup compiler (ISCC.exe) not found - install Inno Setup 6 or 7." -ForegroundColor Red
     exit 1
 }
+Write-Host "Using Inno Setup compiler: $IsccPath"
 
 if (-not $SkipServer -and -not (Test-Path $ServerProjectPath)) {
     Write-Host "Myria.Server.Realm project not found at $ServerProjectPath - re-run with -ServerProjectPath or -SkipServer." -ForegroundColor Red
@@ -246,8 +265,21 @@ if (-not $Publish) {
 
 function Publish-GitHubRelease {
     param([string]$Repo, [string]$Tag, [string]$Title, [string[]]$Assets)
-    & gh release view $Tag --repo $Repo 2>$null | Out-Null
-    if ($LASTEXITCODE -eq 0) {
+    # $ErrorActionPreference = "Stop" (script-wide) plus PowerShell 7.3+'s
+    # $PSNativeCommandUseErrorActionPreference promotes ANY non-zero exit from a native exe to a
+    # terminating exception - including this "does the release exist yet" probe, whose whole point
+    # is to fail on a fresh tag. Scope the preference down to "Continue" just for this call so a
+    # not-found here is just a $LASTEXITCODE check, not a thrown error.
+    $releaseExists = $false
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & gh release view $Tag --repo $Repo *> $null
+        $releaseExists = ($LASTEXITCODE -eq 0)
+    } finally {
+        $ErrorActionPreference = $prevEap
+    }
+    if ($releaseExists) {
         Write-Host "Release $Tag already exists on $Repo - uploading/overwriting assets only." -ForegroundColor Yellow
         & gh release upload $Tag --repo $Repo --clobber @Assets
         if ($LASTEXITCODE -ne 0) { throw "gh release upload failed for $Repo" }
