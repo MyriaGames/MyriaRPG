@@ -2,37 +2,42 @@
 Builds one alpha release end-to-end:
   publish WPF client (self-contained, single-file) -> sign exe -> build installer -> sign installer
   publish MyriaServer/MyriaAuthServer for win-x64 + linux-x64 (self-contained) -> zip each
-  -> stage + commit (and optionally push) all of the above, plus the current Legal/*.md docs,
-     to the MyriaRPG-releases repo.
+  -> (optionally) publish a GitHub Release directly on each project's own repo via the gh CLI:
+     the signed installer to MyriaGames/MyriaRPG, the server zips to MyriaGames/MyriaServer.
 
 Requires: New-SigningCert.ps1 already run once (cert present in Cert:\CurrentUser\My),
-Inno Setup 6 installed, and a local clone of the public MyriaRPG-releases repo. Myria.Server.Realm
+Inno Setup 6 installed, and the GitHub CLI (`gh`, authenticated) if you pass -Publish. Myria.Server.Realm
 and Myria.Server.Auth are published straight out of this same Myria solution (no separate
 sibling-repo clones needed - that split happened before this script was updated to match).
 Signing uses the cert directly from the Windows cert store by thumbprint - no
 .pfx password is ever needed or asked for here.
 
+Previously this staged everything into a local clone of a separate rllyben/MyriaRPG-releases repo
+and committed/pushed there, with a hand-maintained version.json manifest describing the latest
+build. Both this script and the runtime updaters (UpdateService.cs client-side,
+update-production.sh server-side) have since moved to publishing/reading GitHub Releases directly
+on each project's own repo - no separate releases repo or manifest file to keep in sync anymore.
+
 Usage:
-  .\release.ps1 -ReleasesRepoPath "C:\path\to\MyriaRPG-releases"
-  .\release.ps1 -ReleasesRepoPath "C:\path\to\MyriaRPG-releases" -Push
-  .\release.ps1 -Push -SkipServer   # WPF client only, skip building/staging server zips
+  .\release.ps1                          # build + sign everything, don't publish anywhere
+  .\release.ps1 -Publish                 # build, sign, and create the GitHub Releases too
+  .\release.ps1 -Publish -SkipServer     # WPF client only, skip building/releasing server zips
 #>
 
 param(
-    [string]$ReleasesRepoPath = "$PSScriptRoot\..\..\MyriaRPG-releases",
     [string]$ServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Realm",
     [string]$AuthServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Auth",
     [string]$CertSubject = "CN=MyriaRPG Alpha, O=Rhyen",
-    [switch]$Push,
+    [string]$WpfRepo = "MyriaGames/MyriaRPG",
+    [string]$ServerRepo = "MyriaGames/MyriaServer",
+    [switch]$Publish,
     [switch]$SkipServer
 )
 
 $ErrorActionPreference = "Stop"
 
 $RepoRoot     = Resolve-Path "$PSScriptRoot\.."
-$SolutionRoot = Resolve-Path "$RepoRoot\.."
 $CsprojPath   = Join-Path $RepoRoot "Myria.Wpf.csproj"
-$LegalPath    = Join-Path $SolutionRoot "Legal"
 $IsccPath    = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 $TimestampUrl = "http://timestamp.digicert.com"
 
@@ -65,8 +70,8 @@ if (-not $SkipServer -and -not (Test-Path $AuthServerProjectPath)) {
     exit 1
 }
 
-if (-not (Test-Path $LegalPath)) {
-    Write-Host "Legal docs folder not found at $LegalPath - expected Legal/*.md in the solution root." -ForegroundColor Red
+if ($Publish -and -not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    Write-Host "-Publish was passed but the GitHub CLI ('gh') isn't on PATH - install it or omit -Publish to just build+sign locally." -ForegroundColor Red
     exit 1
 }
 
@@ -96,6 +101,7 @@ if ($csprojContent -notmatch "<Version>([\d\.]+)</Version>") {
     exit 1
 }
 $Version = $Matches[1]
+$Tag = "v$Version"
 Write-Host "Building MyriaRPG alpha $Version" -ForegroundColor Cyan
 
 function Invoke-Sign {
@@ -140,6 +146,13 @@ if (-not (Test-Path $InstallerExe)) {
 Write-Host "`nSigning installer..." -ForegroundColor Cyan
 Invoke-Sign -FilePath $InstallerExe
 
+# UpdateService.cs matches release assets by prefix ("MyriaRPG_Setup") + ".exe" suffix - the
+# exact filename doesn't need the version baked in, but versioning it avoids ambiguity/overwrite
+# surprises if multiple builds ever sit in the same folder before being uploaded.
+$VersionedInstallerName = "MyriaRPG_Setup_$Version.exe"
+$VersionedInstallerPath = Join-Path $PSScriptRoot $VersionedInstallerName
+Copy-Item $InstallerExe $VersionedInstallerPath -Force
+
 # ── 5b. Publish MyriaServer for win-x64 + linux-x64 and zip each ────────────
 $WinServerZip = $null
 $LinuxServerZip = $null
@@ -178,8 +191,8 @@ if (-not $SkipServer) {
         Pop-Location
     }
 
-    $WinServerZip   = Join-Path $PSScriptRoot "MyriaServer_win-x64.zip"
-    $LinuxServerZip = Join-Path $PSScriptRoot "MyriaServer_linux-x64.zip"
+    $WinServerZip   = Join-Path $PSScriptRoot "MyriaServer_win-x64_$Version.zip"
+    $LinuxServerZip = Join-Path $PSScriptRoot "MyriaServer_linux-x64_$Version.zip"
     if (Test-Path $WinServerZip)   { Remove-Item $WinServerZip -Force }
     if (Test-Path $LinuxServerZip) { Remove-Item $LinuxServerZip -Force }
 
@@ -219,96 +232,40 @@ if (-not $SkipServer) {
     Write-Host "  $LinuxServerZip"
 }
 
-# ── 6. Stage into the releases repo ──────────────────────────────────────────
-if (-not (Test-Path $ReleasesRepoPath)) {
-    Write-Host "`nReleases repo not found at $ReleasesRepoPath - skipping publish step." -ForegroundColor Yellow
-    Write-Host "Signed installer is ready at: $InstallerExe" -ForegroundColor Green
-    if ($WinServerZip)   { Write-Host "Windows server zip ready at: $WinServerZip" -ForegroundColor Green }
-    if ($LinuxServerZip) { Write-Host "Linux server zip ready at: $LinuxServerZip" -ForegroundColor Green }
+Write-Host "`nBuild complete." -ForegroundColor Green
+Write-Host "  Signed installer: $VersionedInstallerPath"
+if ($WinServerZip)   { Write-Host "  Windows server zip: $WinServerZip" }
+if ($LinuxServerZip) { Write-Host "  Linux server zip:   $LinuxServerZip" }
+
+# ── 6. Publish GitHub Releases directly on each project's own repo ──────────
+if (-not $Publish) {
+    Write-Host "`nNot publishing (pass -Publish to create the GitHub Releases)." -ForegroundColor Yellow
+    Write-Host "Would tag '$Tag' on $WpfRepo (installer) and $ServerRepo (server zips)." -ForegroundColor Yellow
     exit 0
 }
 
-$VersionedName = "MyriaRPG_Setup_$Version.exe"
-Copy-Item $InstallerExe (Join-Path $ReleasesRepoPath $VersionedName) -Force
-
-$VersionedWinServerZip   = "MyriaServer_win-x64_$Version.zip"
-$VersionedLinuxServerZip = "MyriaServer_linux-x64_$Version.zip"
-if ($WinServerZip)   { Copy-Item $WinServerZip   (Join-Path $ReleasesRepoPath $VersionedWinServerZip)   -Force }
-if ($LinuxServerZip) { Copy-Item $LinuxServerZip (Join-Path $ReleasesRepoPath $VersionedLinuxServerZip) -Force }
-
-$ManifestPath = Join-Path $ReleasesRepoPath "version.json"
-$Manifest = @{
-    version      = $Version
-    installerUrl = "https://github.com/rllyben/MyriaRPG-releases/releases/download/v$Version/$VersionedName"
-    notes        = "Alpha build $Version"
-}
-if ($WinServerZip)   { $Manifest.serverWinUrl   = "https://github.com/rllyben/MyriaRPG-releases/releases/download/v$Version/$VersionedWinServerZip" }
-if ($LinuxServerZip) { $Manifest.serverLinuxUrl = "https://github.com/rllyben/MyriaRPG-releases/releases/download/v$Version/$VersionedLinuxServerZip" }
-$Manifest | ConvertTo-Json | Set-Content -Path $ManifestPath -Encoding utf8
-
-# ── 6a. Sync legal docs (Impressum, Datenschutzerklärung, Nutzungsbedingungen) ──────
-# These live at Legal/*.md in the main Myria solution and describe what the published
-# game actually does (data collected, self-service account deletion, etc.) - keep the
-# public releases repo's copy in lockstep with every release rather than only updating
-# it by hand on the rare occasion someone remembers to.
-$ReleasesLegalPath = Join-Path $ReleasesRepoPath "Legal"
-New-Item -ItemType Directory -Path $ReleasesLegalPath -Force | Out-Null
-Copy-Item (Join-Path $LegalPath "*.md") $ReleasesLegalPath -Force
-
-Write-Host "`nStaged release $Version in $ReleasesRepoPath" -ForegroundColor Green
-Write-Host "NOTE: version.json's URLs assume you attach $VersionedName$(if ($WinServerZip) {", $VersionedWinServerZip"})$(if ($LinuxServerZip) {", $VersionedLinuxServerZip"}) to a GitHub Release tagged v$Version." -ForegroundColor Yellow
-
-# ── 6b. Prune old releases - keep only the newest $MaxKeptReleases per artifact ──
-# Only prunes the files tracked in this repo; it does NOT delete the corresponding
-# GitHub Releases (tags + attached assets) - remove those separately with
-# `gh release delete vX.Y.Z` if you want the Releases page itself cleaned up too.
-$MaxKeptReleases = 10
-
-function Get-PruneList {
-    param([string]$Pattern, [string]$CaptureRegex)
-    Get-ChildItem -Path $ReleasesRepoPath -Filter $Pattern |
-        Where-Object { $_.Name -match $CaptureRegex } |
-        ForEach-Object { [PSCustomObject]@{ File = $_; Version = [version]$Matches[1] } } |
-        Sort-Object Version -Descending |
-        Select-Object -Skip $MaxKeptReleases
-}
-
-$ToPrune = @()
-$ToPrune += Get-PruneList -Pattern "MyriaRPG_Setup_*.exe"          -CaptureRegex '^MyriaRPG_Setup_(\d+\.\d+\.\d+)\.exe$'
-$ToPrune += Get-PruneList -Pattern "MyriaServer_win-x64_*.zip"     -CaptureRegex '^MyriaServer_win-x64_(\d+\.\d+\.\d+)\.zip$'
-$ToPrune += Get-PruneList -Pattern "MyriaServer_linux-x64_*.zip"   -CaptureRegex '^MyriaServer_linux-x64_(\d+\.\d+\.\d+)\.zip$'
-
-if ($ToPrune.Count -gt 0) {
-    Write-Host "`nPruning $($ToPrune.Count) release asset(s) older than the newest ${MaxKeptReleases} per platform:" -ForegroundColor Cyan
-    foreach ($old in $ToPrune) { Write-Host "  - $($old.File.Name)" }
-}
-
-Push-Location $ReleasesRepoPath
-try {
-    git add $VersionedName version.json Legal
-    if ($WinServerZip)   { git add $VersionedWinServerZip }
-    if ($LinuxServerZip) { git add $VersionedLinuxServerZip }
-    foreach ($old in $ToPrune) {
-        git rm --quiet $old.File.Name
-    }
-
-    $CommitMessage = "Alpha release $Version"
-    if ($ToPrune.Count -gt 0) { $CommitMessage += " (pruned $($ToPrune.Count) old asset[s])" }
-    git commit -m $CommitMessage
-
-    if ($Push) {
-        git push -u origin HEAD
-        $AttachList = $VersionedName
-        if ($WinServerZip)   { $AttachList += ", $VersionedWinServerZip" }
-        if ($LinuxServerZip) { $AttachList += ", $VersionedLinuxServerZip" }
-        Write-Host "`nPushed. Now create a GitHub Release tagged 'v$Version' and attach $AttachList as assets." -ForegroundColor Green
-        if ($ToPrune.Count -gt 0) {
-            Write-Host "Remember: the pruned GitHub Releases themselves (tags + assets) still exist - delete with 'gh release delete vX.Y.Z' if wanted." -ForegroundColor Yellow
-        }
+function Publish-GitHubRelease {
+    param([string]$Repo, [string]$Tag, [string]$Title, [string[]]$Assets)
+    & gh release view $Tag --repo $Repo 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Release $Tag already exists on $Repo - uploading/overwriting assets only." -ForegroundColor Yellow
+        & gh release upload $Tag --repo $Repo --clobber @Assets
+        if ($LASTEXITCODE -ne 0) { throw "gh release upload failed for $Repo" }
     } else {
-        Write-Host "`nCommitted locally. Run 'git push -u origin HEAD' in $ReleasesRepoPath when ready (or re-run with -Push)." -ForegroundColor Yellow
-        Write-Host "Then create a GitHub Release tagged 'v$Version' and attach the staged assets." -ForegroundColor Yellow
+        & gh release create $Tag --repo $Repo --title $Title --notes "Alpha build $Version" @Assets
+        if ($LASTEXITCODE -ne 0) { throw "gh release create failed for $Repo" }
     }
-} finally {
-    Pop-Location
 }
+
+Write-Host "`nPublishing GitHub Release $Tag on $WpfRepo..." -ForegroundColor Cyan
+Publish-GitHubRelease -Repo $WpfRepo -Tag $Tag -Title "Alpha $Version" -Assets @($VersionedInstallerPath)
+
+if ($WinServerZip -or $LinuxServerZip) {
+    $ServerAssets = @()
+    if ($WinServerZip)   { $ServerAssets += $WinServerZip }
+    if ($LinuxServerZip) { $ServerAssets += $LinuxServerZip }
+    Write-Host "`nPublishing GitHub Release $Tag on $ServerRepo..." -ForegroundColor Cyan
+    Publish-GitHubRelease -Repo $ServerRepo -Tag $Tag -Title "Alpha $Version" -Assets $ServerAssets
+}
+
+Write-Host "`nDone. Released $Tag on $WpfRepo$(if ($WinServerZip -or $LinuxServerZip) { " and $ServerRepo" })." -ForegroundColor Green

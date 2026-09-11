@@ -371,9 +371,9 @@ Handbook/
 ModExperiments/
 screenshots/
 
-# Generated installer/server output - rebuilt by Setup\release.ps1 each release, published to the
-# separate MyriaRPG-releases repo, not meant to be committed here (one of these was already
-# pushing up against GitHub's 100MB hard file-size limit)
+# Generated installer/server output - rebuilt by Setup\release.ps1 each release and published as
+# GitHub Release assets (MyriaGames/MyriaRPG, MyriaGames/MyriaServer), not meant to be committed
+# here (one of these was already pushing up against GitHub's 100MB hard file-size limit)
 Setup/*.exe
 Setup/*.zip
 Setup/certs/*.pfx
