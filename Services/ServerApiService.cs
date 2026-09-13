@@ -340,6 +340,15 @@ namespace Myria.Wpf.Services
                         SkillId   = slot.SkillId
                     }).ToList(),
 
+                    SkillProgress = character.SkillProgress.Select(sp => new SkillProgressDto
+                    {
+                        SkillId             = sp.SkillId,
+                        UsageCount          = sp.UsageCount,
+                        Level               = sp.Level,
+                        UnspentPoints       = sp.UnspentPoints,
+                        PurchasedUpgradeIds = sp.PurchasedUpgradeIds.ToList()
+                    }).ToList(),
+
                     KnownRunes = character.KnownRunes.Select(r => new KnownRuneDto
                     {
                         InstanceId   = r.Id,
@@ -518,6 +527,18 @@ namespace Myria.Wpf.Services
                         SkillId = slot.SkillId
                     });
 
+                // ── Skill Progress ───────────────────────────────────────────────────
+                character.SkillProgress.Clear();
+                foreach (var sp in dto.SkillProgress)
+                    character.SkillProgress.Add(new Myria.Lib.Core.Entities.Skills.SkillProgress
+                    {
+                        SkillId = sp.SkillId,
+                        UsageCount = sp.UsageCount,
+                        Level = sp.Level,
+                        UnspentPoints = sp.UnspentPoints,
+                        PurchasedUpgradeIds = sp.PurchasedUpgradeIds.ToList()
+                    });
+
                 // ── Known Runes ───────────────────────────────────────────────────
                 character.KnownRunes.Clear();
                 foreach (var r in dto.KnownRunes)
@@ -556,6 +577,8 @@ namespace Myria.Wpf.Services
                 BaseRuneService.ResolveRunes(character);
                 SkillSlotService.ResolveSlots(character);
                 SkillSlotService.MigrateIfEmpty(character);
+                foreach (var sp in character.SkillProgress.ToList())
+                    SkillLevelingService.RecalculateLevelAndPoints(character, sp.SkillId);
 
                 return character;
             }
@@ -851,6 +874,7 @@ namespace Myria.Wpf.Services
             public List<RepeatableQuestDto> RepeatableQuests    { get; set; } = new();
             public List<JobDto>             Jobs                { get; set; } = new();
             public List<SkillSlotDto>       SkillSlots          { get; set; } = new();
+            public List<SkillProgressDto>   SkillProgress       { get; set; } = new();
             public List<KnownRuneDto>       KnownRunes          { get; set; } = new();
             public List<RuneDictEntryDto>   RuneDictionary      { get; set; } = new();
             public List<RoomGatheringDto>   RoomGatheringStatus { get; set; } = new();
@@ -898,6 +922,15 @@ namespace Myria.Wpf.Services
             public int    SlotIndex { get; set; }
             public int    Source    { get; set; }
             public string SkillId   { get; set; } = "";
+        }
+
+        private class SkillProgressDto
+        {
+            public string       SkillId             { get; set; } = "";
+            public int          UsageCount          { get; set; }
+            public int          Level               { get; set; } = 1;
+            public int          UnspentPoints       { get; set; }
+            public List<string> PurchasedUpgradeIds { get; set; } = new();
         }
 
         private class KnownRuneDto

@@ -575,6 +575,20 @@ namespace Myria.Wpf.Services
             return false;
         }
 
+        public static async Task<bool> SpendSkillPointAsync(string skillId, string upgradeId)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<bool>("SpendSkillPoint", skillId, upgradeId); } catch { }
+            return false;
+        }
+
+        public static async Task<bool> RespecSkillAsync(string skillId)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<bool>("RespecSkill", skillId); } catch { }
+            return false;
+        }
+
         public static async Task AbandonCombatAsync()
         {
             if (_connection?.State == HubConnectionState.Connected)
