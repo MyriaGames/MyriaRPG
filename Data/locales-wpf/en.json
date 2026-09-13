@@ -337,6 +337,8 @@
   "pg.game.chat.send": "Send",
   "pg.game.force_logout_title": "Session Ended",
   "pg.game.force_logout_message": "Your account was logged in from another location. You have been disconnected.",
+  "pg.game.version_mismatch_title": "Client Out of Date",
+  "pg.game.version_mismatch_message": "This client's version doesn't match what the server currently accepts, so multiplayer features are unavailable. Your account and single-player progress are unaffected — please update to play online.",
   "pg.game.player.propose_trade": "Propose Trade",
   "pg.trade.title": "Trade",
   "pg.trade.header": "Trading with {0}",

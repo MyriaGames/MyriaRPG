@@ -14,6 +14,7 @@ namespace Myria.Wpf.Services
 
         public static event Action? HubConnected;
         public static event Action? ForceLoggedOut;
+        public static event Action<List<string>>? VersionMismatch; // server's currently-allowed client versions
         public static event Action<string, string, string>? ChatMessageReceived; // sender, message, channel
         public static event Action<string>? CharacterEntered;
         public static event Action<string>? CharacterLeft;
@@ -67,8 +68,13 @@ namespace Myria.Wpf.Services
             // the same vanilla data set as the server.
             Myria.Lib.Core.Systems.Mods.ModLoader.ApplyMultiplayerMode(true);
 
+            // Sent as a plain query param (SignalR hub connections can't set custom headers) so
+            // GameHub.OnConnectedAsync can reject an incompatible client outright - see the
+            // versioning scheme in v0.3.md. Uses the same assembly version UpdateService compares
+            // against, so both stay in lockstep automatically.
+            var clientVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             _connection = new HubConnectionBuilder()
-                .WithUrl($"{ServerApiService.BaseUrl}/hubs/game", opts =>
+                .WithUrl($"{ServerApiService.BaseUrl}/hubs/game?clientVersion={clientVersion}", opts =>
                 {
                     opts.AccessTokenProvider = () =>
                         Task.FromResult<string?>(ServerApiService.Token);
@@ -82,6 +88,9 @@ namespace Myria.Wpf.Services
 
             _connection.On("ForceLogout", () =>
                 Dispatch(() => ForceLoggedOut?.Invoke()));
+
+            _connection.On<List<string>>("VersionMismatch", allowedVersions =>
+                Dispatch(() => VersionMismatch?.Invoke(allowedVersions)));
 
             _connection.On<string, string, string>("ChatMessage", (sender, msg, channel) =>
                 Dispatch(() => ChatMessageReceived?.Invoke(sender, msg, channel)));

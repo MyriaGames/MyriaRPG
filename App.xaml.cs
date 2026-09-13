@@ -77,7 +77,8 @@ namespace Myria.Wpf
                         if (isLeader)
                         {
                             var progress = new Progress<UpdateProgress>(updateWindow.Apply);
-                            bool launchingInstaller = await UpdateService.CheckForUpdatesAsync(progress);
+                            bool launchingInstaller = await UpdateService.CheckForUpdatesAsync(
+                                progress, updateWindow.AskConfirmUpdateAsync);
                             if (launchingInstaller)
                                 return; // UpdateService already requested Shutdown()
                         }

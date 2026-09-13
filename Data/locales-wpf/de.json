@@ -337,6 +337,8 @@
   "pg.game.chat.send": "Senden",
   "pg.game.force_logout_title": "Sitzung beendet",
   "pg.game.force_logout_message": "Ihr Konto wurde von einem anderen Ort aus angemeldet. Sie wurden getrennt.",
+  "pg.game.version_mismatch_title": "Client veraltet",
+  "pg.game.version_mismatch_message": "Die Version dieses Clients stimmt nicht mit der überein, die der Server derzeit akzeptiert — Mehrspieler-Funktionen sind deshalb nicht verfügbar. Ihr Konto und der Einzelspieler-Fortschritt sind davon nicht betroffen — bitte aktualisieren, um online zu spielen.",
   "pg.game.player.propose_trade": "Handel vorschlagen",
   "pg.trade.title": "Handel",
   "pg.trade.header": "Handel mit {0}",

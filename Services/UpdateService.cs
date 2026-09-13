@@ -13,17 +13,30 @@ using System.Windows;
 
 namespace Myria.Wpf.Services
 {
-    public enum UpdateStatus { Checking, Downloading, LaunchingInstaller, UpToDate, Failed }
+    public enum UpdateStatus
+    {
+        Checking, Downloading, LaunchingInstaller, UpToDate, Failed,
+        /// <summary>A compat-tier-differing update was found and is awaiting the user's decision
+        /// via the callback passed to <see cref="UpdateService.CheckForUpdatesAsync"/> — see
+        /// <see cref="UpdateProgress.PendingVersion"/>/<see cref="UpdateProgress.PendingNotes"/>.</summary>
+        PendingConfirmation,
+        /// <summary>The user declined a compat-tier-differing update. Distinct from
+        /// <see cref="Failed"/> since nothing went wrong — this was a deliberate choice.</summary>
+        Declined
+    }
 
-    public record UpdateProgress(UpdateStatus Status, double? PercentComplete = null);
+    public record UpdateProgress(
+        UpdateStatus Status,
+        double? PercentComplete = null,
+        string? PendingVersion = null,
+        string? PendingNotes = null);
 
     /// <summary>
-    /// Checks this repo's own GitHub Releases for a newer alpha build and silently reinstalls if
-    /// found. Mirrors ServerApiService's static-HttpClient, swallow-all-exceptions pattern - a
-    /// failed or slow check must never block or crash startup. Every step is logged to
-    /// Data/Misc/update.log so a silent failure (e.g. an AV false-positive deleting the downloaded
-    /// installer) is at least diagnosable after the fact, since nothing about a failed check is
-    /// ever shown in-app.
+    /// Checks this repo's own GitHub Releases for a newer alpha build and reinstalls if found.
+    /// Mirrors ServerApiService's static-HttpClient, swallow-all-exceptions pattern - a failed or
+    /// slow check must never block or crash startup. Every step is logged to Data/Misc/update.log
+    /// so a silent failure (e.g. an AV false-positive deleting the downloaded installer) is at
+    /// least diagnosable after the fact, since nothing about a failed check is ever shown in-app.
     ///
     /// Previously this checked a hand-maintained version.json in a separate rllyben/MyriaRPG-releases
     /// repo. Now that releases are published directly on this repo (MyriaGames/MyriaRPG), the
@@ -31,6 +44,13 @@ namespace Myria.Wpf.Services
     /// sync. The release's tag name (e.g. "v0.2.15" or "0.2.15") is the version, and the installer
     /// is whichever release asset looks like "MyriaRPG_Setup*.exe" (the exact filename varies by
     /// version - see Setup/release.ps1).
+    ///
+    /// v0.3+ versioning scheme: a version is Major.Minor.CompatBreak.Patch (mapped onto .NET's
+    /// Major/Minor/Build/Revision). An update whose Major.Minor.CompatBreak (the "mod-compat
+    /// version") matches the currently-installed one is Patch-only and safe for mods/other clients
+    /// to ignore - that case installs silently, exactly like before this scheme existed. An update
+    /// that changes the mod-compat version might break mods, so it's held for the caller to confirm
+    /// via <paramref name="confirmCompatBreakUpdate"/> before anything is downloaded.
     /// </summary>
     public static class UpdateService
     {
@@ -52,7 +72,14 @@ namespace Myria.Wpf.Services
 
         /// <summary>Returns true if an installer was launched and the caller should stop its own
         /// startup immediately (Shutdown() has already been requested internally).</summary>
-        public static async Task<bool> CheckForUpdatesAsync(IProgress<UpdateProgress>? progress = null)
+        /// <param name="confirmCompatBreakUpdate">Called only when the available update changes
+        /// the mod-compat version (Major.Minor.CompatBreak) — awaited before anything is
+        /// downloaded. Receives the new version string and the release's notes (may be null/empty)
+        /// and should return true to proceed, false to skip this update for now. Same-compat-tier
+        /// (Patch-only) updates never call this - they install silently as before.</param>
+        public static async Task<bool> CheckForUpdatesAsync(
+            IProgress<UpdateProgress>? progress = null,
+            Func<string, string?, Task<bool>>? confirmCompatBreakUpdate = null)
         {
             try
             {
@@ -88,6 +115,27 @@ namespace Myria.Wpf.Services
                     Log("Already up to date.");
                     progress?.Report(new UpdateProgress(UpdateStatus.UpToDate));
                     return false;
+                }
+
+                bool sameCompatTier = latest.Major == current.Major
+                    && latest.Minor == current.Minor
+                    && latest.Build == current.Build;
+                if (!sameCompatTier)
+                {
+                    Log($"Update changes the mod-compat version ({current.Major}.{current.Minor}.{current.Build} -> " +
+                        $"{latest.Major}.{latest.Minor}.{latest.Build}) - asking before installing.");
+                    progress?.Report(new UpdateProgress(UpdateStatus.PendingConfirmation,
+                        PendingVersion: versionText, PendingNotes: release.Body));
+
+                    bool confirmed = confirmCompatBreakUpdate is null
+                        || await confirmCompatBreakUpdate(versionText, release.Body);
+                    if (!confirmed)
+                    {
+                        Log("User declined the compat-breaking update.");
+                        progress?.Report(new UpdateProgress(UpdateStatus.Declined));
+                        return false;
+                    }
+                    Log("User confirmed the compat-breaking update - proceeding.");
                 }
 
                 // Suffix with the current process id so two overlapping checks (e.g. a stray
@@ -171,6 +219,7 @@ namespace Myria.Wpf.Services
         {
             [JsonPropertyName("tag_name")]
             public string? TagName { get; set; }
+            public string? Body { get; set; }
             public List<GitHubReleaseAsset>? Assets { get; set; }
         }
 

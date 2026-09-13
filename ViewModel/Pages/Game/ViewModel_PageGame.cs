@@ -567,6 +567,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 GameEvents.RoomEntered += OnRoomEnteredForShopGate;
 
                 GameHubService.ForceLoggedOut          += OnForceLoggedOut;
+                GameHubService.VersionMismatch          += OnVersionMismatch;
                 GameHubService.ChatMessageReceived     += OnChatMessage;
                 GameHubService.PartyInviteReceived     += OnPartyInvite;
                 GameHubService.PartyUpdated            += OnPartyUpdated;
@@ -615,6 +616,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             GameEvents.RoomEntered -= OnRoomEnteredForShopGate;
 
             GameHubService.ForceLoggedOut          -= OnForceLoggedOut;
+            GameHubService.VersionMismatch          -= OnVersionMismatch;
             GameHubService.ChatMessageReceived     -= OnChatMessage;
             GameHubService.PartyInviteReceived     -= OnPartyInvite;
             GameHubService.PartyUpdated            -= OnPartyUpdated;
@@ -651,6 +653,21 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             MessageBox.Show(
                 Myria.Lib.Core.Systems.Localization.T("pg.game.force_logout_message"),
                 Myria.Lib.Core.Systems.Localization.T("pg.game.force_logout_title"),
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        /// <summary>
+        /// Server rejected this client's version at connect (GameHub.OnConnectedAsync aborts the
+        /// connection right after sending this). ConnectThenNavigateToRoomAsync's own try/catch
+        /// already falls back to the offline room ViewModel when StartAsync then throws - this just
+        /// adds a clear explanation instead of a silent fallback, since a raw connection-failed
+        /// error wouldn't tell the player their client itself is the problem.
+        /// </summary>
+        private void OnVersionMismatch(List<string> allowedVersions)
+        {
+            MessageBox.Show(
+                Myria.Lib.Core.Systems.Localization.T("pg.game.version_mismatch_message"),
+                Myria.Lib.Core.Systems.Localization.T("pg.game.version_mismatch_title"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
