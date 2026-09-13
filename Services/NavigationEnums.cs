@@ -49,7 +49,6 @@ namespace Myria.Wpf.Services
         Trade = 29,
         Shop = 30,
         AddFriend = 31,
-        SkillCombination = 32,
         SkillSlot = 33,
         EquipmentPanel = 34,
         InventoryPanel = 35,

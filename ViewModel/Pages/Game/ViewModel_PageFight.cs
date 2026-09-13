@@ -199,8 +199,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 InitGroupCombat(pend);
                 _lastGroupLogIndex = _groupEncounter?.Log.Count ?? 0;
 
-                foreach (var (skill, source) in SkillSlotService.GetCombatSkills(character))
-                    Skills.Add(new FightSkillVm(skill, DetermineTag(character, skill, source)));
+                foreach (var (skill, _) in SkillSlotService.GetCombatSkills(character))
+                    Skills.Add(new FightSkillVm(skill, ""));
             }
             else
             {
@@ -224,8 +224,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                     OnPropertyChanged(nameof(CharacterMpText));
                 };
 
-                foreach (var (skill, source) in SkillSlotService.GetCombatSkills(character))
-                    Skills.Add(new FightSkillVm(skill, DetermineTag(character, skill, source)));
+                foreach (var (skill, _) in SkillSlotService.GetCombatSkills(character))
+                    Skills.Add(new FightSkillVm(skill, ""));
 
                 FlushNewLogEntries();
                 RaiseAll();
@@ -401,14 +401,6 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 Navigation.Current.Navigate(Nav.Room);
             }
         }
-
-        protected static string DetermineTag(Character character, Skill skill, SlottedSkillSource source) =>
-            source switch
-            {
-                SlottedSkillSource.Combined        => "Combined",
-                SlottedSkillSource.CompositeFusion => "Fusion",
-                _                                  => ""
-            };
 
         protected bool CanActMethod() => CanAct;
 

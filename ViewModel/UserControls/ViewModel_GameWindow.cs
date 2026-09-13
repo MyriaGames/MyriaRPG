@@ -238,7 +238,6 @@ namespace Myria.Wpf.ViewModel.UserControls
             nav.RegisterView(Nav.Quest,              NavigationFrameType.CharacterMenu, () => new Page_QuestList());
             nav.RegisterView(Nav.Friends,            NavigationFrameType.CharacterMenu, () => new Page_Friends());
             nav.RegisterView(Nav.Inventory,          NavigationFrameType.CharacterMenu, () => new InventoryPage(UserAccountService.CurrentCharacter));
-            nav.RegisterView(Nav.SkillCombination,   NavigationFrameType.CharacterMenu, () => new Page_SkillCombination());
             nav.RegisterView(Nav.SkillSlot,          NavigationFrameType.CharacterMenu, () => new Page_SkillSlots());
             nav.RegisterView(Nav.Runes,              NavigationFrameType.CharacterMenu, () => new Page_Runes());
             nav.RegisterView(Nav.RuneDrawing,        NavigationFrameType.CharacterMenu, () => new Page_RuneDrawing());

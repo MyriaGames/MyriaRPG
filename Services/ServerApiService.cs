@@ -340,10 +340,6 @@ namespace Myria.Wpf.Services
                         SkillId   = slot.SkillId
                     }).ToList(),
 
-                    CompositeSkills = BuildCompositeSkillDtos(character),
-
-                    CombinedSkills = BuildCombinedSkillDtos(character),
-
                     KnownRunes = character.KnownRunes.Select(r => new KnownRuneDto
                     {
                         InstanceId   = r.Id,
@@ -522,59 +518,6 @@ namespace Myria.Wpf.Services
                         SkillId = slot.SkillId
                     });
 
-                // ── Composite Skills (active) ─────────────────────────────────────
-                character.CompositeSkills.Clear();
-                character.ActiveCompositeSkillIds.Clear();
-                character.StashedCompositeSkills.Clear();
-
-                foreach (var cs in dto.CompositeSkills)
-                {
-                    var composite = new CompositeSkill
-                    {
-                        Id           = cs.InstanceId,
-                        ComponentIds = cs.ComponentIds.ToList()
-                    };
-
-                    if (cs.IsStashed && !string.IsNullOrEmpty(cs.StashedForClass))
-                    {
-                        var cls = cs.StashedForClass!;
-                        if (!character.StashedCompositeSkills.ContainsKey(cls))
-                            character.StashedCompositeSkills[cls] = new();
-                        character.StashedCompositeSkills[cls].Add(composite);
-                    }
-                    else
-                    {
-                        character.CompositeSkills.Add(composite);
-                        if (cs.IsActive)
-                            character.ActiveCompositeSkillIds.Add(cs.InstanceId);
-                    }
-                }
-
-                // ── Combined Skills ───────────────────────────────────────────────
-                character.CombinedSkills.Clear();
-                character.StashedCombinedSkills.Clear();
-
-                foreach (var cs in dto.CombinedSkills)
-                {
-                    var combined = new CombinedSkill
-                    {
-                        Id       = cs.InstanceId,
-                        SkillIds = cs.SkillIds.ToList()
-                    };
-
-                    if (cs.IsStashed && !string.IsNullOrEmpty(cs.StashedForClass))
-                    {
-                        var cls = cs.StashedForClass!;
-                        if (!character.StashedCombinedSkills.ContainsKey(cls))
-                            character.StashedCombinedSkills[cls] = new();
-                        character.StashedCombinedSkills[cls].Add(combined);
-                    }
-                    else
-                    {
-                        character.CombinedSkills.Add(combined);
-                    }
-                }
-
                 // ── Known Runes ───────────────────────────────────────────────────
                 character.KnownRunes.Clear();
                 foreach (var r in dto.KnownRunes)
@@ -611,70 +554,12 @@ namespace Myria.Wpf.Services
                 character.ValidateQuestStatuses();
                 SkillFactory.UpdateSkills(character);
                 BaseRuneService.ResolveRunes(character);
-                SkillFusionSystem.ResolveCompositeSkills(character);
-                SkillCombinationService.ResolveCombinedSkills(character);
                 SkillSlotService.ResolveSlots(character);
                 SkillSlotService.MigrateIfEmpty(character);
 
                 return character;
             }
             catch { return null; }
-        }
-
-        // ── Helpers ──────────────────────────────────────────────────────────────
-
-        private static List<CompositeSkillDto> BuildCompositeSkillDtos(Character character)
-        {
-            var list = new List<CompositeSkillDto>();
-
-            foreach (var cs in character.CompositeSkills)
-                list.Add(new CompositeSkillDto
-                {
-                    InstanceId      = cs.Id,
-                    ComponentIds    = cs.ComponentIds.ToList(),
-                    IsStashed       = false,
-                    StashedForClass = null,
-                    IsActive        = character.ActiveCompositeSkillIds.Contains(cs.Id)
-                });
-
-            foreach (var (cls, stashList) in character.StashedCompositeSkills)
-                foreach (var cs in stashList)
-                    list.Add(new CompositeSkillDto
-                    {
-                        InstanceId      = cs.Id,
-                        ComponentIds    = cs.ComponentIds.ToList(),
-                        IsStashed       = true,
-                        StashedForClass = cls,
-                        IsActive        = false
-                    });
-
-            return list;
-        }
-
-        private static List<CombinedSkillDto> BuildCombinedSkillDtos(Character character)
-        {
-            var list = new List<CombinedSkillDto>();
-
-            foreach (var cs in character.CombinedSkills)
-                list.Add(new CombinedSkillDto
-                {
-                    InstanceId      = cs.Id,
-                    SkillIds        = cs.SkillIds.ToList(),
-                    IsStashed       = false,
-                    StashedForClass = null
-                });
-
-            foreach (var (cls, stashList) in character.StashedCombinedSkills)
-                foreach (var cs in stashList)
-                    list.Add(new CombinedSkillDto
-                    {
-                        InstanceId      = cs.Id,
-                        SkillIds        = cs.SkillIds.ToList(),
-                        IsStashed       = true,
-                        StashedForClass = cls
-                    });
-
-            return list;
         }
 
         // ── Other character endpoints ─────────────────────────────────────────────
@@ -966,8 +851,6 @@ namespace Myria.Wpf.Services
             public List<RepeatableQuestDto> RepeatableQuests    { get; set; } = new();
             public List<JobDto>             Jobs                { get; set; } = new();
             public List<SkillSlotDto>       SkillSlots          { get; set; } = new();
-            public List<CompositeSkillDto>  CompositeSkills     { get; set; } = new();
-            public List<CombinedSkillDto>   CombinedSkills      { get; set; } = new();
             public List<KnownRuneDto>       KnownRunes          { get; set; } = new();
             public List<RuneDictEntryDto>   RuneDictionary      { get; set; } = new();
             public List<RoomGatheringDto>   RoomGatheringStatus { get; set; } = new();
@@ -1015,23 +898,6 @@ namespace Myria.Wpf.Services
             public int    SlotIndex { get; set; }
             public int    Source    { get; set; }
             public string SkillId   { get; set; } = "";
-        }
-
-        private class CompositeSkillDto
-        {
-            public string       InstanceId      { get; set; } = "";
-            public List<string> ComponentIds    { get; set; } = new();
-            public bool         IsStashed       { get; set; }
-            public string? StashedForClass { get; set; }
-            public bool         IsActive        { get; set; }
-        }
-
-        private class CombinedSkillDto
-        {
-            public string       InstanceId      { get; set; } = "";
-            public List<string> SkillIds        { get; set; } = new();
-            public bool         IsStashed       { get; set; }
-            public string? StashedForClass { get; set; }
         }
 
         private class KnownRuneDto

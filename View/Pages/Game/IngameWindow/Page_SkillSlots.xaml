@@ -227,24 +227,6 @@
                                     <ItemsControl ItemsSource="{Binding AvailableRegularSkills}"
                                                   ItemTemplate="{StaticResource AvailableSkillCard}"/>
 
-                                    <!-- Combined skills -->
-                                    <TextBlock Text="{Binding TblCombined}"
-                                               Style="{StaticResource MutedText}"
-                                               FontSize="11"
-                                               Margin="2,10,0,6"
-                                               Visibility="{Binding HasCombinedSkills, Converter={StaticResource BoolToVis}}"/>
-                                    <ItemsControl ItemsSource="{Binding AvailableCombinedSkills}"
-                                                  ItemTemplate="{StaticResource AvailableSkillCard}"/>
-
-                                    <!-- Fusion skills -->
-                                    <TextBlock Text="{Binding TblFusion}"
-                                               Style="{StaticResource MutedText}"
-                                               FontSize="11"
-                                               Margin="2,10,0,6"
-                                               Visibility="{Binding HasFusionSkills, Converter={StaticResource BoolToVis}}"/>
-                                    <ItemsControl ItemsSource="{Binding AvailableFusionSkills}"
-                                                  ItemTemplate="{StaticResource AvailableSkillCard}"/>
-
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>
@@ -307,11 +289,6 @@
                                                                    FontFamily="{StaticResource Font.Body}"
                                                                    FontSize="13"
                                                                    FontWeight="SemiBold"/>
-                                                        <TextBlock Text="{Binding SourceTag}"
-                                                                   Style="{StaticResource MutedText}"
-                                                                   FontSize="11"
-                                                                   Margin="0,2,0,0"
-                                                                   Visibility="{Binding HasSourceTag, Converter={StaticResource BoolToVis}}"/>
                                                     </StackPanel>
 
                                                     <!-- Move up / down -->

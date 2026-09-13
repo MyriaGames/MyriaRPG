@@ -70,8 +70,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 InitGroupCombat(pend);
                 _lastGroupLogIndex = _groupEncounter?.Log.Count ?? 0;
 
-                foreach (var (skill, source) in SkillSlotService.GetCombatSkills(character))
-                    Skills.Add(new FightSkillVm(skill, DetermineTag(character, skill, source)));
+                foreach (var (skill, _) in SkillSlotService.GetCombatSkills(character))
+                    Skills.Add(new FightSkillVm(skill, ""));
 
                 if (!_isLocalGroupCombat)
                 {
@@ -304,8 +304,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             _serverCharacterMpMax  = character.MaxMana;
             _canActServer       = true;
 
-            foreach (var (skill, source) in SkillSlotService.GetCombatSkills(character))
-                Skills.Add(new FightSkillVm(skill, DetermineTag(character, skill, source)));
+            foreach (var (skill, _) in SkillSlotService.GetCombatSkills(character))
+                Skills.Add(new FightSkillVm(skill, ""));
 
             LogLines.Add(LogLineVm.From("pg.fight.log.enemy_appears",
                 Localization.T("pg.fight.log.enemy_appears", LocalizationText.LocalizeMonsterName(_serverEnemyName))));

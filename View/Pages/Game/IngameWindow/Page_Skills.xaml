@@ -10,7 +10,7 @@
 
     <Page.Resources>
 
-        <!-- Tab-style button (header actions: Combine, Manage Slots) -->
+        <!-- Tab-style button (header action: Manage Slots) -->
         <Style x:Key="TabButton" TargetType="Button">
             <Setter Property="Height"          Value="38"/>
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Muted}"/>
@@ -128,11 +128,6 @@
                     <!-- Action buttons -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal"
                                 VerticalAlignment="Center" Margin="0,0,0,10">
-                        <Button Content="{Binding TblCombineSkills}"
-                                Command="{Binding OpenCombineCommand}"
-                                Style="{StaticResource TabButton}"
-                                Padding="16,0"
-                                Margin="0,0,8,0"/>
                         <Button Content="{Binding TblManageSlots}"
                                 Command="{Binding OpenSlotsCommand}"
                                 Style="{StaticResource TabButton}"

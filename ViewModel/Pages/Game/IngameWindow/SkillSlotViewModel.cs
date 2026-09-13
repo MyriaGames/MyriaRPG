@@ -19,8 +19,6 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         private string _tblSlot = string.Empty;
         private string _tblUnslot = string.Empty;
         private string _tblRegular = string.Empty;
-        private string _tblCombined = string.Empty;
-        private string _tblFusion = string.Empty;
         private string _tblBack = string.Empty;
         [LocalizedKey("pg.skill_slots.title")]
         public string TblTitle
@@ -64,20 +62,6 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             set { _tblRegular = value; OnPropertyChanged(); }
         }
 
-        [LocalizedKey("pg.skill_slots.combined")]
-        public string TblCombined
-        {
-            get => _tblCombined;
-            set { _tblCombined = value; OnPropertyChanged(); }
-        }
-
-        [LocalizedKey("pg.skill_slots.fusion")]
-        public string TblFusion
-        {
-            get => _tblFusion;
-            set { _tblFusion = value; OnPropertyChanged(); }
-        }
-
         [LocalizedKey("app.general.UI.back")]
         public string TblBack
         {
@@ -87,12 +71,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
 
         public string SlotCountText => $"{_player.SkillSlots.Count} / {_player.SkillSlotCount} slots";
 
-        public bool HasCombinedSkills => AvailableCombinedSkills.Count > 0;
-        public bool HasFusionSkills => AvailableFusionSkills.Count > 0;
-
         public ObservableCollection<SlottableSkillVm> AvailableRegularSkills { get; } = new();
-        public ObservableCollection<SlottableSkillVm> AvailableCombinedSkills { get; } = new();
-        public ObservableCollection<SlottableSkillVm> AvailableFusionSkills { get; } = new();
         public ObservableCollection<ActiveSlotVm> ActiveSlots { get; } = new();
 
         public ICommand SlotSkillCommand { get; }
@@ -119,8 +98,6 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         protected void Refresh()
         {
             AvailableRegularSkills.Clear();
-            AvailableCombinedSkills.Clear();
-            AvailableFusionSkills.Clear();
             ActiveSlots.Clear();
 
             bool atCap = _player.SkillSlots.Count >= _player.SkillSlotCount;
@@ -132,29 +109,11 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
                     SlottedSkillSource.Regular, slotted, atCap));
             }
 
-            foreach (var c in _player.CombinedSkills.Where(c => c.ResolvedSkill != null))
-            {
-                bool slotted = _player.SkillSlots.Any(sl => sl.Source == SlottedSkillSource.Combined && sl.SkillId == c.Id);
-                var sk = c.ResolvedSkill!;
-                AvailableCombinedSkills.Add(new SlottableSkillVm(c.Id, c.DisplayName, sk.Type.ToString(), sk.Target.ToString(),
-                    SlottedSkillSource.Combined, slotted, atCap));
-            }
-
-            foreach (var f in _player.CompositeSkills.Where(f => f.ResolvedSkill != null))
-            {
-                bool slotted = _player.SkillSlots.Any(sl => sl.Source == SlottedSkillSource.CompositeFusion && sl.SkillId == f.Id);
-                var sk = f.ResolvedSkill!;
-                AvailableFusionSkills.Add(new SlottableSkillVm(f.Id, f.DisplayName, sk.Type.ToString(), sk.Target.ToString(),
-                    SlottedSkillSource.CompositeFusion, slotted, atCap));
-            }
-
             int idx = 1;
             foreach (var slot in _player.SkillSlots)
                 ActiveSlots.Add(new ActiveSlotVm(idx++, slot));
 
             OnPropertyChanged(nameof(SlotCountText));
-            OnPropertyChanged(nameof(HasCombinedSkills));
-            OnPropertyChanged(nameof(HasFusionSkills));
         }
 
         protected virtual void SlotSkill(SlottableSkillVm? vm)
@@ -221,13 +180,6 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public string SkillId => _slot.SkillId;
         public SlottedSkillSource Source => _slot.Source;
         public string SkillName => _slot.ResolvedSkill?.Name ?? _slot.SkillId;
-        public string SourceTag => _slot.Source switch
-        {
-            SlottedSkillSource.Combined => "Combined",
-            SlottedSkillSource.CompositeFusion => "Fusion",
-            _ => ""
-        };
-        public bool HasSourceTag => !string.IsNullOrEmpty(SourceTag);
 
         public ActiveSlotVm(int number, SkillSlot slot)
         {

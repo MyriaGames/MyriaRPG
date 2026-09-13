@@ -56,11 +56,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public ICommand NextPageCommand => _nextPageCommand;
 
         public ICommand OpenDetailsCommand { get; }
-        public ICommand OpenCombineCommand { get; }
         public ICommand OpenSlotsCommand { get; }
-
-        [LocalizedKey("pg.skill_combo.title")]
-        public string TblCombineSkills { get; set; }
 
         [LocalizedKey("pg.skill_slots.title")]
         public string TblManageSlots { get; set; }
@@ -94,13 +90,6 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             foreach (var s in player.Skills)
                 _allSkills.Add(new SkillVm(s));
 
-            // Combined skills
-            foreach (var combined in player.CombinedSkills)
-            {
-                if (combined.ResolvedSkill != null)
-                    _allSkills.Add(new SkillVm(combined.ResolvedSkill, "Combined"));
-            }
-
             // Rune skills � magic classes that have runes in their collection
             foreach (var rune in player.KnownRunes)
             {
@@ -108,15 +97,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
                     _allSkills.Add(new SkillVm(rune.ResolvedSkill, "Rune"));
             }
 
-            // Fusion skills � physical classes that have composed skills
-            foreach (var composite in player.CompositeSkills)
-            {
-                if (composite.ResolvedSkill != null)
-                    _allSkills.Add(new SkillVm(composite.ResolvedSkill, "Fusion"));
-            }
-
             OpenDetailsCommand = new RelayCommand<SkillVm?>(OpenDetails);
-            OpenCombineCommand = new RelayCommand(() => Navigation.Current.Navigate(new Page_SkillCombination()));
             OpenSlotsCommand = new RelayCommand(() => Navigation.Current.Navigate(new Page_SkillSlots()));
 
             _prevPageCommand = new RelayCommand(() => CurrentPage--, () => _currentPage > 1);
@@ -149,7 +130,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
     {
         private readonly Skill _skill;
 
-        /// <summary>"Rune", "Fusion", or empty string for regular class skills.</summary>
+        /// <summary>"Rune", or empty string for regular class skills.</summary>
         public string Tag { get; }
         public bool HasTag => !string.IsNullOrEmpty(Tag);
 
