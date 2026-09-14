@@ -270,7 +270,6 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
         private string _itemType;
         private string _itemRarity;
         private Brush _rarityColor;
-        private string _itemStats;
         private string _classText = "";
         private Brush _classColor = s_classMuted;
         private bool _hasClassInfo;
@@ -278,6 +277,17 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
         private static readonly Brush s_classCompatible   = MakeBrush(0x6F, 0xCF, 0x97);
         private static readonly Brush s_classIncompatible = MakeBrush(0xCF, 0x66, 0x79);
         private static readonly Brush s_classMuted        = MakeBrush(0x9A, 0x8A, 0x68);
+
+        // Reused for stat comparison deltas/loss lines - same colors as the class-compatibility text
+        // above (green = better/gained, red = worse/lost), so the tooltip only has one "good/bad"
+        // color language rather than two.
+        private static Brush StatGainBrush => s_classCompatible;
+        private static Brush StatLossBrush => s_classIncompatible;
+
+        // Resolved fresh per SetItem call (not cached) so it tracks the current Light/Dark theme,
+        // same as every other color in this class - matches how RarityColor/ClassColor already work.
+        private static Brush DefaultStatBrush =>
+            System.Windows.Application.Current?.TryFindResource("Brush.Foreground") as Brush ?? Brushes.White;
 
         private static Brush MakeBrush(byte r, byte g, byte b)
         {
@@ -292,7 +302,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
         public string ItemType { get => _itemType; set => SetProperty(ref _itemType, value); }
         public string ItemRarity { get => _itemRarity; set => SetProperty(ref _itemRarity, value); }
         public Brush RarityColor { get => _rarityColor; set => SetProperty(ref _rarityColor, value); }
-        public string ItemStats { get => _itemStats; set => SetProperty(ref _itemStats, value); }
+
+        /// <summary>One line per stat, optionally colored - see PopulateStatLines. Replaces the old
+        /// single plain string so mixed green/red/default lines can render in one list.</summary>
+        public ObservableCollection<StatLineViewModel> ItemStats { get; } = new();
         public string ClassText { get => _classText; private set => SetProperty(ref _classText, value); }
         public Brush ClassColor { get => _classColor; private set => SetProperty(ref _classColor, value); }
         public bool HasClassInfo { get => _hasClassInfo; private set => SetProperty(ref _hasClassInfo, value); }
@@ -307,7 +320,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
             ItemType = $"{Localization.T("pg.inventory.tooltip.type")}: {item.GetType().Name}";
             ItemRarity = $"{Localization.T("pg.inventory.tooltip.rarity")}: {item.Rarity}";
             RarityColor = GetRarityBrush(item.Rarity);
-            ItemStats = BuildStatsString(item);
+            PopulateStatLines(item, character);
 
             if (item is EquipmentItem equip && equip.AllowedClasses.Count > 0)
             {
@@ -323,39 +336,96 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
             }
         }
 
-        private static string BuildStatsString(Item item)
+        /// <summary>One (stat, hovered-value, isPercent) descriptor per equipment bonus, in the same
+        /// order the tooltip has always shown them.</summary>
+        private static readonly (string LabelKey, Func<EquipmentItem, float> Value, bool IsPercent)[] s_equipStats =
         {
+            ("atk",      i => i.BonusATK,      false),
+            ("def",      i => i.BonusDEF,      false),
+            ("matk",     i => i.BonusMATK,     false),
+            ("mdef",     i => i.BonusMDEF,     false),
+            ("str",      i => i.BonusSTR,      false),
+            ("dex",      i => i.BonusDEX,      false),
+            ("end",      i => i.BonusEND,      false),
+            ("int",      i => i.BonusINT,      false),
+            ("spr",      i => i.BonusSPR,      false),
+            ("hp",       i => i.BonusHP,       false),
+            ("mp",       i => i.BonusMP,       false),
+            ("aim",      i => i.BonusAim,      true),
+            ("evasion",  i => i.BonusEvasion,  true),
+            ("crit",     i => i.BonusCrit,     true),
+            ("block",    i => i.BonusBlock,    true),
+        };
+
+        /// <summary>
+        /// Rebuilds ItemStats for the hovered item. For equipment, compares against whatever is
+        /// currently equipped in the *same slot* (skipped entirely if there's nothing equipped
+        /// there, or the hovered item IS that equipped item - reference-equal, e.g. hovering your
+        /// own worn gear on the Equipment page): a stat both items have gets a green/red (+N)/(-N)
+        /// suffix when they differ, a stat only the equipped item has gets a full red loss line
+        /// ("+N STAT"), everything else is a plain line exactly like before this comparison existed.
+        /// </summary>
+        private void PopulateStatLines(Item item, Myria.Lib.Core.Entities.Characters.Character? character)
+        {
+            ItemStats.Clear();
+
             if (item is EquipmentItem equip)
             {
-                var lines = new List<string>();
-                if (equip.BonusATK > 0)     lines.Add($"{Localization.T("pg.inventory.stat.atk")}: +{equip.BonusATK}");
-                if (equip.BonusDEF > 0)     lines.Add($"{Localization.T("pg.inventory.stat.def")}: +{equip.BonusDEF}");
-                if (equip.BonusMATK > 0)    lines.Add($"{Localization.T("pg.inventory.stat.matk")}: +{equip.BonusMATK}");
-                if (equip.BonusMDEF > 0)    lines.Add($"{Localization.T("pg.inventory.stat.mdef")}: +{equip.BonusMDEF}");
-                if (equip.BonusSTR > 0)     lines.Add($"{Localization.T("pg.inventory.stat.str")}: +{equip.BonusSTR}");
-                if (equip.BonusDEX > 0)     lines.Add($"{Localization.T("pg.inventory.stat.dex")}: +{equip.BonusDEX}");
-                if (equip.BonusEND > 0)     lines.Add($"{Localization.T("pg.inventory.stat.end")}: +{equip.BonusEND}");
-                if (equip.BonusINT > 0)     lines.Add($"{Localization.T("pg.inventory.stat.int")}: +{equip.BonusINT}");
-                if (equip.BonusSPR > 0)     lines.Add($"{Localization.T("pg.inventory.stat.spr")}: +{equip.BonusSPR}");
-                if (equip.BonusHP > 0)      lines.Add($"{Localization.T("pg.inventory.stat.hp")}: +{equip.BonusHP}");
-                if (equip.BonusMP > 0)      lines.Add($"{Localization.T("pg.inventory.stat.mp")}: +{equip.BonusMP}");
-                if (equip.BonusAim > 0)     lines.Add($"{Localization.T("pg.inventory.stat.aim")}: +{equip.BonusAim}%");
-                if (equip.BonusEvasion > 0) lines.Add($"{Localization.T("pg.inventory.stat.evasion")}: +{equip.BonusEvasion}%");
-                if (equip.BonusCrit > 0)    lines.Add($"{Localization.T("pg.inventory.stat.crit")}: +{equip.BonusCrit}%");
-                if (equip.BonusBlock > 0)   lines.Add($"{Localization.T("pg.inventory.stat.block")}: +{equip.BonusBlock}%");
-                return lines.Count > 0 ? string.Join("\n", lines) : Localization.T("pg.inventory.tooltip.no_bonuses");
+                var equipped = character?.Equipped.GetValueOrDefault(equip.SlotType);
+                bool skipComparison = equipped == null || ReferenceEquals(equipped, equip);
+
+                foreach (var (labelKey, getValue, isPercent) in s_equipStats)
+                {
+                    float hoveredVal = getValue(equip);
+                    float equippedVal = skipComparison ? 0f : getValue(equipped!);
+                    if (hoveredVal <= 0 && equippedVal <= 0) continue;
+
+                    string label = Localization.T($"pg.inventory.stat.{labelKey}");
+                    string suffix = isPercent ? "%" : "";
+
+                    if (hoveredVal > 0)
+                    {
+                        string baseLine = $"{label}: +{FormatStatNumber(hoveredVal)}{suffix}";
+                        // Epsilon, not exact equality - Crit/Block are floats scaled by upgrade/craft
+                        // multipliers, so two stats that display identically can differ by a fraction
+                        // of a rounding error; a literal "(+0)" on a tied stat is exactly the noise
+                        // the no-suffix-when-equal rule exists to avoid.
+                        if (!skipComparison && equippedVal > 0 && MathF.Abs(hoveredVal - equippedVal) >= 0.01f)
+                        {
+                            float delta = hoveredVal - equippedVal;
+                            var brush = delta > 0 ? StatGainBrush : StatLossBrush;
+                            string sign = delta > 0 ? "+" : "";
+                            ItemStats.Add(new StatLineViewModel($"{baseLine} ({sign}{FormatStatNumber(delta)}{suffix})", brush));
+                        }
+                        else
+                        {
+                            ItemStats.Add(new StatLineViewModel(baseLine, DefaultStatBrush));
+                        }
+                    }
+                    else // equippedVal > 0, hoveredVal <= 0 - a stat you'd give up by switching
+                    {
+                        ItemStats.Add(new StatLineViewModel($"+{FormatStatNumber(equippedVal)}{suffix} {label}", StatLossBrush));
+                    }
+                }
+
+                if (ItemStats.Count == 0)
+                    ItemStats.Add(new StatLineViewModel(Localization.T("pg.inventory.tooltip.no_bonuses"), DefaultStatBrush));
+                return;
             }
 
             if (item is ConsumableItem consumable)
             {
-                var lines = new List<string>();
-                if (consumable.HealAmount > 0)  lines.Add($"{Localization.T("pg.inventory.stat.heal")}: {consumable.HealAmount}");
-                if (consumable.ManaRestore > 0) lines.Add($"{Localization.T("pg.inventory.stat.mana")}: {consumable.ManaRestore}");
-                return lines.Count > 0 ? string.Join("\n", lines) : Localization.T("pg.inventory.tooltip.no_effects");
+                if (consumable.HealAmount > 0)
+                    ItemStats.Add(new StatLineViewModel($"{Localization.T("pg.inventory.stat.heal")}: {consumable.HealAmount}", DefaultStatBrush));
+                if (consumable.ManaRestore > 0)
+                    ItemStats.Add(new StatLineViewModel($"{Localization.T("pg.inventory.stat.mana")}: {consumable.ManaRestore}", DefaultStatBrush));
+                if (ItemStats.Count == 0)
+                    ItemStats.Add(new StatLineViewModel(Localization.T("pg.inventory.tooltip.no_effects"), DefaultStatBrush));
             }
-
-            return string.Empty;
         }
+
+        private static string FormatStatNumber(float value) =>
+            value == MathF.Truncate(value) ? value.ToString("0") : value.ToString("0.##");
 
         private static Brush GetRarityBrush(string rarity) => rarity switch
         {
@@ -371,5 +441,19 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
             Myria.Lib.Core.Systems.Enums.ItemRarity.Godly     => new SolidColorBrush(Color.FromRgb(255, 0, 0)),
             _                    => new SolidColorBrush(Color.FromRgb(160, 160, 160))
         };
+    }
+
+    /// <summary>One line of ItemTooltipViewModel.ItemStats - text plus its own color, so a stat
+    /// comparison can mix plain/green/red lines in a single list.</summary>
+    public class StatLineViewModel
+    {
+        public string Text { get; }
+        public Brush Foreground { get; }
+
+        public StatLineViewModel(string text, Brush foreground)
+        {
+            Text = text;
+            Foreground = foreground;
+        }
     }
 }

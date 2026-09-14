@@ -60,10 +60,16 @@
                                FontFamily="{StaticResource Font.Body}" FontSize="10"
                                TextWrapping="Wrap" Margin="0,0,0,6"/>
                     <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.3" Margin="0,0,0,6"/>
-                    <TextBlock Text="{Binding ItemStats}"
-                               FontFamily="{StaticResource Font.Body}" FontSize="10"
-                               Foreground="{DynamicResource Brush.Foreground}"
-                               TextWrapping="Wrap"/>
+                    <ItemsControl ItemsSource="{Binding ItemStats}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Text}"
+                                           FontFamily="{StaticResource Font.Body}" FontSize="10"
+                                           Foreground="{Binding Foreground}"
+                                           TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </Border>
         </Popup>
@@ -504,10 +510,16 @@
                                                FontFamily="{StaticResource Font.Body}" FontSize="10"
                                                TextWrapping="Wrap" Margin="0,0,0,6"/>
                                     <Rectangle Height="1" Fill="{DynamicResource Brush.Gold}" Opacity="0.3" Margin="0,0,0,6"/>
-                                    <TextBlock Text="{Binding ItemStats}"
-                                               FontFamily="{StaticResource Font.Body}" FontSize="10"
-                                               Foreground="{DynamicResource Brush.Foreground}"
-                                               TextWrapping="Wrap"/>
+                                    <ItemsControl ItemsSource="{Binding ItemStats}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Text}"
+                                                           FontFamily="{StaticResource Font.Body}" FontSize="10"
+                                                           Foreground="{Binding Foreground}"
+                                                           TextWrapping="Wrap"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </Border>
                         </Popup>
