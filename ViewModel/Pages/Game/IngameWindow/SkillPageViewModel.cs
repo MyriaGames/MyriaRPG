@@ -1,4 +1,5 @@
-﻿using Myria.Lib.Core.Entities.Skills;
+﻿using Myria.Lib.Core.Entities.Effects;
+using Myria.Lib.Core.Entities.Skills;
 using Myria.Lib.Core.Systems;
 using Myria.Lib.Core.Systems.Enums;
 using Myria.Lib.Core.Services;
@@ -143,6 +144,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public string Id => _skill.Id;
         public string Name => _skill.Name;
         public string Description => _skill.Description;
+        /// <summary>The skill's own data-driven effects (poison, stun, lifesteal, etc.) - exposed
+        /// so SkillDetailViewModel can show what a skill actually *does* beyond its raw numbers.</summary>
+        public IReadOnlyList<SkillEffectEntry> RawEffects => _skill.Effects;
         public int ManaCost => _skill.ManaCost;
         public int MinLevel => _skill.MinLevel;
         public bool IsHealing => _skill.IsHealing;

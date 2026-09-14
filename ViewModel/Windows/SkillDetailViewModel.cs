@@ -1,5 +1,8 @@
+using Myria.Lib.Core.Entities.Effects;
 using Myria.Lib.Core.Entities.Skills;
 using Myria.Lib.Core.Services;
+using Myria.Lib.Core.Services.Builder;
+using Myria.Lib.Core.Systems;
 using Myria.Wpf.Services;
 using Myria.Wpf.Utils;
 using Myria.Wpf.ViewModel.Pages.Game.IngameWindow;
@@ -29,6 +32,7 @@ namespace Myria.Wpf.ViewModel.Windows
             SpendPointCommand = new RelayCommand<UpgradeOptionVm?>(SpendPoint);
             RespecCommand = new RelayCommand(Respec);
 
+            PopulateEffects();
             Refresh();
         }
 
@@ -42,6 +46,31 @@ namespace Myria.Wpf.ViewModel.Windows
         public bool IsHealing => _skill.IsHealing;
         public string TimingText => _skill.TimingText;
         public string ScalingText => $"{_skill.ScalingFactor:0.##} × {_skill.StatToScaleFrom}";
+
+        /// <summary>What this skill actually *does* beyond its raw numbers - poison, stun,
+        /// lifesteal, etc. Built once from the skill's own data (Skill.Effects), not per-Refresh,
+        /// since a skill's own effects never change with leveling/upgrades (only their eventual
+        /// magnitude does, which combat computes live - this is deliberately just the qualitative
+        /// "what happens" text, not a magnitude preview).</summary>
+        public ObservableCollection<SkillEffectVm> Effects { get; } = new();
+        public bool HasEffects => Effects.Count > 0;
+
+        private void PopulateEffects()
+        {
+            foreach (var entry in _skill.RawEffects)
+            {
+                var def = EffectFactory.GetDefinition(entry.EffectId);
+                if (def == null) continue; // unknown/removed effect id - skip rather than show garbage
+                Effects.Add(new SkillEffectVm(def.Name, def.Description, EffectTargetText(entry.ApplyTo)));
+            }
+        }
+
+        private static string EffectTargetText(EffectTarget target) => target switch
+        {
+            EffectTarget.Caster    => Localization.T("pg.skills.effect_target.caster"),
+            EffectTarget.AllAllies => Localization.T("pg.skills.effect_target.all_allies"),
+            _                      => Localization.T("pg.skills.effect_target.target")
+        };
 
         /// <summary>False for a rune/other non-base skill this character's Skills list doesn't
         /// contain by id (e.g. the Rune tab's entries) - leveling only applies to base skills.</summary>
@@ -131,12 +160,37 @@ namespace Myria.Wpf.ViewModel.Windows
         public bool NotPurchased => !IsPurchased;
         public bool CanPurchase { get; }
 
+        /// <summary>e.g. "Also adds: Weak Poison" - empty when this upgrade doesn't grant a new
+        /// effect (most don't; they just adjust the skill's existing numbers).</summary>
+        public string AddsEffectText { get; }
+        public bool HasAddsEffectText => !string.IsNullOrEmpty(AddsEffectText);
+
         public UpgradeOptionVm(SkillUpgradeOption option, bool isPurchased, bool canPurchase)
         {
             Id = option.Id;
             Description = option.Description;
             IsPurchased = isPurchased;
             CanPurchase = canPurchase;
+
+            var names = option.AddedEffects
+                .Select(e => EffectFactory.GetDefinition(e.EffectId)?.Name)
+                .Where(n => !string.IsNullOrEmpty(n));
+            var joined = string.Join(", ", names);
+            AddsEffectText = string.IsNullOrEmpty(joined) ? "" : Localization.T("pg.skills.details.adds_effect", joined);
+        }
+    }
+
+    public class SkillEffectVm
+    {
+        public string Name { get; }
+        public string Description { get; }
+        public string TargetText { get; }
+
+        public SkillEffectVm(string name, string description, string targetText)
+        {
+            Name = name;
+            Description = description;
+            TargetText = targetText;
         }
     }
 }

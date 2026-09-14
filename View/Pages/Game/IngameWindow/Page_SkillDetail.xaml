@@ -81,6 +81,46 @@
                        Foreground="{DynamicResource Brush.Foreground}"
                        LineHeight="22"/>
 
+            <!-- What the skill actually does in combat (poison, stun, lifesteal, etc.) - separate
+                 from Description, which is just flavor text. Omitted entirely for skills with no
+                 data-driven Effects (most damage/heal-only skills). -->
+            <StackPanel Visibility="{Binding HasEffects, Converter={StaticResource BoolToVis}}">
+
+                <TextBlock Text="Effects"
+                           FontWeight="SemiBold"
+                           FontFamily="{StaticResource Font.Body}"
+                           FontSize="13"
+                           Foreground="{DynamicResource Brush.SecondaryText}"
+                           Margin="0,16,0,6"/>
+
+                <ItemsControl ItemsSource="{Binding Effects}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource Brush.Gold}"
+                                    BorderThickness="1"
+                                    CornerRadius="2"
+                                    Padding="10,8"
+                                    Margin="0,0,0,6">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                        <TextBlock Text="{Binding TargetText, StringFormat=' — {0}'}"
+                                                   Foreground="{DynamicResource Brush.SecondaryText}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Description}"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource Brush.Foreground}"
+                                               Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </StackPanel>
+
             <!-- Leveling / upgrades - only for real base skills (not e.g. the Rune tab's entries) -->
             <StackPanel Visibility="{Binding HasProgress, Converter={StaticResource BoolToVis}}">
 
@@ -118,11 +158,17 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0"
-                                               Text="{Binding Description}"
-                                               TextWrapping="Wrap"
-                                               VerticalAlignment="Center"
-                                               Foreground="{DynamicResource Brush.Foreground}"/>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Description}"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource Brush.Foreground}"/>
+                                        <TextBlock Text="{Binding AddsEffectText}"
+                                                   TextWrapping="Wrap"
+                                                   FontStyle="Italic"
+                                                   Foreground="{DynamicResource Brush.SecondaryText}"
+                                                   Margin="0,2,0,0"
+                                                   Visibility="{Binding HasAddsEffectText, Converter={StaticResource BoolToVis}}"/>
+                                    </StackPanel>
                                     <Button Grid.Column="1"
                                             Content="Buy"
                                             Style="{StaticResource SkillUpgradeButton}"
