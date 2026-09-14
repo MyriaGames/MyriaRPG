@@ -23,6 +23,12 @@ namespace Myria.Wpf.ViewModel.Windows
         private readonly Skill? _baseSkill;
         private SkillProgress? _progress;
 
+        /// <summary>The skill's current, character-specific numbers - base-nerf fade and purchased
+        /// upgrades applied - re-resolved every Refresh() so it never goes stale after a purchase/
+        /// respec on this same screen. Falls back to the raw _skill for non-base entries (the Rune
+        /// tab) that leveling doesn't apply to. Never null after the constructor runs Refresh().</summary>
+        private SkillVm _effectiveSkill = null!;
+
         public SkillDetailViewModel(SkillVm skill)
         {
             _skill = skill;
@@ -32,7 +38,6 @@ namespace Myria.Wpf.ViewModel.Windows
             SpendPointCommand = new RelayCommand<UpgradeOptionVm?>(SpendPoint);
             RespecCommand = new RelayCommand(Respec);
 
-            PopulateEffects();
             Refresh();
         }
 
@@ -41,23 +46,25 @@ namespace Myria.Wpf.ViewModel.Windows
         public string TypeText => _skill.TypeText;
         public string TargetText => _skill.TargetText;
         public string Description => _skill.Description;
-        public int ManaCost => _skill.ManaCost;
+        public int ManaCost => _effectiveSkill.ManaCost;
         public int MinLevel => _skill.MinLevel;
         public bool IsHealing => _skill.IsHealing;
-        public string TimingText => _skill.TimingText;
-        public string ScalingText => $"{_skill.ScalingFactor:0.##} × {_skill.StatToScaleFrom}";
+        public string TimingText => _effectiveSkill.TimingText;
+        public string ScalingText => $"{_effectiveSkill.ScalingFactor:0.##} × {_effectiveSkill.StatToScaleFrom}";
 
         /// <summary>What this skill actually *does* beyond its raw numbers - poison, stun,
-        /// lifesteal, etc. Built once from the skill's own data (Skill.Effects), not per-Refresh,
-        /// since a skill's own effects never change with leveling/upgrades (only their eventual
-        /// magnitude does, which combat computes live - this is deliberately just the qualitative
-        /// "what happens" text, not a magnitude preview).</summary>
+        /// lifesteal, etc, including any effect a purchased upgrade has newly granted. Rebuilt every
+        /// Refresh() from the current effective skill's Effects (see _effectiveSkill), not just once
+        /// at construction, so a newly-bought "adds an effect" upgrade shows up immediately - the
+        /// eventual magnitude still isn't shown here, this is deliberately just the qualitative
+        /// "what happens" text.</summary>
         public ObservableCollection<SkillEffectVm> Effects { get; } = new();
         public bool HasEffects => Effects.Count > 0;
 
         private void PopulateEffects()
         {
-            foreach (var entry in _skill.RawEffects)
+            Effects.Clear();
+            foreach (var entry in _effectiveSkill.RawEffects)
             {
                 var def = EffectFactory.GetDefinition(entry.EffectId);
                 if (def == null) continue; // unknown/removed effect id - skip rather than show garbage
@@ -92,6 +99,16 @@ namespace Myria.Wpf.ViewModel.Windows
 
         private void Refresh()
         {
+            _effectiveSkill = _baseSkill != null
+                ? new SkillVm(SkillLevelingService.ResolveEffectiveSkill(_character, _baseSkill), _skill.Tag)
+                : _skill; // rune/non-base entry - leveling doesn't apply, show its own raw numbers
+
+            PopulateEffects();
+            OnPropertyChanged(nameof(ManaCost));
+            OnPropertyChanged(nameof(TimingText));
+            OnPropertyChanged(nameof(ScalingText));
+            OnPropertyChanged(nameof(HasEffects));
+
             UpgradeOptions.Clear();
             if (_baseSkill == null) return;
 

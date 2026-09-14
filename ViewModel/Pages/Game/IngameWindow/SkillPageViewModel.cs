@@ -87,9 +87,11 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         {
             var player = UserAccountService.CurrentCharacter;
 
-            // Regular class skills (all classes)
+            // Regular class skills (all classes) - resolved to each skill's current effective
+            // numbers (base-nerf fade + purchased upgrades), not the raw shared template, so the
+            // list shows what the skill actually costs/does for this character right now.
             foreach (var s in player.Skills)
-                _allSkills.Add(new SkillVm(s));
+                _allSkills.Add(new SkillVm(SkillLevelingService.ResolveEffectiveSkill(player, s)));
 
             // Rune skills � magic classes that have runes in their collection
             foreach (var rune in player.KnownRunes)
