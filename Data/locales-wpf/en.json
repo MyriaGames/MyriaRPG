@@ -302,6 +302,8 @@
   "pg.skills.effect_target.target": "Target",
   "pg.skills.effect_target.all_allies": "All Allies",
   "pg.skills.details.adds_effect": "Also adds: {0}",
+  "pg.skills.details.unlocks_at_level": "Unlocks at level {0}",
+  "pg.skills.details.maxed": "Maxed ({0}/{1})",
   "pg.skills.no_description": "No description.",
   "pg.skills.timing.instant": "Instant",
   "pg.skills.timing.cast": "Cast: {0}t",

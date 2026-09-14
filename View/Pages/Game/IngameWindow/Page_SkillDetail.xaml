@@ -168,21 +168,29 @@
                                                    Foreground="{DynamicResource Brush.SecondaryText}"
                                                    Margin="0,2,0,0"
                                                    Visibility="{Binding HasAddsEffectText, Converter={StaticResource BoolToVis}}"/>
+                                        <TextBlock Text="{Binding TimesPurchased, StringFormat='Purchased ×{0}'}"
+                                                   FontStyle="Italic"
+                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                   Margin="0,2,0,0"
+                                                   Visibility="{Binding HasPurchases, Converter={StaticResource BoolToVis}}"/>
                                     </StackPanel>
                                     <Button Grid.Column="1"
                                             Content="Buy"
                                             Style="{StaticResource SkillUpgradeButton}"
                                             IsEnabled="{Binding CanPurchase}"
-                                            Visibility="{Binding NotPurchased, Converter={StaticResource BoolToVis}}"
+                                            Visibility="{Binding IsAvailable, Converter={StaticResource BoolToVis}}"
                                             Command="{Binding DataContext.SpendPointCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}"
                                             Margin="10,0,0,0"/>
                                     <TextBlock Grid.Column="1"
-                                               Text="Purchased"
-                                               Foreground="{DynamicResource Brush.GoldSoft}"
-                                               FontWeight="SemiBold"
+                                               Text="{Binding UnavailableReasonText}"
+                                               Foreground="{DynamicResource Brush.Muted}"
+                                               FontStyle="Italic"
                                                VerticalAlignment="Center"
-                                               Visibility="{Binding IsPurchased, Converter={StaticResource BoolToVis}}"
+                                               TextAlignment="Right"
+                                               MaxWidth="120"
+                                               TextWrapping="Wrap"
+                                               Visibility="{Binding IsUnavailable, Converter={StaticResource BoolToVis}}"
                                                Margin="10,0,0,0"/>
                                 </Grid>
                             </Border>

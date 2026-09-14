@@ -100,8 +100,12 @@ namespace Myria.Wpf.ViewModel.Windows
 
             foreach (var option in _baseSkill.UpgradeOptions)
             {
-                bool purchased = _progress.PurchasedUpgradeIds.Contains(option.Id);
-                UpgradeOptions.Add(new UpgradeOptionVm(option, purchased, !purchased && _progress.UnspentPoints > 0));
+                int timesPurchased = _progress.PurchasedUpgradeIds.Count(id => id == option.Id);
+                int maxPurchases = SkillLevelingService.GetEffectiveMaxPurchases(option);
+                bool isMaxed = maxPurchases > 0 && timesPurchased >= maxPurchases;
+                bool isLocked = _progress.Level < option.RequiredLevel;
+                bool canPurchase = !isLocked && !isMaxed && _progress.UnspentPoints > 0;
+                UpgradeOptions.Add(new UpgradeOptionVm(option, timesPurchased, maxPurchases, isLocked, canPurchase));
             }
 
             OnPropertyChanged(nameof(Level));
@@ -156,21 +160,53 @@ namespace Myria.Wpf.ViewModel.Windows
     {
         public string Id { get; }
         public string Description { get; }
-        public bool IsPurchased { get; }
-        public bool NotPurchased => !IsPurchased;
+        public int TimesPurchased { get; }
+        public bool HasPurchases => TimesPurchased > 0;
+
+        /// <summary>0 means this upgrade can be bought an unlimited number of times, stacking its
+        /// deltas again each time - see SkillLevelingService.GetEffectiveMaxPurchases.</summary>
+        public int MaxPurchases { get; }
+        public bool IsUnlimited => MaxPurchases <= 0;
+        public bool IsMaxed => !IsUnlimited && TimesPurchased >= MaxPurchases;
+
+        public int RequiredLevel { get; }
+        public bool IsLocked { get; }
+
         public bool CanPurchase { get; }
+
+        /// <summary>True once this upgrade can never be bought right now for a reason other than
+        /// points (locked behind a level, or already at its purchase cap) - drives which of the Buy
+        /// button / UnavailableReasonText shows, mutually exclusively. A purely points-blocked
+        /// option (still available, just no points yet) still shows the (disabled) Buy button.</summary>
+        public bool IsUnavailable => IsLocked || IsMaxed;
+        public bool IsAvailable => !IsUnavailable;
+
+        /// <summary>What the Buy button's row shows instead of the button once this upgrade is no
+        /// longer purchasable for a reason other than "not enough points" - e.g. "Maxed (2/2)" or
+        /// "Unlocks at level 11". Empty while CanPurchase is true or the only blocker is points.</summary>
+        public string UnavailableReasonText { get; }
+        public bool HasUnavailableReasonText => !string.IsNullOrEmpty(UnavailableReasonText);
 
         /// <summary>e.g. "Also adds: Weak Poison" - empty when this upgrade doesn't grant a new
         /// effect (most don't; they just adjust the skill's existing numbers).</summary>
         public string AddsEffectText { get; }
         public bool HasAddsEffectText => !string.IsNullOrEmpty(AddsEffectText);
 
-        public UpgradeOptionVm(SkillUpgradeOption option, bool isPurchased, bool canPurchase)
+        public UpgradeOptionVm(SkillUpgradeOption option, int timesPurchased, int maxPurchases, bool isLocked, bool canPurchase)
         {
             Id = option.Id;
             Description = option.Description;
-            IsPurchased = isPurchased;
+            TimesPurchased = timesPurchased;
+            MaxPurchases = maxPurchases;
+            RequiredLevel = option.RequiredLevel;
+            IsLocked = isLocked;
             CanPurchase = canPurchase;
+
+            UnavailableReasonText = isLocked
+                ? Localization.T("pg.skills.details.unlocks_at_level", option.RequiredLevel)
+                : (!IsUnlimited && TimesPurchased >= maxPurchases
+                    ? Localization.T("pg.skills.details.maxed", TimesPurchased, maxPurchases)
+                    : "");
 
             var names = option.AddedEffects
                 .Select(e => EffectFactory.GetDefinition(e.EffectId)?.Name)

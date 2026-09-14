@@ -302,6 +302,8 @@
   "pg.skills.effect_target.target": "Ziel",
   "pg.skills.effect_target.all_allies": "Alle Verbündeten",
   "pg.skills.details.adds_effect": "Fügt außerdem hinzu: {0}",
+  "pg.skills.details.unlocks_at_level": "Schaltet frei ab Level {0}",
+  "pg.skills.details.maxed": "Maximiert ({0}/{1})",
   "pg.skills.no_description": "Keine Beschreibung.",
   "pg.skills.timing.instant": "Sofort",
   "pg.skills.timing.cast": "Wirken: {0}t",
