@@ -48,7 +48,10 @@ namespace Myria.Wpf.Services
                 address = (isLoopback ? "http://" : "https://") + address;
             }
 
-            return address;
+            // Every endpoint is built as $"{address}/api/...", so a trailing slash (easy to paste,
+            // e.g. "myria.example.com/auth/") would produce "//api/..." - which misses the route
+            // on the server and doesn't match a reverse proxy's path prefix either.
+            return address.TrimEnd('/');
         }
 
         // Any operator can run their own Auth/Realm server - not just the official one - and
