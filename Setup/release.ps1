@@ -2,35 +2,42 @@
 Builds one alpha release end-to-end:
   publish WPF client (self-contained, single-file) -> sign exe -> build installer -> sign installer
   publish MyriaServer/MyriaAuthServer for win-x64 + linux-x64 (self-contained) -> zip each
-  -> (optionally) publish a GitHub Release directly on each project's own repo via the gh CLI:
-     the signed installer to MyriaGames/MyriaRPG, the server zips to MyriaGames/MyriaServer.
+  -> (optionally) publish the release on the game's own server (-Publish): uploaded over SSH,
+     checksums verified there, then made live at https://myria.myria-games.duckdns.org/downloads/
+     (website download, client auto-update via latest.json, server auto-update via
+     update-production.sh). The realm server on that machine is updated right away.
+  -> (optionally, -PublishGitHub) also create GitHub Releases on each project's own repo via the
+     gh CLI - only needed as a bridge for clients <= 0.2.21, which still look for updates there.
 
 Requires: New-SigningCert.ps1 already run once (cert present in Cert:\CurrentUser\My),
-Inno Setup 6 installed, and the GitHub CLI (`gh`, authenticated) if you pass -Publish. Myria.Server.Realm
-and Myria.Server.Auth are published straight out of this same Myria solution (no separate
-sibling-repo clones needed - that split happened before this script was updated to match).
-Signing uses the cert directly from the Windows cert store by thumbprint - no
-.pfx password is ever needed or asked for here.
-
-Previously this staged everything into a local clone of a separate rllyben/MyriaRPG-releases repo
-and committed/pushed there, with a hand-maintained version.json manifest describing the latest
-build. Both this script and the runtime updaters (UpdateService.cs client-side,
-update-production.sh server-side) have since moved to publishing/reading GitHub Releases directly
-on each project's own repo - no separate releases repo or manifest file to keep in sync anymore.
+Inno Setup 6 installed, SSH key login to the release server for -Publish, and the GitHub CLI
+(`gh`, authenticated) for -PublishGitHub. Myria.Server.Realm and Myria.Server.Auth are published
+straight out of this same Myria solution. Signing uses the cert directly from the Windows cert
+store by thumbprint - no .pfx password is ever needed or asked for here. The client's
+UpdateService pins this certificate's thumbprint and refuses installers signed by anything else.
 
 Usage:
-  .\release.ps1                          # build + sign everything, don't publish anywhere
-  .\release.ps1 -Publish                 # build, sign, and create the GitHub Releases too
-  .\release.ps1 -Publish -SkipServer     # WPF client only, skip building/releasing server zips
+  .\release.ps1                                  # build + sign everything, don't publish anywhere
+  .\release.ps1 -Publish                         # build, sign and publish on the game server
+  .\release.ps1 -Publish -NotesEn "- Fixed X" -NotesDe "- X behoben"   # with changelog text
+  .\release.ps1 -Publish -PublishGitHub          # bridge release: game server AND GitHub
+  .\release.ps1 -Publish -SkipServer             # WPF client only, no server zips
 #>
 
 param(
     [string]$ServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Realm",
     [string]$AuthServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Auth",
     [string]$CertSubject = "CN=MyriaRPG Alpha, O=Rhyen",
+    [string]$ReleaseHost = "admin@192.168.1.1",                   # SSH target of the release server
+    [string]$ReleaseDownloadsDir = "myria-web/downloads",         # relative to that user's home
+    [string]$ReleasePublishScript = "myria-ops/publish-release.sh",
+    [string]$NotesEn = "",                                        # changelog text (lines starting
+    [string]$NotesDe = "",                                        #  with "-" become bullets)
     [string]$WpfRepo = "MyriaGames/MyriaRPG",
     [string]$ServerRepo = "MyriaGames/MyriaServer",
     [switch]$Publish,
+    [switch]$PublishGitHub,
+    [switch]$Force,                                               # replace an already published version
     [switch]$SkipServer
 )
 
@@ -89,9 +96,24 @@ if (-not $SkipServer -and -not (Test-Path $AuthServerProjectPath)) {
     exit 1
 }
 
-if ($Publish -and -not (Get-Command gh -ErrorAction SilentlyContinue)) {
-    Write-Host "-Publish was passed but the GitHub CLI ('gh') isn't on PATH - install it or omit -Publish to just build+sign locally." -ForegroundColor Red
+if ($PublishGitHub -and -not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    Write-Host "-PublishGitHub was passed but the GitHub CLI ('gh') isn't on PATH - install it or omit -PublishGitHub." -ForegroundColor Red
     exit 1
+}
+
+if ($Publish) {
+    foreach ($tool in "ssh", "scp") {
+        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
+            Write-Host "-Publish needs '$tool' (Windows OpenSSH client) on PATH." -ForegroundColor Red
+            exit 1
+        }
+    }
+    # Fail now, not after a 10-minute build: key login must work without a password prompt.
+    & ssh -o BatchMode=yes -o ConnectTimeout=10 $ReleaseHost "test -x ~/$ReleasePublishScript || test -f ~/$ReleasePublishScript"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Cannot reach the release server '$ReleaseHost' with SSH key login, or ~/$ReleasePublishScript is missing there." -ForegroundColor Red
+        exit 1
+    }
 }
 
 function Find-SignTool {
@@ -256,10 +278,74 @@ Write-Host "  Signed installer: $VersionedInstallerPath"
 if ($WinServerZip)   { Write-Host "  Windows server zip: $WinServerZip" }
 if ($LinuxServerZip) { Write-Host "  Linux server zip:   $LinuxServerZip" }
 
-# ── 6. Publish GitHub Releases directly on each project's own repo ──────────
-if (-not $Publish) {
-    Write-Host "`nNot publishing (pass -Publish to create the GitHub Releases)." -ForegroundColor Yellow
-    Write-Host "Would tag '$Tag' on $WpfRepo (installer) and $ServerRepo (server zips)." -ForegroundColor Yellow
+if (-not $Publish -and -not $PublishGitHub) {
+    Write-Host "`nNot publishing (pass -Publish to release on the game server)." -ForegroundColor Yellow
+    exit 0
+}
+
+# ── 6. Publish on the game's own server ──────────────────────────────────────
+# Upload layout on the server (~/$ReleaseDownloadsDir, served at /downloads/):
+#   .incoming/<version>/   upload area, never served; publish-release.sh verifies SHA256SUMS,
+#                          moves it to <version>/ and rewrites latest.json + releases.json
+#                          atomically, then starts the realm server update on that machine.
+if ($Publish) {
+    $releaseFiles = @(@{ Kind = "client-installer"; Path = $VersionedInstallerPath })
+    if ($LinuxServerZip) { $releaseFiles += @{ Kind = "server-linux";   Path = $LinuxServerZip } }
+    if ($WinServerZip)   { $releaseFiles += @{ Kind = "server-windows"; Path = $WinServerZip } }
+
+    # Stage everything in one folder so scp only ever sees plain relative file names (local
+    # paths with a drive letter and spaces are easy to get wrong on an scp command line).
+    $Stage = Join-Path $PSScriptRoot "release-$Version"
+    if (Test-Path $Stage) { Remove-Item $Stage -Recurse -Force }
+    New-Item -ItemType Directory -Path $Stage | Out-Null
+
+    $fileEntries = @()
+    $sumLines = @()
+    foreach ($f in $releaseFiles) {
+        $name = Split-Path $f.Path -Leaf
+        Copy-Item $f.Path (Join-Path $Stage $name)
+        $hash = (Get-FileHash -Algorithm SHA256 -Path $f.Path).Hash.ToLowerInvariant()
+        $fileEntries += [ordered]@{ kind = $f.Kind; name = $name; sha256 = $hash; size = (Get-Item $f.Path).Length }
+        $sumLines += "$hash  $name"
+    }
+    $notes = [ordered]@{}
+    if ($NotesEn) { $notes.en = $NotesEn }
+    if ($NotesDe) { $notes.de = $NotesDe }
+    # "version" must stay the first field: update-production.sh greps for it without a JSON parser.
+    $entry = [ordered]@{
+        version = $Version
+        date    = (Get-Date).ToString("yyyy-MM-dd")
+        notes   = $notes
+        files   = $fileEntries
+    }
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText((Join-Path $Stage "SHA256SUMS"), (($sumLines -join "`n") + "`n"), $utf8NoBom)
+    [System.IO.File]::WriteAllText((Join-Path $Stage "entry.json"), ($entry | ConvertTo-Json -Depth 5), $utf8NoBom)
+
+    $remoteIn = "$ReleaseDownloadsDir/.incoming/$Version"
+    Write-Host "`nUploading release $Version to ${ReleaseHost}..." -ForegroundColor Cyan
+    & ssh -o BatchMode=yes $ReleaseHost "rm -rf ~/$remoteIn && mkdir -p ~/$remoteIn"
+    if ($LASTEXITCODE -ne 0) { throw "could not prepare the upload folder on $ReleaseHost" }
+    Push-Location $Stage
+    try {
+        $uploads = @(Get-ChildItem -File | ForEach-Object { $_.Name })
+        & scp -o BatchMode=yes @uploads "${ReleaseHost}:$remoteIn/"
+        if ($LASTEXITCODE -ne 0) { throw "upload to $ReleaseHost failed" }
+    } finally {
+        Pop-Location
+    }
+
+    Write-Host "Verifying and publishing on the server..." -ForegroundColor Cyan
+    $publishArgs = if ($Force) { "$Version --force" } else { "$Version" }
+    & ssh -o BatchMode=yes $ReleaseHost "bash ~/$ReleasePublishScript $publishArgs"
+    if ($LASTEXITCODE -ne 0) { throw "publishing on $ReleaseHost failed (see output above)" }
+    Remove-Item $Stage -Recurse -Force
+    Write-Host "Release $Version is live: https://myria.myria-games.duckdns.org/" -ForegroundColor Green
+}
+
+# ── 7. (Optional) GitHub Releases - bridge for clients <= 0.2.21 ─────────────
+if (-not $PublishGitHub) {
+    Write-Host "`nDone. Released $Version on the game server." -ForegroundColor Green
     exit 0
 }
 
@@ -300,4 +386,4 @@ if ($WinServerZip -or $LinuxServerZip) {
     Publish-GitHubRelease -Repo $ServerRepo -Tag $Tag -Title "Alpha $Version" -Assets $ServerAssets
 }
 
-Write-Host "`nDone. Released $Tag on $WpfRepo$(if ($WinServerZip -or $LinuxServerZip) { " and $ServerRepo" })." -ForegroundColor Green
+Write-Host "`nDone. Released $Tag on $(if ($Publish) { "the game server, " })$WpfRepo$(if ($WinServerZip -or $LinuxServerZip) { " and $ServerRepo" })." -ForegroundColor Green
