@@ -27,7 +27,11 @@ namespace Myria.Wpf.Services
         // selection; every realm trusts JWTs it issues via a shared signing key, no live
         // validation call back to it needed. BaseUrl points at the selected realm's own
         // MyriaServer instance — set when the player picks a realm on the lobby screen.
-        public static string AuthBaseUrl { get; set; } = "http://localhost:5050";
+        /// <summary>The official Myria auth server, used whenever no server address is set
+        /// (new installs, or the address box left empty). Own servers / local dev: type the
+        /// address in the Game settings, e.g. "localhost:5050".</summary>
+        public const string DefaultAuthBaseUrl = "https://myria.myria-games.duckdns.org/auth";
+        public static string AuthBaseUrl { get; set; } = DefaultAuthBaseUrl;
         public static string BaseUrl     { get; set; } = "http://localhost:5001";
 
         /// <summary>Prepends a scheme if the user typed a server address with none (e.g.

@@ -80,8 +80,10 @@ namespace Myria.Wpf.ViewModel.Pages
                 Settings.Current.ServerAddress = normalized;
                 SettingsService.Save();
 
-                if (!string.IsNullOrWhiteSpace(normalized))
-                    ServerApiService.AuthBaseUrl = normalized;
+                // Empty box = back to the official server right away, not only after a restart.
+                ServerApiService.AuthBaseUrl = string.IsNullOrWhiteSpace(normalized)
+                    ? ServerApiService.DefaultAuthBaseUrl
+                    : normalized;
             }
         }
 
