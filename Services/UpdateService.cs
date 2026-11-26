@@ -138,6 +138,20 @@ namespace Myria.Wpf.Services
                 }
                 Log($"Checksum OK, {signatureInfo}.");
 
+                // The signature proves the release script built this installer - not WHICH release.
+                // An older, genuinely signed installer offered as "9.9.9" passed every check above, a
+                // silent downgrade to an old client (security review 2026-11-26, A08 F3). The version
+                // inside the installer (Inno Setup's AppVersion -> ProductVersion, covered by the
+                // signature) must be the announced one, and newer than this client.
+                var installerVersion = FileVersionInfo.GetVersionInfo(installerPath).ProductVersion;
+                if (!IsAcceptableInstallerVersion(manifest.Version!, installerVersion, current, out var versionProblem))
+                {
+                    Log($"Installer version rejected: {versionProblem} - aborting and deleting it.");
+                    TryDelete(installerPath);
+                    progress?.Report(new UpdateProgress(UpdateStatus.Failed));
+                    return false;
+                }
+
                 Log("Launching installer and shutting down.");
                 progress?.Report(new UpdateProgress(UpdateStatus.LaunchingInstaller));
                 Process.Start(new ProcessStartInfo
@@ -185,6 +199,29 @@ namespace Myria.Wpf.Services
             if (file.Sha256 is null || !Sha256Pattern.IsMatch(file.Sha256)) { problem = "missing or malformed SHA-256"; return false; }
             version = parsed;
             installer = file;
+            problem = "";
+            return true;
+        }
+
+        /// <summary>
+        /// The installer's own version (from its signed version resource) must equal the manifest's
+        /// and be newer than the running client (A08 F3: no downgrade by relabelling an old installer).
+        /// </summary>
+        public static bool IsAcceptableInstallerVersion(string manifestVersion, string? installerVersion,
+                                                        Version current, out string problem)
+        {
+            var text = installerVersion?.Trim() ?? "";
+            if (!Regex.IsMatch(text, @"^\d+(\.\d+){1,3}$") || !Version.TryParse(text, out var inInstaller))
+            { problem = $"installer has no usable version ('{text}')"; return false; }
+            if (!Version.TryParse(manifestVersion, out var announced))
+            { problem = $"invalid manifest version '{manifestVersion}'"; return false; }
+
+            static Version Norm(Version v) => new(v.Major, v.Minor, Math.Max(v.Build, 0), Math.Max(v.Revision, 0));
+            if (Norm(inInstaller) != Norm(announced))
+            { problem = $"installer is version {text}, but {manifestVersion} was announced"; return false; }
+            if (!IsNewer(inInstaller, current))
+            { problem = $"installer version {text} is not newer than the running {current}"; return false; }
+
             problem = "";
             return true;
         }
