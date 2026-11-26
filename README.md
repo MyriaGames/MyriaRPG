@@ -1,6 +1,6 @@
 # Myria RPG — WPF Client
 
-Myria is a fantasy RPG with turn-based combat, character classes and races, quests, jobs, crafting, guilds, player-run shops, and a rune-based magic system. This repository is the **Windows desktop client** (WPF, .NET 8, MVVM), one of several front ends built on the shared [Myria.Lib](https://github.com/MyriaGames/MyriaLib) game library. It can be played fully offline as a local single-player save, or online against a Myria realm server.
+Myria is a fantasy RPG with turn-based combat, character classes and races, quests, jobs, crafting, guilds, player-run shops, and a rune-based magic system. This repository is the **Windows desktop client** (WPF, .NET 10, MVVM), one of several front ends built on the shared [Myria.Lib](https://github.com/MyriaGames/MyriaLib) game library. It can be played fully offline as a local single-player save, or online against a Myria realm server.
 
 ## Features
 
@@ -37,7 +37,7 @@ A player can either play entirely offline (a local, file-based save under `Data/
 ## Requirements
 
 - Windows (WPF is Windows-only)
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - Visual Studio 2022+ (with the .NET desktop workload) or the `dotnet` CLI
 
 This solution also expects a sibling clone of [MyriaLib](https://github.com/MyriaGames/MyriaLib) at `../Myria.Lib` relative to this repo, since `Myria.Wpf.csproj` references `..\Myria.Lib\Myria.Lib.Core\Myria.Lib.Core.csproj` and links in its `Data/common` and `Data/locales` content directly.

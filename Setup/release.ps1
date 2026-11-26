@@ -39,6 +39,11 @@ param(
     [switch]$PublishGitHub,
     [switch]$Force,                                               # replace an already published version
     [switch]$SkipServer,
+    # Supply-chain gate (security review 2026-11-26, A03 F4): the release stops if a shipped project
+    # has a package with a known vulnerability, or if the .NET runtime it would bundle isn't the newest
+    # patch (or its channel is out of support). Override only consciously, e.g. offline.
+    [switch]$AllowVulnerable,
+    [switch]$AllowOutdatedRuntime,
     # SSH key that signs SHA256SUMS of every release; servers verify it (update-production.sh).
     # Never leaves this PC. Created on the first run (security review 2026-11-26, A08 F2).
     [string]$ReleaseSigningKey = "$HOME\.ssh\myria_release_signing"
@@ -178,6 +183,84 @@ $Version = $Matches[1]
 $Tag = "v$Version"
 Write-Host "Building MyriaRPG alpha $Version" -ForegroundColor Cyan
 
+# ── 1b. Supply-chain checks (security review 2026-11-26, A03 F4) ─────────────
+# Every component is self-contained, so the runtime inside the release is whatever the SDK on this PC
+# bundles - and players/servers get .NET security fixes only through a new Myria release. Release
+# 0.2.24 shipped .NET 8.0.30 long after 8.0.31-8.0.33 were out; this stops that from happening silently.
+$ShippedProjects = @($CsprojPath)
+if (-not $SkipServer) {
+    $ShippedProjects += (Join-Path $ServerProjectPath "Myria.Server.Realm.csproj")
+    $ShippedProjects += (Join-Path $AuthServerProjectPath "Myria.Server.Auth.csproj")
+}
+
+function Test-NoVulnerablePackages {
+    $problems = @()
+    foreach ($proj in $ShippedProjects) {
+        $json = & dotnet list $proj package --vulnerable --include-transitive --format json 2>$null
+        if ($LASTEXITCODE -ne 0) { $problems += "$proj : 'dotnet list package --vulnerable' failed"; continue }
+        $report = ($json -join "`n") | ConvertFrom-Json
+        foreach ($p in $report.projects) {
+            foreach ($fw in @($p.frameworks)) {
+                foreach ($pkg in @($fw.topLevelPackages) + @($fw.transitivePackages)) {
+                    if ($pkg -and $pkg.vulnerabilities) {
+                        $ids = ($pkg.vulnerabilities | ForEach-Object { "$($_.severity) $($_.advisoryurl)" }) -join ", "
+                        $problems += "$(Split-Path $p.path -Leaf): $($pkg.id) $($pkg.resolvedVersion) - $ids"
+                    }
+                }
+            }
+        }
+    }
+    return $problems
+}
+
+function Test-RuntimeIsCurrent {
+    $problems = @()
+    $channels = $ShippedProjects | ForEach-Object {
+        if ((Get-Content $_ -Raw) -match "<TargetFramework>net(\d+\.\d+)") { $Matches[1] }
+    } | Sort-Object -Unique
+    try {
+        $index = Invoke-RestMethod "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json" -TimeoutSec 30
+    } catch {
+        return @("could not read the official .NET release index ($($_.Exception.Message))")
+    }
+    # The runtime packs a self-contained publish uses = what this SDK bundles (respects global.json).
+    Push-Location $RepoRoot
+    try { $sdkVersion = (& dotnet --version).Trim() } finally { Pop-Location }
+    $sdkLine = & dotnet --list-sdks | Where-Object { $_ -like "$sdkVersion *" } | Select-Object -First 1
+    $sdkDir = Join-Path ($sdkLine -replace '^.*\[(.*)\]$', '$1') $sdkVersion
+    $bundled = Get-Content (Join-Path $sdkDir "Microsoft.NETCoreSdk.BundledVersions.props") -Raw
+    foreach ($ch in $channels) {
+        $entry = $index.'releases-index' | Where-Object { $_.'channel-version' -eq $ch }
+        if (-not $entry) { $problems += ".NET $ch is not in the official release index"; continue }
+        if ($entry.'support-phase' -eq 'eol') { $problems += ".NET $ch is out of support since $($entry.'eol-date') - move to a supported version" }
+        $pattern = 'KnownFrameworkReference Include="Microsoft.NETCore.App"\s+TargetFramework="net' + [regex]::Escape($ch) + '"[^>]*?LatestRuntimeFrameworkVersion="([^"]+)"'
+        if ($bundled -notmatch $pattern) { $problems += "SDK $sdkVersion has no runtime pack for net$ch"; continue }
+        $have = $Matches[1]; $latest = $entry.'latest-runtime'
+        if ([version]$have -lt [version]$latest) {
+            $problems += "SDK $sdkVersion bundles .NET runtime $have, but $latest is out (security fixes) - update the .NET SDK on this PC first (winget upgrade Microsoft.DotNet.SDK.$($sdkVersion.Split('.')[0]))"
+        } else {
+            Write-Host "  .NET $ch runtime $have = newest patch ($latest)" -ForegroundColor Green
+        }
+    }
+    return $problems
+}
+
+Write-Host "`nChecking packages for known vulnerabilities..." -ForegroundColor Cyan
+$vulnerable = @(Test-NoVulnerablePackages)
+if ($vulnerable.Count -gt 0) {
+    $vulnerable | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+    if (-not $AllowVulnerable) { Write-Host "Stopping: update these packages (or re-run with -AllowVulnerable if you've assessed them)." -ForegroundColor Red; exit 1 }
+    Write-Host "  -AllowVulnerable: continuing anyway." -ForegroundColor Yellow
+} else { Write-Host "  none found" -ForegroundColor Green }
+
+Write-Host "Checking the bundled .NET runtime is current..." -ForegroundColor Cyan
+$outdated = @(Test-RuntimeIsCurrent)
+if ($outdated.Count -gt 0) {
+    $outdated | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+    if (-not $AllowOutdatedRuntime) { Write-Host "Stopping (re-run with -AllowOutdatedRuntime only if you know why)." -ForegroundColor Red; exit 1 }
+    Write-Host "  -AllowOutdatedRuntime: continuing anyway." -ForegroundColor Yellow
+}
+
 function Invoke-Sign {
     param([string]$FilePath)
     & $SignTool sign /sha1 $Thumbprint /fd SHA256 /tr $TimestampUrl /td SHA256 "$FilePath"
@@ -194,7 +277,7 @@ try {
     Pop-Location
 }
 
-$PublishDir = Join-Path $RepoRoot "bin\Release\net8.0-windows\publish"
+$PublishDir = Join-Path $RepoRoot "bin\Release\net10.0-windows\publish"
 $PublishedExe = Join-Path $PublishDir "MyriaRPG.exe"
 if (-not (Test-Path $PublishedExe)) {
     Write-Host "Published exe not found at $PublishedExe" -ForegroundColor Red
