@@ -389,10 +389,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             var template = QuestManager.GetQuestById(questVm.Id);
             if (template == null) return;
 
-            var clone = template.Clone();
-            clone.GrantAcceptItems(_character);
-            clone.Status = clone.IsTalkOnly ? QuestStatus.Completed : QuestStatus.InProgress;
-            _character.ActiveQuests.Add(clone);
+            QuestManager.StartQuest(_character, template);   // also counts items already carried
 
             UpdateMode();
         }
