@@ -449,7 +449,8 @@ namespace Myria.Wpf.Services
                     PvpRating               = dto.PvpRating,
                     PvpCurrency             = dto.PvpCurrency,
                     PvpWins                 = dto.PvpWins,
-                    PvpLosses               = dto.PvpLosses
+                    PvpLosses               = dto.PvpLosses,
+                    AdventurersGuildMember  = dto.AdventurersGuildMember
                 };
 
                 character.CurrentRoom = RoomService.AllRooms.FirstOrDefault(r => r.Id == dto.CurrentRoomId);
@@ -480,6 +481,10 @@ namespace Myria.Wpf.Services
                     character.AccessorySlot = ItemFactory.CreateItem(dto.AccessoryItemId) as Myria.Lib.Core.Entities.Items.EquipmentItem;
 
                 // ── Active Quests ─────────────────────────────────────────────────
+                // Generated (dynamic) quests aren't in quests.json - register the definitions the
+                // server sent first, so GetQuestById below resolves them like any other quest.
+                foreach (var dq in dto.DynamicQuests)
+                    QuestManager.RegisterDynamic(Myria.Lib.Core.Systems.World.DynamicQuests.FromDto(dq));
                 character.ActiveQuests.Clear();
                 foreach (var aq in dto.ActiveQuests)
                 {
@@ -887,6 +892,9 @@ namespace Myria.Wpf.Services
             public long     PvpCurrency             { get; set; }
             public int      PvpWins                 { get; set; }
             public int      PvpLosses               { get; set; }
+            // v0.3 quest rework (read on load; the server ignores these on save)
+            public bool     AdventurersGuildMember  { get; set; }
+            public List<Myria.Lib.Core.Models.Dto.DynamicQuestDto> DynamicQuests { get; set; } = new();
 
             public List<InventoryItemDto>   InventoryItems      { get; set; } = new();
             public List<string>             SkillIds            { get; set; } = new();

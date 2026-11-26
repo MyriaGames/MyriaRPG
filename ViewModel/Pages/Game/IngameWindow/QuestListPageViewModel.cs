@@ -410,7 +410,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             var vm = new QuestListItemVm
             {
                 Id               = quest.Id,
-                Title            = LocalizationText.LocalizeQuestText(quest.Name),
+                Title            = Myria.Lib.Core.Systems.World.QuestText.Name(quest),
                 Level            = quest.RequiredLevel,
                 Status           = quest.Status,
                 Category         = quest.Category,
@@ -418,8 +418,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
                 GiverNpcId       = quest.GiverNpcId,
                 GiverNpcName     = ResolveNpcName(quest.GiverNpcId),
                 AreaName         = ResolveNpcName(quest.GiverNpcId),
-                ShortDescription = LocalizationText.LocalizeQuestText(quest.Description),
-                Description      = LocalizationText.LocalizeQuestText(quest.Description),
+                ShortDescription = Myria.Lib.Core.Systems.World.QuestText.Description(quest),
+                Description      = Myria.Lib.Core.Systems.World.QuestText.Description(quest),
                 ProgressText     = QuestFormatter.BuildProgressText(quest)
             };
             var objectives = new List<string>();

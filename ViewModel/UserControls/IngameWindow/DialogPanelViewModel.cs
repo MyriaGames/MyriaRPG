@@ -3,6 +3,7 @@ using Myria.Lib.Core.Entities.Characters;
 using Myria.Lib.Core.Services;
 using Myria.Lib.Core.Services.Manager;
 using Myria.Lib.Core.Systems;
+using Myria.Lib.Core.Systems.World;
 using Myria.Wpf.Utils;
 using Myria.Wpf.ViewModel.Pages.Game.IngameWindow.NpcInteraction;
 using System.Collections.ObjectModel;
@@ -34,13 +35,14 @@ namespace Myria.Wpf.ViewModel.UserControls.IngameWindow
             RefreshServiceOptions();
         }
 
-        private void RefreshServiceOptions()
+        protected void RefreshServiceOptions()
         {
             ServiceOptions.Clear();
 
             foreach (var service in _npc.Services)
             {
                 var s = service;
+                if (!SupportsService(s)) continue;
                 ServiceOptions.Add(new ServiceOption
                 {
                     Text        = Localization.T($"npc.service.{s}.title"),
@@ -55,7 +57,7 @@ namespace Myria.Wpf.ViewModel.UserControls.IngameWindow
                 ServiceOptions.Add(new ServiceOption
                 {
                     Text        = Localization.T("npc.service.quest.title"),
-                    Description = LocalizationText.LocalizeQuestText(q.Name),
+                    Description = QuestText.Name(q),
                     Command     = new RelayCommand(() => _onNavigate($"quest:{q.Id}"))
                 });
             }
@@ -66,11 +68,21 @@ namespace Myria.Wpf.ViewModel.UserControls.IngameWindow
                 ServiceOptions.Add(new ServiceOption
                 {
                     Text        = Localization.T("npc.service.quest_return.title"),
-                    Description = LocalizationText.LocalizeQuestText(q.Name),
+                    Description = QuestText.Name(q),
                     Command     = new RelayCommand(() => _onNavigate($"quest_return:{q.Id}"))
                 });
             }
+
+            AddExtraOptions();
         }
+
+        /// <summary>Services this dialog can handle. Offline there's no Adventurers' Guild (it
+        /// needs the server's world state), so its service is hidden.</summary>
+        protected virtual bool SupportsService(string serviceId) => serviceId != DynamicQuestRules.GuildNpcId;
+
+        /// <summary>Extra entries after services and quests - the multiplayer dialog adds the
+        /// server's supply requests / bounties here.</summary>
+        protected virtual void AddExtraOptions() { }
 
         protected override void OnLanguageChanged(object? sender, EventArgs e)
         {
@@ -79,7 +91,7 @@ namespace Myria.Wpf.ViewModel.UserControls.IngameWindow
             RefreshServiceOptions();
         }
 
-        private void HandleService(string serviceId)
+        protected virtual void HandleService(string serviceId)
         {
             if (serviceId == "heal")
             {

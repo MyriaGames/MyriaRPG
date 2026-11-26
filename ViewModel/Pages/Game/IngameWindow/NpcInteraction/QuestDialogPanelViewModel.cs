@@ -5,6 +5,7 @@ using Myria.Lib.Core.Services;
 using Myria.Lib.Core.Systems.Enums;
 using Localization = Myria.Lib.Core.Systems.Localization;
 using Myria.Wpf.Utils;
+using Myria.Lib.Core.Systems.World;
 using System.Windows;
 using System.Windows.Input;
 
@@ -20,7 +21,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.NpcInteraction
         private readonly List<DialogLine> _lines;
         private int _index;
 
-        public string QuestTitle => LocalizationText.LocalizeQuestText(_quest.Name);
+        public string QuestTitle => QuestText.Name(_quest);
 
         private string _speakerName = "";
         public string SpeakerName
@@ -60,7 +61,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.NpcInteraction
             _goBack   = goBack;
 
             var dialog = isReturn ? quest.ReturnDialog : quest.AcceptDialog;
-            _lines = dialog.Count > 0 ? dialog : [new DialogLine { Speaker = "npc", Text = "..." }];
+            // Generated quests have no authored dialog - their description is the line.
+            _lines = dialog.Count > 0 ? dialog
+                : [new DialogLine { Speaker = "npc", Text = quest.IsDynamic ? QuestText.Description(quest) : "..." }];
             _index = 0;
 
             NextCommand    = new RelayCommand(Advance, () => !IsLastLine);
@@ -106,6 +109,17 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.NpcInteraction
             {
                 var active = _character.ActiveQuests.FirstOrDefault(q => q.Id == _quest.Id);
                 if (active == null) { _goBack(); return; }
+
+                if (active.IsDynamic)
+                {
+                    // Server-only quests: the server takes the items and pays out, then pushes the
+                    // inventory/money/progress; locally it just leaves the quest list (never the
+                    // completed list - these aren't one-time quests).
+                    _character.ActiveQuests.Remove(active);
+                    QuestManager.UnregisterDynamic(active.Id);
+                    _goBack();
+                    return;
+                }
 
                 active.GrantRewards(_character); // includes J9/J10 job rewards via Quest.GrantRewards
 

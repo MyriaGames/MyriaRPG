@@ -386,6 +386,38 @@ namespace Myria.Wpf.Services
             return null;
         }
 
+        // ── Adventurers' Guild + dynamic quests (v0.3 quest rework) ─────────
+
+        public static async Task<bool> JoinAdventurersGuildAsync()
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<bool>("JoinAdventurersGuild"); } catch { }
+            return false;
+        }
+
+        public static async Task<bool> LeaveAdventurersGuildAsync()
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<bool>("LeaveAdventurersGuild"); } catch { }
+            return false;
+        }
+
+        /// <summary>Supply requests (normal NPC) or bounties (guild house, members only) on offer now.</summary>
+        public static async Task<List<DynamicQuestOfferDto>> GetDynamicQuestOffersAsync(string npcId)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<List<DynamicQuestOfferDto>>("GetDynamicQuestOffers", npcId); } catch { }
+            return new();
+        }
+
+        /// <summary>Takes an offer; null if it's gone or not takeable here.</summary>
+        public static async Task<DynamicQuestDto?> AcceptDynamicQuestAsync(string token)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<DynamicQuestDto?>("AcceptDynamicQuest", token); } catch { }
+            return null;
+        }
+
         // ── PvP (v0.3) ───────────────────────────────────────────────────────
 
         public static async Task<List<PvpTargetInfo>> GetPvpTargetsAsync()
