@@ -75,7 +75,18 @@ namespace Myria.Wpf.Services
                 if (!IsNewer(latest, current))
                 {
                     Log("Already up to date.");
+                    TryDelete(PendingUpdateFile);
                     progress?.Report(new UpdateProgress(UpdateStatus.UpToDate));
+                    return false;
+                }
+
+                // The installer restarts the game when it's done. If this very update was launched a
+                // moment ago and we're still the old version, it didn't take effect - don't loop
+                // (download, install, restart, ...) forever; start the game and try again later.
+                if (!ShouldAttemptUpdate(ReadPendingUpdate(), latest, DateTime.UtcNow, out var skipReason))
+                {
+                    Log($"Not updating now: {skipReason}");
+                    progress?.Report(new UpdateProgress(UpdateStatus.Failed));
                     return false;
                 }
 
@@ -154,10 +165,15 @@ namespace Myria.Wpf.Services
 
                 Log("Launching installer and shutting down.");
                 progress?.Report(new UpdateProgress(UpdateStatus.LaunchingInstaller));
+                WritePendingUpdate(latest, DateTime.UtcNow);
+                // The installer starts the new version itself once every file is in place (its [Run]
+                // entry for silent installs). /NORESTARTAPPLICATIONS: Windows' Restart Manager must not
+                // also relaunch this (old) process early - that started the old version again while
+                // the install was still running, which then downloaded the same update a second time.
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = installerPath,
-                    Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS",
+                    Arguments = InstallerArguments,
                     UseShellExecute = true
                 });
 
@@ -172,6 +188,55 @@ namespace Myria.Wpf.Services
                 progress?.Report(new UpdateProgress(UpdateStatus.Failed));
                 return false;
             }
+        }
+
+        public const string InstallerArguments = "/VERYSILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTARTAPPLICATIONS";
+
+        // "<version>|<UTC time>" of the update most recently handed to the installer.
+        private const string PendingUpdateFile = "Data/Misc/update-pending.txt";
+
+        /// <summary>How long after launching an installer the same update isn't retried if the game
+        /// still reports the old version (the install evidently failed).</summary>
+        public static readonly TimeSpan RetryCooldown = TimeSpan.FromMinutes(30);
+
+        /// <summary>False if <paramref name="latest"/> was already handed to the installer less than
+        /// <see cref="RetryCooldown"/> ago - we're still old, so that install didn't take effect.</summary>
+        public static bool ShouldAttemptUpdate(string? pending, Version latest, DateTime nowUtc, out string reason)
+        {
+            reason = "";
+            var parts = pending?.Trim().Split('|');
+            if (parts is not { Length: 2 } ||
+                !Version.TryParse(parts[0], out var pendingVersion) ||
+                !DateTime.TryParse(parts[1], System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal,
+                    out var launchedUtc))
+                return true;
+
+            if (pendingVersion != latest)
+                return true;                                   // a newer release appeared since
+            var age = nowUtc - launchedUtc;
+            if (age < TimeSpan.Zero || age >= RetryCooldown)
+                return true;                                   // long enough ago (or clock changed): retry
+
+            reason = $"the installer for {latest} was started {age.TotalMinutes:0} min ago but this is still the old " +
+                     $"version - it didn't install. Trying again after {RetryCooldown.TotalMinutes:0} min or on a newer release.";
+            return false;
+        }
+
+        private static string? ReadPendingUpdate()
+        {
+            try { return File.Exists(PendingUpdateFile) ? File.ReadAllText(PendingUpdateFile) : null; }
+            catch { return null; }
+        }
+
+        private static void WritePendingUpdate(Version version, DateTime nowUtc)
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(PendingUpdateFile)!);
+                File.WriteAllText(PendingUpdateFile, $"{version}|{nowUtc:O}");
+            }
+            catch { /* best effort - only disables the loop guard */ }
         }
 
         // Installer names come from the server, so only accept the release script's own pattern

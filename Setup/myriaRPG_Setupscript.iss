@@ -55,4 +55,10 @@ Name: "{autoprograms}\MyriaRPG"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\MyriaRPG"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
+; Interactive install: the usual "Launch" checkbox on the last page.
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+; Silent install = the in-game auto-update (UpdateService runs this installer with /VERYSILENT and exits):
+; start the new version once every file is in place. The game then checks for updates again, so a
+; further release is picked up straight away. The updater passes /NORESTARTAPPLICATIONS so Windows'
+; Restart Manager doesn't also start the old version early.
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Flags: nowait runasoriginaluser; Check: WizardSilent
