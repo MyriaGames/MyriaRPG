@@ -487,8 +487,18 @@ if ($Publish) {
     # Sign SHA256SUMS -> SHA256SUMS.sig (A08 F2), then check the signature once before uploading.
     $sumsPath = Join-Path $Stage "SHA256SUMS"
     Write-Host "`nSigning SHA256SUMS with $ReleaseSigningKey ..." -ForegroundColor Cyan
-    & ssh-keygen -Y sign -f $ReleaseSigningKey -n myria-release $sumsPath
-    if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$sumsPath.sig")) { throw "signing SHA256SUMS failed" }
+    # A mistyped passphrase used to abort here, after the whole build - now it asks again (3 tries).
+    $maxSignAttempts = 3
+    $signed = $false
+    for ($attempt = 1; $attempt -le $maxSignAttempts -and -not $signed; $attempt++) {
+        Remove-Item "$sumsPath.sig" -ErrorAction SilentlyContinue
+        & ssh-keygen -Y sign -f $ReleaseSigningKey -n myria-release $sumsPath
+        $signed = ($LASTEXITCODE -eq 0) -and (Test-Path "$sumsPath.sig")
+        if (-not $signed -and $attempt -lt $maxSignAttempts) {
+            Write-Host "Signing failed (wrong passphrase?) - try again ($attempt of $maxSignAttempts tries used)." -ForegroundColor Yellow
+        }
+    }
+    if (-not $signed) { throw "signing SHA256SUMS failed after $maxSignAttempts tries - the build is kept, re-run to publish" }
     if (-not (Test-ReleaseSignature -DataFile $sumsPath -SigFile "$sumsPath.sig")) { throw "the fresh SHA256SUMS signature does not verify" }
 
     $remoteIn = "$ReleaseDownloadsDir/.incoming/$Version"
