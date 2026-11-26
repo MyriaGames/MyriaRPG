@@ -309,12 +309,19 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <!-- Stop working button -->
-                            <Button Grid.Row="2"
-                                    Style="{StaticResource RpgBtn}"
-                                    Content="{Binding CurrentJob.ActiveLabel}"
-                                    Command="{Binding CurrentJob.ToggleActiveCommand}"
-                                    HorizontalAlignment="Stretch" Margin="0,12,0,0"/>
+                            <StackPanel Grid.Row="2" Margin="0,12,0,0">
+                                <!-- Craft on the go: only for opted-in jobs (Job.AllowJobPageCrafting) -->
+                                <Button Style="{StaticResource RpgBtn}"
+                                        Content="{Binding TblCraft}"
+                                        Command="{Binding OpenCraftCommand}"
+                                        Visibility="{Binding CanCraftFromJobPage, Converter={StaticResource BoolToVis}}"
+                                        HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+                                <!-- Stop working button -->
+                                <Button Style="{StaticResource RpgBtn}"
+                                        Content="{Binding CurrentJob.ActiveLabel}"
+                                        Command="{Binding CurrentJob.ToggleActiveCommand}"
+                                        HorizontalAlignment="Stretch"/>
+                            </StackPanel>
                         </Grid>
                         </ScrollViewer>
                     </Grid>
@@ -495,6 +502,17 @@
                             </ItemsControl>
                         </ScrollViewer>
                     </Grid>
+                </Border>
+
+                <!-- ── Job-page craft overlay (covers both panels while open) ── -->
+                <Border Grid.ColumnSpan="3"
+                        Style="{StaticResource GoldPanel}"
+                        Background="{DynamicResource Brush.WindowBackgroundGradient}"
+                        Padding="16"
+                        Visibility="{Binding IsCraftOpen, Converter={StaticResource BoolToVis}}">
+                    <Frame Content="{Binding CraftPage}"
+                           NavigationUIVisibility="Hidden"
+                           JournalOwnership="OwnsJournal"/>
                 </Border>
             </Grid>
         </Grid>

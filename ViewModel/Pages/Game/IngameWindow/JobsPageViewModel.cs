@@ -1,5 +1,6 @@
 ﻿using Myria.Lib.Core.Entities.Jobs;
 using Myria.Lib.Core.Entities.Characters;
+using Myria.Lib.Core.Entities.NPCs;
 using Myria.Lib.Core.Services;
 using Myria.Lib.Core.Services.Manager;
 using Myria.Lib.Core.Systems;
@@ -7,6 +8,7 @@ using Myria.Wpf.Services;
 using Myria.Wpf.Utils;
 using Myria.Wpf.Model;
 using Myria.Wpf.View.Pages.Game.IngameWindow;
+using Myria.Wpf.View.Pages.Game.IngameWindow.NpcInteraction;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -101,11 +103,42 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             set { _tblFame = value; OnPropertyChanged(); }
         }
 
+        private string _tblCraft = string.Empty;
+        [LocalizedKey("npc.craft.craft")]
+        public string TblCraft
+        {
+            get => _tblCraft;
+            set { _tblCraft = value; OnPropertyChanged(); }
+        }
+
         public ObservableCollection<JobVm> Jobs { get; } = new();
 
         public JobVm? CurrentJob    => Jobs.FirstOrDefault(j => j.IsActive);
         public bool   HasActiveJob  => CurrentJob != null;
         public bool   HasNoActiveJob => !HasActiveJob;
+
+        // ── Job-page crafting (opted-in jobs only, see Job.AllowJobPageCrafting) ──
+
+        /// <summary>The active job's craft NPC if that job may craft from here, else null.</summary>
+        public Npc? CraftNpc => JobManager.GetJobPageCraftNpc(_character.ActiveJobId);
+        public bool CanCraftFromJobPage => CraftNpc != null;
+
+        private object? _craftPage;
+        /// <summary>The CraftPanel shown as an overlay on this page while open, else null.</summary>
+        public object? CraftPage
+        {
+            get => _craftPage;
+            private set { _craftPage = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsCraftOpen)); }
+        }
+        public bool IsCraftOpen => _craftPage != null;
+
+        public ICommand OpenCraftCommand { get; }
+
+        private void OpenCraft()
+        {
+            if (CraftNpc is not { } npc) return;
+            CraftPage = new CraftPanel(npc, () => CraftPage = null, viaJobPage: true);
+        }
 
         public ICommand GoBackCommand { get; }
 
@@ -122,6 +155,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         {
             _character = character;
             GoBackCommand = new RelayCommand(() => Navigation.Current.Navigate(new Page_Character()));
+            OpenCraftCommand = new RelayCommand(OpenCraft);
             Refresh();
             RefreshCooldown();
         }
@@ -145,6 +179,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             OnPropertyChanged(nameof(CurrentJob));
             OnPropertyChanged(nameof(HasActiveJob));
             OnPropertyChanged(nameof(HasNoActiveJob));
+            OnPropertyChanged(nameof(CraftNpc));
+            OnPropertyChanged(nameof(CanCraftFromJobPage));
+            CraftPage = null; // a different (or no) job can't keep the old job's craft panel open
         }
 
         private void RefreshCooldown()

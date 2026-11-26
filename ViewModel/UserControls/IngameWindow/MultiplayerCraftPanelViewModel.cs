@@ -9,19 +9,29 @@ namespace Myria.Wpf.ViewModel.UserControls.IngameWindow
 {
     public class MultiplayerCraftPanelViewModel : CraftPanelViewModel
     {
-        public MultiplayerCraftPanelViewModel(Npc npc, Character character, Action goBack)
-            : base(npc, character, goBack) { }
+        private readonly bool _viaJobPage;
+
+        /// <param name="viaJobPage">Crafting from the Jobs page (GameHub.CraftFromJob, active
+        /// job's NPC resolved by the server) instead of at the NPC itself (GameHub.Craft).</param>
+        public MultiplayerCraftPanelViewModel(Npc npc, Character character, Action goBack, bool viaJobPage = false)
+            : base(npc, character, goBack)
+        {
+            _viaJobPage = viaJobPage;
+        }
 
         protected override async Task ExecuteCraft()
         {
-            var result = await GameHubService.CraftAsync(_npc.Id, SelectedRecipe.Id, Quantity);
+            var result = _viaJobPage
+                ? await GameHubService.CraftFromJobAsync(SelectedRecipe.Id, Quantity)
+                : await GameHubService.CraftAsync(_npc.Id, SelectedRecipe.Id, Quantity);
             if (result == null || !result.Success)
             {
                 StatusMessage = result?.Reason switch
                 {
-                    "missing_ingredients" => Localization.T("npc.craft.notEnoughMaterials"),
-                    "unknown_recipe"      => Localization.T("npc.craft.fail"),
-                    _                     => Localization.T("npc.craft.fail")
+                    "missing_ingredients"      => Localization.T("npc.craft.notEnoughMaterials"),
+                    "inventory_full"           => Localization.T("npc.craft.inventoryFull"),
+                    "job_crafting_not_allowed" => Localization.T("pg.jobs.craft.not_allowed"),
+                    _                          => Localization.T("npc.craft.fail")
                 };
                 return;
             }

@@ -618,6 +618,14 @@ namespace Myria.Wpf.Services
             return null;
         }
 
+        /// <summary>Jobs-page crafting for the active job (server resolves the NPC itself).</summary>
+        public static async Task<CraftActionResult?> CraftFromJobAsync(string recipeId, int quantity)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<CraftActionResult>("CraftFromJob", recipeId, quantity); } catch { }
+            return null;
+        }
+
         public static async Task<UpgradeActionResult?> UpgradeAsync(string npcId, string itemId)
         {
             if (_connection?.State == HubConnectionState.Connected)
