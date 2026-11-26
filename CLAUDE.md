@@ -19,7 +19,7 @@ dotnet build -c Release
 
 ```bash
 # Run every suite in the solution
-dotnet test Myria.slnx
+dotnet test ../Myria.slnx
 
 # Run one suite
 dotnet test Myria.Wpf.Tests
