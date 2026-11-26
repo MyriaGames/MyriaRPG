@@ -38,7 +38,10 @@ param(
     [switch]$Publish,
     [switch]$PublishGitHub,
     [switch]$Force,                                               # replace an already published version
-    [switch]$SkipServer
+    [switch]$SkipServer,
+    # SSH key that signs SHA256SUMS of every release; servers verify it (update-production.sh).
+    # Never leaves this PC. Created on the first run (security review 2026-11-26, A08 F2).
+    [string]$ReleaseSigningKey = "$HOME\.ssh\myria_release_signing"
 )
 
 $ErrorActionPreference = "Stop"
@@ -60,6 +63,36 @@ if (-not $SigningCert) {
 }
 $Thumbprint = $SigningCert.Thumbprint
 Write-Host "Signing with cert thumbprint: $Thumbprint"
+
+# Release signing key (servers check SHA256SUMS against it before installing an update - the
+# checksums alone come from the same server as the files). Created once, interactively: ssh-keygen
+# asks for an optional passphrase, which is then asked for at every release.
+if (-not (Test-Path $ReleaseSigningKey)) {
+    Write-Host "Creating the release signing key $ReleaseSigningKey ..." -ForegroundColor Yellow
+    Write-Host "  (optional passphrase: if you set one, it is asked for at every release)" -ForegroundColor Yellow
+    New-Item -ItemType Directory -Force -Path (Split-Path $ReleaseSigningKey) | Out-Null
+    & ssh-keygen -t ed25519 -C "myria-release" -f $ReleaseSigningKey
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$ReleaseSigningKey.pub")) { throw "could not create the release signing key" }
+}
+# allowed_signers line: principal, namespace restriction, public key
+$ReleaseSignersLine = 'myria-release namespaces="myria-release" ' + (Get-Content "$ReleaseSigningKey.pub" -Raw).Trim()
+
+# Checks a signature like the servers do (ssh-keygen reads the signed data from stdin; passed as a
+# file, not through a PowerShell pipeline, so line endings stay byte-exact).
+function Test-ReleaseSignature {
+    param([string]$DataFile, [string]$SigFile)
+    $signers = Join-Path $env:TEMP "myria-release-signers-$PID"
+    $out     = Join-Path $env:TEMP "myria-release-verify-$PID.txt"
+    [System.IO.File]::WriteAllText($signers, $ReleaseSignersLine + "`n", (New-Object System.Text.UTF8Encoding $false))
+    try {
+        $p = Start-Process -FilePath "ssh-keygen" -NoNewWindow -Wait -PassThru `
+            -ArgumentList @("-Y", "verify", "-f", "`"$signers`"", "-I", "myria-release", "-n", "myria-release", "-s", "`"$SigFile`"") `
+            -RedirectStandardInput $DataFile -RedirectStandardOutput $out
+        return $p.ExitCode -eq 0
+    } finally {
+        Remove-Item $signers, $out -Force -ErrorAction SilentlyContinue
+    }
+}
 
 # Newest version wins if more than one is installed (e.g. mid-upgrade from 6 to 7) - the .iss
 # script itself has no version-specific syntax, so whichever ISCC compiles it is fine. Installer
@@ -232,6 +265,13 @@ if (-not $SkipServer) {
         Pop-Location
     }
 
+    # The public half of the release signing key travels with the server: update-production.sh
+    # installs it with the first signed release and from then on refuses unsigned updates.
+    $signersBytes = (New-Object System.Text.UTF8Encoding $false).GetBytes($ReleaseSignersLine + "`n")
+    foreach ($out in $WinServerOut, $LinuxServerOut) {
+        [System.IO.File]::WriteAllBytes((Join-Path $out "release-signers"), $signersBytes)
+    }
+
     $WinServerZip   = Join-Path $PSScriptRoot "MyriaServer_win-x64_$Version.zip"
     $LinuxServerZip = Join-Path $PSScriptRoot "MyriaServer_linux-x64_$Version.zip"
     if (Test-Path $WinServerZip)   { Remove-Item $WinServerZip -Force }
@@ -321,6 +361,13 @@ if ($Publish) {
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     [System.IO.File]::WriteAllText((Join-Path $Stage "SHA256SUMS"), (($sumLines -join "`n") + "`n"), $utf8NoBom)
     [System.IO.File]::WriteAllText((Join-Path $Stage "entry.json"), ($entry | ConvertTo-Json -Depth 5), $utf8NoBom)
+
+    # Sign SHA256SUMS -> SHA256SUMS.sig (A08 F2), then check the signature once before uploading.
+    $sumsPath = Join-Path $Stage "SHA256SUMS"
+    Write-Host "`nSigning SHA256SUMS with $ReleaseSigningKey ..." -ForegroundColor Cyan
+    & ssh-keygen -Y sign -f $ReleaseSigningKey -n myria-release $sumsPath
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$sumsPath.sig")) { throw "signing SHA256SUMS failed" }
+    if (-not (Test-ReleaseSignature -DataFile $sumsPath -SigFile "$sumsPath.sig")) { throw "the fresh SHA256SUMS signature does not verify" }
 
     $remoteIn = "$ReleaseDownloadsDir/.incoming/$Version"
     Write-Host "`nUploading release $Version to ${ReleaseHost}..." -ForegroundColor Cyan
