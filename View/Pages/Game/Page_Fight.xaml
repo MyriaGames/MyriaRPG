@@ -71,6 +71,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>  <!-- Attack -->
                         <RowDefinition Height="*"/>     <!-- Skills -->
+                        <RowDefinition Height="Auto"/>  <!-- Items -->
                         <RowDefinition Height="Auto"/>  <!-- Run -->
                     </Grid.RowDefinitions>
 
@@ -152,8 +153,75 @@
                         </ItemsControl>
                     </ScrollViewer>
 
+                    <!-- Consumables: one row per item id, using one costs the turn -->
+                    <StackPanel Grid.Row="2" Margin="0,6,0,0">
+                        <TextBlock Text="{Binding ItemsLabel}"
+                                   FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                   Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding NoItemsText}"
+                                   FontFamily="{StaticResource Font.Body}" FontSize="11"
+                                   Foreground="{DynamicResource Brush.Foreground}" Opacity="0.6"
+                                   Visibility="{Binding HasNoItems, Converter={StaticResource BoolToVis}}"/>
+                        <ScrollViewer MaxHeight="96"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Height="28"
+                                                Margin="0,0,0,4"
+                                                HorizontalContentAlignment="Stretch"
+                                                Command="{Binding DataContext.UseItemCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource ShopQtyButton}"
+                                                Padding="8,0">
+                                            <Button.ToolTip>
+                                                <Border Background="{DynamicResource Brush.PanelDark}"
+                                                        BorderBrush="{DynamicResource Brush.Gold}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="3"
+                                                        Padding="10,8"
+                                                        MaxWidth="240">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="13" FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource Brush.GoldSoft}"
+                                                                   Margin="0,0,0,3"/>
+                                                        <TextBlock Text="{Binding Description}"
+                                                                   FontFamily="{StaticResource Font.Body}" FontSize="11"
+                                                                   Foreground="{DynamicResource Brush.Foreground}"
+                                                                   TextWrapping="Wrap" Opacity="0.85"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Button.ToolTip>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Name}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           FontFamily="{StaticResource Font.Body}" FontSize="11" FontWeight="Bold"
+                                                           Foreground="{DynamicResource Brush.GoldSoft}"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding CountText}"
+                                                           FontFamily="{StaticResource Font.Body}" FontSize="11"
+                                                           Foreground="{DynamicResource Brush.Foreground}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="6,0,0,0"/>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
+
                     <!-- Run button -->
-                    <Button Grid.Row="2"
+                    <Button Grid.Row="3"
                             Content="{Binding BtnRun}"
                             Command="{Binding RunCommand}"
                             Style="{StaticResource ShopQtyButton}"

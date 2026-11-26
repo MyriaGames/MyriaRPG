@@ -19,8 +19,11 @@ namespace Myria.Wpf.Utils
             return MonsterNameKeyRegex.Replace(value, match => Localization.T(match.Value));
         }
 
+        // Combat log args can also carry item name keys (e.g. "pg.fight.log.usedItem"'s item).
         public static object[] LocalizeMonsterArgs(IEnumerable<object> args)
-            => args.Select(arg => arg is string text ? LocalizeMonsterName(text) : arg).ToArray();
+            => args.Select(arg => arg is string text
+                ? (text.StartsWith("item.", StringComparison.OrdinalIgnoreCase) ? Localization.T(text) : LocalizeMonsterName(text))
+                : arg).ToArray();
 
         public static string LocalizeQuestText(string value)
             => !string.IsNullOrEmpty(value) && value.StartsWith("quest.", StringComparison.OrdinalIgnoreCase)

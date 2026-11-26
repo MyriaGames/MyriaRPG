@@ -370,6 +370,13 @@ namespace Myria.Wpf.Services
             return null;
         }
 
+        public static async Task<GroupCombatSnapshot?> GroupCharacterUseItemAsync(string itemId)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<GroupCombatSnapshot>("GroupCharacterUseItem", itemId); } catch { }
+            return null;
+        }
+
         /// <summary>On-demand resync for a group fight - null means the server doesn't think the
         /// caller is in an active one (already ended, or the local turn belief was simply wrong).</summary>
         public static async Task<GroupCombatSnapshot?> GetGroupCombatStateAsync()
@@ -657,6 +664,13 @@ namespace Myria.Wpf.Services
         {
             if (_connection?.State == HubConnectionState.Connected)
                 try { return await _connection.InvokeAsync<CombatTurnResult>("CharacterCastSkill", skillId); } catch { }
+            return null;
+        }
+
+        public static async Task<CombatTurnResult?> CharacterUseItemAsync(string itemId)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<CombatTurnResult>("CharacterUseItem", itemId); } catch { }
             return null;
         }
 

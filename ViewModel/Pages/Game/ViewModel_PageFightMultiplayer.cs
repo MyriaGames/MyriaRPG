@@ -325,6 +325,15 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 return;
             }
 
+            if (!result.Success)
+            {
+                // Rejected by the server (e.g. a stale item button) - EmptyCombatTurn carries
+                // zeroed HP/mana, which must not be applied as if it were a real turn.
+                _canActServer = true;
+                RaiseAll();
+                return;
+            }
+
             foreach (var msg in result.LogEntries)
                 LogLines.Add(LogLineVm.From(msg.Key,
                     Localization.T(msg.Key, LocalizationText.LocalizeMonsterArgs(msg.Args.Cast<object>()))));
@@ -471,6 +480,35 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 var result = await GameHubService.CharacterCastSkillAsync(vm.Skill.Id ?? vm.Skill.Name);
                 ApplyCombatTurnResult(result);
             }
+        }
+
+        protected override async Task UseItemAsync(FightItemVm? vm)
+        {
+            if (vm == null) return;
+
+            if (_isGroupCombat && !_isLocalGroupCombat)
+            {
+                _canActServer = false;
+                RaiseAll();
+                var snap = await GameHubService.GroupCharacterUseItemAsync(vm.ItemId);
+                if (snap == null || snap.Characters.Count == 0)
+                    await ResyncGroupCombatStateAsync();
+                return;
+            }
+
+            if (!_isGroupCombat && _encounter == null && GameHubService.IsConnected)
+            {
+                _canActServer = false;
+                RaiseAll();
+                var result = await GameHubService.CharacterUseItemAsync(vm.ItemId);
+                ApplyCombatTurnResult(result);
+                return;
+            }
+
+            // Local engines (offline group/solo) - same handling as the base class.
+            await base.UseItemAsync(vm);
+            if (_isLocalGroupCombat) _canActServer = IsMyTurn;
+            RaiseAll();
         }
 
         protected override void CheckLocalGroupFinished()

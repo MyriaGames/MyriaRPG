@@ -1,3 +1,4 @@
+using Myria.Lib.Core.Entities.Items;
 using Myria.Lib.Core.Entities.Monsters;
 using Myria.Lib.Core.Entities.Characters;
 using Myria.Lib.Core.Entities.Skills;
@@ -115,6 +116,23 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             set { _skillsLabel = value; OnPropertyChanged(); }
         }
 
+        private string _itemsLabel = string.Empty;
+        private string _noItemsText = string.Empty;
+
+        [LocalizedKey("pg.fight.items")]
+        public string ItemsLabel
+        {
+            get => _itemsLabel;
+            set { _itemsLabel = value; OnPropertyChanged(); }
+        }
+
+        [LocalizedKey("pg.fight.items.none")]
+        public string NoItemsText
+        {
+            get => _noItemsText;
+            set { _noItemsText = value; OnPropertyChanged(); }
+        }
+
         [LocalizedKey("pg.fight.group.party")]
         public string TblGroupParty
         {
@@ -161,10 +179,13 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
         public ObservableCollection<LogLineVm>   LogLines { get; } = new();
         public ObservableCollection<FightSkillVm> Skills  { get; } = new();
+        public ObservableCollection<FightItemVm>  Items   { get; } = new();
+        public bool HasNoItems => Items.Count == 0;
 
         public ICommand AttackCommand        { get; protected set; }
         public ICommand RunCommand           { get; protected set; }
         public ICommand CastSkillCommand     { get; protected set; }
+        public ICommand UseItemCommand       { get; protected set; }
         public ICommand SelectMonsterCommand { get; protected set; }
 
         public IEnumerable<GroupCombatantVm> OtherMonsters =>
@@ -247,6 +268,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             AttackCommand        = new RelayCommand(() => _ = AttackAsync(), CanActMethod);
             CastSkillCommand     = new RelayCommand<FightSkillVm>(vm => _ = CastSkillAsync(vm), _ => CanAct);
+            UseItemCommand       = new RelayCommand<FightItemVm>(vm => _ = UseItemAsync(vm), _ => CanAct);
             RunCommand           = new RelayCommand(Run);
             SelectMonsterCommand = new RelayCommand<GroupCombatantVm>(vm =>
             {
@@ -254,7 +276,51 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 int idx = GroupMonsters.IndexOf(vm);
                 if (idx >= 0) SelectedMonsterIndex = idx;
             });
+
+            var inventory = UserAccountService.CurrentCharacter.Inventory;
+            inventory.ItemReceived += OnInventoryChanged;
+            inventory.ItemRemoved  += OnInventoryChanged;
+            RefreshItems();
         }
+
+        // ── Items ────────────────────────────────────────────────────────────
+
+        // One button per consumable item id (stacks summed). Rebuilt from the character's own
+        // inventory, which every combat path keeps current: the local engines consume from it
+        // directly, and in server mode the server's CharacterUpdated inventory snapshot does.
+        protected void RefreshItems()
+        {
+            var consumables = UserAccountService.CurrentCharacter.Inventory.Items
+                .OfType<ConsumableItem>()
+                .GroupBy(i => i.Id, StringComparer.OrdinalIgnoreCase)
+                .Select(g => new FightItemVm(g.First(), g.Sum(i => i.StackSize)))
+                .OrderBy(vm => vm.Name)
+                .ToList();
+
+            Items.Clear();
+            foreach (var vm in consumables) Items.Add(vm);
+            OnPropertyChanged(nameof(HasNoItems));
+        }
+
+        private void OnInventoryChanged(object? sender, ItemReceivedEventArgs e)
+        {
+            // One VM per fight, but the character's inventory outlives it - detach once this
+            // fight is no longer the active one instead of tracking every exit path.
+            if (ActiveFight != this)
+            {
+                var inventory = UserAccountService.CurrentCharacter.Inventory;
+                inventory.ItemReceived -= OnInventoryChanged;
+                inventory.ItemRemoved  -= OnInventoryChanged;
+                return;
+            }
+            RefreshItems();
+        }
+
+        /// <summary>Resolves the actual inventory entry to use for a button - the VM's own
+        /// reference can be stale after a restack/snapshot.</summary>
+        protected static ConsumableItem? ResolveOwnedConsumable(FightItemVm vm) =>
+            UserAccountService.CurrentCharacter.Inventory.Items.OfType<ConsumableItem>()
+                .FirstOrDefault(i => string.Equals(i.Id, vm.ItemId, StringComparison.OrdinalIgnoreCase));
 
         // ── Group combat helpers ─────────────────────────────────────────────
 
@@ -461,6 +527,36 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             }
         }
 
+        /// <summary>Offline paths (local solo / local group engine). The multiplayer subclass adds
+        /// the server paths and delegates here for the local ones.</summary>
+        protected virtual Task UseItemAsync(FightItemVm? vm)
+        {
+            if (vm == null || ResolveOwnedConsumable(vm) is not { } item) return Task.CompletedTask;
+
+            if (_isGroupCombat && _isLocalGroupCombat && _groupEncounter != null)
+            {
+                var lp = UserAccountService.CurrentCharacter;
+                _groupEncounter.CharacterUseItem(lp.Name, item);
+                SyncFromGroupEncounter();
+                FlushGroupLog();
+                if (!_groupEncounter.IsFinished)
+                {
+                    CurrentTurnCharacterName = _groupEncounter.CurrentTurnCharacterName;
+                    IsMyTurn = string.Equals(CurrentTurnCharacterName, lp.Name, StringComparison.OrdinalIgnoreCase);
+                }
+                RaiseAll();
+                CheckLocalGroupFinished();
+            }
+            else if (_encounter != null)
+            {
+                _encounter.CharacterUseItem(item);
+                FlushNewLogEntries();
+                CheckLocalCombatFinished();
+                RaiseAll();
+            }
+            return Task.CompletedTask;
+        }
+
         protected virtual void Run()
         {
             Navigation.Current.SetFightState(false);
@@ -628,6 +724,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             // does not depend on window focus or input activity.
             (AttackCommand as RelayCommand)?.RaiseCanExecuteChanged();
             (CastSkillCommand as RelayCommand<FightSkillVm>)?.RaiseCanExecuteChanged();
+            (UseItemCommand as RelayCommand<FightItemVm>)?.RaiseCanExecuteChanged();
 
             System.Windows.Input.CommandManager.InvalidateRequerySuggested();
             if (_encounter != null && EnemyHp < 1)
@@ -688,6 +785,22 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             ["pg.fight.log.win"]       = s_victory,
             ["pg.fight.log.lose"]      = s_defeat,
         };
+    }
+
+    public class FightItemVm
+    {
+        public string ItemId      { get; }
+        public string Name        { get; }
+        public string Description { get; }
+        public string CountText   { get; }
+
+        public FightItemVm(ConsumableItem item, int count)
+        {
+            ItemId      = item.Id;
+            Name        = Localization.T(item.Name);
+            Description = string.IsNullOrEmpty(item.Description) ? "" : Localization.T(item.Description);
+            CountText   = $"×{count}";
+        }
     }
 
     public class FightSkillVm
