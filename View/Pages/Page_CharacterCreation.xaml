@@ -464,8 +464,9 @@
                                                                        Foreground="{DynamicResource Brush.Foreground}"/>
                                                         </Button>
                                                     </Grid>
-                                                    <Rectangle Grid.Row="2" Height="1"
-                                                               Fill="{DynamicResource Brush.Gold}" Opacity="0.2"/>
+                                                    <TextBlock Grid.Row="2" Text="{Binding CardText}"
+                                                               FontFamily="{StaticResource Font.Body}" FontSize="9" TextWrapping="Wrap"
+                                                               Foreground="{DynamicResource Brush.SecondaryText}"/>
                                                     <Border Grid.Row="4"
                                                             Background="{DynamicResource Brush.Panel}"
                                                             BorderBrush="{DynamicResource Brush.Border}"

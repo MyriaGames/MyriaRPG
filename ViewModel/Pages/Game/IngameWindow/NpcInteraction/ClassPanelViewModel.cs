@@ -18,7 +18,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.NpcInteraction
         public string Name { get; }
         public string GroupLabel { get; }
         public bool IsAllowed { get; }
-        public string ForbiddenLabel => Localization.T("pg.class.forbidden");
+        public string ForbiddenLabel { get; }
 
         public int ClassLevel => ClassManager.GetClassLevel(_character, _class);
         public double ProgressFraction => ClassXpService.GetProgressFraction(ClassManager.GetClassXp(_character, _class));
@@ -55,6 +55,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.NpcInteraction
                 _             => group
             };
             IsAllowed = ClassManager.IsClassAllowed(character.Race, cls);
+            ForbiddenLabel = ClassManager.GetRestrictionReason(character.Race, cls) ?? Localization.T("pg.class.forbidden");
             _isActive = character.Class.Equals(cls, StringComparison.OrdinalIgnoreCase);
 
             SelectCommand = new RelayCommand(Select, () => IsAllowed && !IsActive && ClassManager.CanChangeClass(_character));

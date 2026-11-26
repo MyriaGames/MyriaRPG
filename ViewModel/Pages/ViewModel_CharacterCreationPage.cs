@@ -281,8 +281,9 @@ namespace Myria.Wpf.ViewModel.Pages
         {
             Classes.Clear();
             _selectedClass = null;
-            foreach (var cls in ClassManager.GetAllowedClasses(EffectiveRace))
-                Classes.Add(new ClassOptionVm(cls, OnClassSelected));
+            // Every class is listed; ones this race can't take are greyed out with the reason.
+            foreach (var cls in ClassProfile.All.Keys)
+                Classes.Add(new ClassOptionVm(cls, OnClassSelected, EffectiveRace));
             OnPropertyChanged(nameof(SelectedClass));
             OnPropertyChanged(nameof(PreviewClassName));
             OnPropertyChanged(nameof(PreviewClassGrowthLine));
@@ -405,10 +406,14 @@ namespace Myria.Wpf.ViewModel.Pages
         public string Class { get; }
         public string Name { get; }
         public string StatGrowthLabel { get; }
+        public string Description { get; }
 
-        /// <summary>False for classes that exist in the data but are not selectable in this build (e.g. RunicMage — see Pflichtenheft/Herausforderungen: rune magic scope cut).</summary>
+        /// <summary>False for classes this race can't take, and for classes not selectable in this
+        /// build (RunicMage - rune magic is out of v0.3's scope).</summary>
         public bool IsAvailable { get; }
         public string? UnavailableHint { get; }
+        /// <summary>The reason shown on the card itself instead of the description when unavailable.</summary>
+        public string CardText => UnavailableHint ?? Description;
 
         private bool _isSelected;
         public bool IsSelected
@@ -423,7 +428,7 @@ namespace Myria.Wpf.ViewModel.Pages
 
         public ICommand SelectCommand { get; }
 
-        public ClassOptionVm(string cls, Action<ClassOptionVm> onSelect)
+        public ClassOptionVm(string cls, Action<ClassOptionVm> onSelect, string? race = null)
         {
             Class = cls;
             Name  = Localization.T($"class.{cls}");
@@ -433,8 +438,11 @@ namespace Myria.Wpf.ViewModel.Pages
                   $"INT +{p.StatGrowth["INT"]}  SPR +{p.StatGrowth["SPR"]}  HP +{p.HpPerLevel}  MP +{p.ManaPerLevel}"
                 : "";
 
-            IsAvailable     = !cls.Equals(CharacterClass.RunicMage, StringComparison.OrdinalIgnoreCase);
-            UnavailableHint = IsAvailable ? null : Localization.T("pg.character.create.class.unavailable");
+            Description = Localization.T($"class.{cls}.desc");
+            string? raceReason = race is null ? null : ClassManager.GetRestrictionReason(race, cls);
+            bool notInBuild = cls.Equals(CharacterClass.RunicMage, StringComparison.OrdinalIgnoreCase);
+            IsAvailable     = raceReason is null && !notInBuild;
+            UnavailableHint = raceReason ?? (notInBuild ? Localization.T("pg.character.create.class.unavailable") : null);
 
             SelectCommand = new RelayCommand(() => onSelect(this));
         }
