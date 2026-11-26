@@ -2,36 +2,58 @@
 Builds one alpha release end-to-end:
   publish WPF client (self-contained, single-file) -> sign exe -> build installer -> sign installer
   publish MyriaServer/MyriaAuthServer for win-x64 + linux-x64 (self-contained) -> zip each
-  -> (optionally) publish a GitHub Release directly on each project's own repo via the gh CLI:
-     the signed installer to MyriaGames/MyriaRPG, the server zips to MyriaGames/MyriaServer.
+  -> (optionally) publish the release on the game's own server (-Publish): uploaded over SSH,
+     checksums verified there, then made live at https://myria.myria-games.duckdns.org/downloads/
+     (website download, client auto-update via latest.json, server auto-update via
+     update-production.sh). The realm server on that machine is updated right away.
+  -> (optionally, -PublishGitHub) also create GitHub Releases on each project's own repo via the
+     gh CLI - only needed as a bridge for clients <= 0.2.21, which still look for updates there.
 
 Requires: New-SigningCert.ps1 already run once (cert present in Cert:\CurrentUser\My),
-Inno Setup 6 installed, and the GitHub CLI (`gh`, authenticated) if you pass -Publish. Myria.Server.Realm
-and Myria.Server.Auth are published straight out of this same Myria solution (no separate
-sibling-repo clones needed - that split happened before this script was updated to match).
-Signing uses the cert directly from the Windows cert store by thumbprint - no
-.pfx password is ever needed or asked for here.
-
-Previously this staged everything into a local clone of a separate rllyben/MyriaRPG-releases repo
-and committed/pushed there, with a hand-maintained version.json manifest describing the latest
-build. Both this script and the runtime updaters (UpdateService.cs client-side,
-update-production.sh server-side) have since moved to publishing/reading GitHub Releases directly
-on each project's own repo - no separate releases repo or manifest file to keep in sync anymore.
+Inno Setup 6 installed, SSH key login to the release server for -Publish, and the GitHub CLI
+(`gh`, authenticated) for -PublishGitHub. Myria.Server.Realm and Myria.Server.Auth are published
+straight out of this same Myria solution. Signing uses the cert directly from the Windows cert
+store by thumbprint - no .pfx password is ever needed or asked for here. The client's
+UpdateService pins this certificate's thumbprint and refuses installers signed by anything else.
 
 Usage:
-  .\release.ps1                          # build + sign everything, don't publish anywhere
-  .\release.ps1 -Publish                 # build, sign, and create the GitHub Releases too
-  .\release.ps1 -Publish -SkipServer     # WPF client only, skip building/releasing server zips
+  .\release.ps1                                  # build + sign everything, don't publish anywhere
+  .\release.ps1 -Publish                         # build, sign and publish on the game server
+  .\release.ps1 -Publish -NotesEn "- Fixed X" -NotesDe "- X behoben"   # with changelog text
+  .\release.ps1 -Publish -PublishGitHub          # bridge release: game server AND GitHub
+  .\release.ps1 -Publish -SkipServer             # WPF client only, no server zips
+  .\release.ps1 -AllowUnreleasedCode              # local test build of uncommitted code (never with -Publish)
+
+Every repo (Wpf, Lib, Realm, Auth) must be committed and on origin/main; BUILDINFO.txt (commits, SDK,
+runtime) is written next to the installer and shipped inside the signed SHA256SUMS (security review A11 F3).
 #>
 
 param(
     [string]$ServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Realm",
     [string]$AuthServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Auth",
     [string]$CertSubject = "CN=MyriaRPG Alpha, O=Rhyen",
+    [string]$ReleaseHost = "admin@192.168.1.1",                   # SSH target of the release server
+    [string]$ReleaseDownloadsDir = "myria-web/downloads",         # relative to that user's home
+    [string]$ReleasePublishScript = "myria-ops/publish-release.sh",
+    [string]$NotesEn = "",                                        # changelog text (lines starting
+    [string]$NotesDe = "",                                        #  with "-" become bullets)
     [string]$WpfRepo = "MyriaGames/MyriaRPG",
     [string]$ServerRepo = "MyriaGames/MyriaServer",
     [switch]$Publish,
-    [switch]$SkipServer
+    [switch]$PublishGitHub,
+    [switch]$Force,                                               # replace an already published version
+    [switch]$SkipServer,
+    # Supply-chain gate (security review 2026-11-26, A03 F4): the release stops if a shipped project
+    # has a package with a known vulnerability, or if the .NET runtime it would bundle isn't the newest
+    # patch (or its channel is out of support). Override only consciously, e.g. offline.
+    [switch]$AllowVulnerable,
+    [switch]$AllowOutdatedRuntime,
+    # Provenance (A11 F3): every repo must be committed and on origin/main. Test builds only, never with -Publish.
+    [switch]$AllowUnreleasedCode,
+    [string]$LibPath = "$PSScriptRoot\..\..\Myria.Lib",
+    # SSH key that signs SHA256SUMS of every release; servers verify it (update-production.sh).
+    # Never leaves this PC. Created on the first run (security review 2026-11-26, A08 F2).
+    [string]$ReleaseSigningKey = "$HOME\.ssh\myria_release_signing"
 )
 
 $ErrorActionPreference = "Stop"
@@ -53,6 +75,36 @@ if (-not $SigningCert) {
 }
 $Thumbprint = $SigningCert.Thumbprint
 Write-Host "Signing with cert thumbprint: $Thumbprint"
+
+# Release signing key (servers check SHA256SUMS against it before installing an update - the
+# checksums alone come from the same server as the files). Created once, interactively: ssh-keygen
+# asks for an optional passphrase, which is then asked for at every release.
+if (-not (Test-Path $ReleaseSigningKey)) {
+    Write-Host "Creating the release signing key $ReleaseSigningKey ..." -ForegroundColor Yellow
+    Write-Host "  (optional passphrase: if you set one, it is asked for at every release)" -ForegroundColor Yellow
+    New-Item -ItemType Directory -Force -Path (Split-Path $ReleaseSigningKey) | Out-Null
+    & ssh-keygen -t ed25519 -C "myria-release" -f $ReleaseSigningKey
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$ReleaseSigningKey.pub")) { throw "could not create the release signing key" }
+}
+# allowed_signers line: principal, namespace restriction, public key
+$ReleaseSignersLine = 'myria-release namespaces="myria-release" ' + (Get-Content "$ReleaseSigningKey.pub" -Raw).Trim()
+
+# Checks a signature like the servers do (ssh-keygen reads the signed data from stdin; passed as a
+# file, not through a PowerShell pipeline, so line endings stay byte-exact).
+function Test-ReleaseSignature {
+    param([string]$DataFile, [string]$SigFile)
+    $signers = Join-Path $env:TEMP "myria-release-signers-$PID"
+    $out     = Join-Path $env:TEMP "myria-release-verify-$PID.txt"
+    [System.IO.File]::WriteAllText($signers, $ReleaseSignersLine + "`n", (New-Object System.Text.UTF8Encoding $false))
+    try {
+        $p = Start-Process -FilePath "ssh-keygen" -NoNewWindow -Wait -PassThru `
+            -ArgumentList @("-Y", "verify", "-f", "`"$signers`"", "-I", "myria-release", "-n", "myria-release", "-s", "`"$SigFile`"") `
+            -RedirectStandardInput $DataFile -RedirectStandardOutput $out
+        return $p.ExitCode -eq 0
+    } finally {
+        Remove-Item $signers, $out -Force -ErrorAction SilentlyContinue
+    }
+}
 
 # Newest version wins if more than one is installed (e.g. mid-upgrade from 6 to 7) - the .iss
 # script itself has no version-specific syntax, so whichever ISCC compiles it is fine. Installer
@@ -89,9 +141,24 @@ if (-not $SkipServer -and -not (Test-Path $AuthServerProjectPath)) {
     exit 1
 }
 
-if ($Publish -and -not (Get-Command gh -ErrorAction SilentlyContinue)) {
-    Write-Host "-Publish was passed but the GitHub CLI ('gh') isn't on PATH - install it or omit -Publish to just build+sign locally." -ForegroundColor Red
+if ($PublishGitHub -and -not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    Write-Host "-PublishGitHub was passed but the GitHub CLI ('gh') isn't on PATH - install it or omit -PublishGitHub." -ForegroundColor Red
     exit 1
+}
+
+if ($Publish) {
+    foreach ($tool in "ssh", "scp") {
+        if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
+            Write-Host "-Publish needs '$tool' (Windows OpenSSH client) on PATH." -ForegroundColor Red
+            exit 1
+        }
+    }
+    # Fail now, not after a 10-minute build: key login must work without a password prompt.
+    & ssh -o BatchMode=yes -o ConnectTimeout=10 $ReleaseHost "test -x ~/$ReleasePublishScript || test -f ~/$ReleasePublishScript"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Cannot reach the release server '$ReleaseHost' with SSH key login, or ~/$ReleasePublishScript is missing there." -ForegroundColor Red
+        exit 1
+    }
 }
 
 function Find-SignTool {
@@ -123,6 +190,113 @@ $Version = $Matches[1]
 $Tag = "v$Version"
 Write-Host "Building MyriaRPG alpha $Version" -ForegroundColor Cyan
 
+# ── 1b. Supply-chain checks (security review 2026-11-26, A03 F4) ─────────────
+# Every component is self-contained, so the runtime inside the release is whatever the SDK on this PC
+# bundles - and players/servers get .NET security fixes only through a new Myria release. Release
+# 0.2.24 shipped .NET 8.0.30 long after 8.0.31-8.0.33 were out; this stops that from happening silently.
+$ShippedProjects = @($CsprojPath)
+if (-not $SkipServer) {
+    $ShippedProjects += (Join-Path $ServerProjectPath "Myria.Server.Realm.csproj")
+    $ShippedProjects += (Join-Path $AuthServerProjectPath "Myria.Server.Auth.csproj")
+}
+
+function Test-NoVulnerablePackages {
+    $problems = @()
+    foreach ($proj in $ShippedProjects) {
+        $json = & dotnet list $proj package --vulnerable --include-transitive --format json 2>$null
+        if ($LASTEXITCODE -ne 0) { $problems += "$proj : 'dotnet list package --vulnerable' failed"; continue }
+        $report = ($json -join "`n") | ConvertFrom-Json
+        foreach ($p in $report.projects) {
+            foreach ($fw in @($p.frameworks)) {
+                foreach ($pkg in @($fw.topLevelPackages) + @($fw.transitivePackages)) {
+                    if ($pkg -and $pkg.vulnerabilities) {
+                        $ids = ($pkg.vulnerabilities | ForEach-Object { "$($_.severity) $($_.advisoryurl)" }) -join ", "
+                        $problems += "$(Split-Path $p.path -Leaf): $($pkg.id) $($pkg.resolvedVersion) - $ids"
+                    }
+                }
+            }
+        }
+    }
+    return $problems
+}
+
+function Test-RuntimeIsCurrent {
+    $problems = @()
+    $channels = $ShippedProjects | ForEach-Object {
+        if ((Get-Content $_ -Raw) -match "<TargetFramework>net(\d+\.\d+)") { $Matches[1] }
+    } | Sort-Object -Unique
+    try {
+        $index = Invoke-RestMethod "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json" -TimeoutSec 30
+    } catch {
+        return @("could not read the official .NET release index ($($_.Exception.Message))")
+    }
+    # The runtime packs a self-contained publish uses = what this SDK bundles (respects global.json).
+    Push-Location $RepoRoot
+    try { $sdkVersion = (& dotnet --version).Trim() } finally { Pop-Location }
+    $script:BuildSdk = $sdkVersion
+    $sdkLine = & dotnet --list-sdks | Where-Object { $_ -like "$sdkVersion *" } | Select-Object -First 1
+    $sdkDir = Join-Path ($sdkLine -replace '^.*\[(.*)\]$', '$1') $sdkVersion
+    $bundled = Get-Content (Join-Path $sdkDir "Microsoft.NETCoreSdk.BundledVersions.props") -Raw
+    foreach ($ch in $channels) {
+        $entry = $index.'releases-index' | Where-Object { $_.'channel-version' -eq $ch }
+        if (-not $entry) { $problems += ".NET $ch is not in the official release index"; continue }
+        if ($entry.'support-phase' -eq 'eol') { $problems += ".NET $ch is out of support since $($entry.'eol-date') - move to a supported version" }
+        $pattern = 'KnownFrameworkReference Include="Microsoft.NETCore.App"\s+TargetFramework="net' + [regex]::Escape($ch) + '"[^>]*?LatestRuntimeFrameworkVersion="([^"]+)"'
+        if ($bundled -notmatch $pattern) { $problems += "SDK $sdkVersion has no runtime pack for net$ch"; continue }
+        $have = $Matches[1]; $latest = $entry.'latest-runtime'
+        $script:BuildRuntime = (@($script:BuildRuntime, "net$ch $have") | Where-Object { $_ }) -join ", "
+        if ([version]$have -lt [version]$latest) {
+            $problems += "SDK $sdkVersion bundles .NET runtime $have, but $latest is out (security fixes) - update the .NET SDK on this PC first (winget upgrade Microsoft.DotNet.SDK.$($sdkVersion.Split('.')[0]))"
+        } else {
+            Write-Host "  .NET $ch runtime $have = newest patch ($latest)" -ForegroundColor Green
+        }
+    }
+    return $problems
+}
+
+Write-Host "`nChecking packages for known vulnerabilities..." -ForegroundColor Cyan
+$vulnerable = @(Test-NoVulnerablePackages)
+if ($vulnerable.Count -gt 0) {
+    $vulnerable | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+    if (-not $AllowVulnerable) { Write-Host "Stopping: update these packages (or re-run with -AllowVulnerable if you've assessed them)." -ForegroundColor Red; exit 1 }
+    Write-Host "  -AllowVulnerable: continuing anyway." -ForegroundColor Yellow
+} else { Write-Host "  none found" -ForegroundColor Green }
+
+Write-Host "Checking the bundled .NET runtime is current..." -ForegroundColor Cyan
+$outdated = @(Test-RuntimeIsCurrent)
+if ($outdated.Count -gt 0) {
+    $outdated | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+    if (-not $AllowOutdatedRuntime) { Write-Host "Stopping (re-run with -AllowOutdatedRuntime only if you know why)." -ForegroundColor Red; exit 1 }
+    Write-Host "  -AllowOutdatedRuntime: continuing anyway." -ForegroundColor Yellow
+}
+
+# ── 1c. Provenance: build only committed, pushed code; record what went in (A11 F3) ──
+. (Join-Path $PSScriptRoot "ReleaseChecks.ps1")
+$ReleaseRepos = @($RepoRoot, $LibPath)
+if (-not $SkipServer) { $ReleaseRepos += $ServerProjectPath; $ReleaseRepos += $AuthServerProjectPath }
+Write-Host "Checking that every repo is committed and on origin/main..." -ForegroundColor Cyan
+$RepoStates = @($ReleaseRepos | ForEach-Object { Get-RepoReleaseState -Path $_ })
+$unreleased = @($RepoStates | Where-Object { $_.Problems.Count -gt 0 })
+foreach ($s in $RepoStates) {
+    if ($s.Problems.Count -eq 0) { Write-Host ("  {0,-20} {1}" -f $s.Name, $s.Commit.Substring(0, 7)) -ForegroundColor Green }
+    else { $s.Problems | ForEach-Object { Write-Host ("  {0,-20} {1}" -f $s.Name, $_) -ForegroundColor Red } }
+}
+if ($unreleased.Count -gt 0) {
+    if (-not $AllowUnreleasedCode) {
+        Write-Host "Stopping: commit and push to main first (-AllowUnreleasedCode only for test builds, never for -Publish)." -ForegroundColor Red
+        exit 1
+    }
+    if ($Publish -or $PublishGitHub) {
+        Write-Host "Stopping: -AllowUnreleasedCode can't be combined with publishing." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "  -AllowUnreleasedCode: test build, marked as such in BUILDINFO." -ForegroundColor Yellow
+}
+$BuildInfoPath = Join-Path $PSScriptRoot "BUILDINFO_$Version.txt"
+[System.IO.File]::WriteAllText($BuildInfoPath,
+    (New-BuildInfo -Version $Version -States $RepoStates -Sdk $script:BuildSdk -Runtime $script:BuildRuntime -UnreleasedCode:($unreleased.Count -gt 0)),
+    (New-Object System.Text.UTF8Encoding $false))
+
 function Invoke-Sign {
     param([string]$FilePath)
     & $SignTool sign /sha1 $Thumbprint /fd SHA256 /tr $TimestampUrl /td SHA256 "$FilePath"
@@ -139,7 +313,7 @@ try {
     Pop-Location
 }
 
-$PublishDir = Join-Path $RepoRoot "bin\Release\net8.0-windows\publish"
+$PublishDir = Join-Path $RepoRoot "bin\Release\net10.0-windows\publish"
 $PublishedExe = Join-Path $PublishDir "MyriaRPG.exe"
 if (-not (Test-Path $PublishedExe)) {
     Write-Host "Published exe not found at $PublishedExe" -ForegroundColor Red
@@ -210,6 +384,13 @@ if (-not $SkipServer) {
         Pop-Location
     }
 
+    # The public half of the release signing key travels with the server: update-production.sh
+    # installs it with the first signed release and from then on refuses unsigned updates.
+    $signersBytes = (New-Object System.Text.UTF8Encoding $false).GetBytes($ReleaseSignersLine + "`n")
+    foreach ($out in $WinServerOut, $LinuxServerOut) {
+        [System.IO.File]::WriteAllBytes((Join-Path $out "release-signers"), $signersBytes)
+    }
+
     $WinServerZip   = Join-Path $PSScriptRoot "MyriaServer_win-x64_$Version.zip"
     $LinuxServerZip = Join-Path $PSScriptRoot "MyriaServer_linux-x64_$Version.zip"
     if (Test-Path $WinServerZip)   { Remove-Item $WinServerZip -Force }
@@ -256,10 +437,84 @@ Write-Host "  Signed installer: $VersionedInstallerPath"
 if ($WinServerZip)   { Write-Host "  Windows server zip: $WinServerZip" }
 if ($LinuxServerZip) { Write-Host "  Linux server zip:   $LinuxServerZip" }
 
-# ── 6. Publish GitHub Releases directly on each project's own repo ──────────
-if (-not $Publish) {
-    Write-Host "`nNot publishing (pass -Publish to create the GitHub Releases)." -ForegroundColor Yellow
-    Write-Host "Would tag '$Tag' on $WpfRepo (installer) and $ServerRepo (server zips)." -ForegroundColor Yellow
+if (-not $Publish -and -not $PublishGitHub) {
+    Write-Host "`nNot publishing (pass -Publish to release on the game server)." -ForegroundColor Yellow
+    exit 0
+}
+
+# ── 6. Publish on the game's own server ──────────────────────────────────────
+# Upload layout on the server (~/$ReleaseDownloadsDir, served at /downloads/):
+#   .incoming/<version>/   upload area, never served; publish-release.sh verifies SHA256SUMS,
+#                          moves it to <version>/ and rewrites latest.json + releases.json
+#                          atomically, then starts the realm server update on that machine.
+if ($Publish) {
+    $releaseFiles = @(@{ Kind = "client-installer"; Path = $VersionedInstallerPath })
+    if ($LinuxServerZip) { $releaseFiles += @{ Kind = "server-linux";   Path = $LinuxServerZip } }
+    if ($WinServerZip)   { $releaseFiles += @{ Kind = "server-windows"; Path = $WinServerZip } }
+
+    # Stage everything in one folder so scp only ever sees plain relative file names (local
+    # paths with a drive letter and spaces are easy to get wrong on an scp command line).
+    $Stage = Join-Path $PSScriptRoot "release-$Version"
+    if (Test-Path $Stage) { Remove-Item $Stage -Recurse -Force }
+    New-Item -ItemType Directory -Path $Stage | Out-Null
+
+    $fileEntries = @()
+    $sumLines = @()
+    foreach ($f in $releaseFiles) {
+        $name = Split-Path $f.Path -Leaf
+        Copy-Item $f.Path (Join-Path $Stage $name)
+        $hash = (Get-FileHash -Algorithm SHA256 -Path $f.Path).Hash.ToLowerInvariant()
+        $fileEntries += [ordered]@{ kind = $f.Kind; name = $name; sha256 = $hash; size = (Get-Item $f.Path).Length }
+        $sumLines += "$hash  $name"
+    }
+    # What this release was built from - listed in SHA256SUMS, so covered by the release signature (A11 F3).
+    Copy-Item $BuildInfoPath (Join-Path $Stage "BUILDINFO.txt")
+    $sumLines += "$((Get-FileHash -Algorithm SHA256 -Path $BuildInfoPath).Hash.ToLowerInvariant())  BUILDINFO.txt"
+    $notes = [ordered]@{}
+    if ($NotesEn) { $notes.en = $NotesEn }
+    if ($NotesDe) { $notes.de = $NotesDe }
+    # "version" must stay the first field: update-production.sh greps for it without a JSON parser.
+    $entry = [ordered]@{
+        version = $Version
+        date    = (Get-Date).ToString("yyyy-MM-dd")
+        notes   = $notes
+        files   = $fileEntries
+    }
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText((Join-Path $Stage "SHA256SUMS"), (($sumLines -join "`n") + "`n"), $utf8NoBom)
+    [System.IO.File]::WriteAllText((Join-Path $Stage "entry.json"), ($entry | ConvertTo-Json -Depth 5), $utf8NoBom)
+
+    # Sign SHA256SUMS -> SHA256SUMS.sig (A08 F2), then check the signature once before uploading.
+    $sumsPath = Join-Path $Stage "SHA256SUMS"
+    Write-Host "`nSigning SHA256SUMS with $ReleaseSigningKey ..." -ForegroundColor Cyan
+    & ssh-keygen -Y sign -f $ReleaseSigningKey -n myria-release $sumsPath
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$sumsPath.sig")) { throw "signing SHA256SUMS failed" }
+    if (-not (Test-ReleaseSignature -DataFile $sumsPath -SigFile "$sumsPath.sig")) { throw "the fresh SHA256SUMS signature does not verify" }
+
+    $remoteIn = "$ReleaseDownloadsDir/.incoming/$Version"
+    Write-Host "`nUploading release $Version to ${ReleaseHost}..." -ForegroundColor Cyan
+    & ssh -o BatchMode=yes $ReleaseHost "rm -rf ~/$remoteIn && mkdir -p ~/$remoteIn"
+    if ($LASTEXITCODE -ne 0) { throw "could not prepare the upload folder on $ReleaseHost" }
+    Push-Location $Stage
+    try {
+        $uploads = @(Get-ChildItem -File | ForEach-Object { $_.Name })
+        & scp -o BatchMode=yes @uploads "${ReleaseHost}:$remoteIn/"
+        if ($LASTEXITCODE -ne 0) { throw "upload to $ReleaseHost failed" }
+    } finally {
+        Pop-Location
+    }
+
+    Write-Host "Verifying and publishing on the server..." -ForegroundColor Cyan
+    $publishArgs = if ($Force) { "$Version --force" } else { "$Version" }
+    & ssh -o BatchMode=yes $ReleaseHost "bash ~/$ReleasePublishScript $publishArgs"
+    if ($LASTEXITCODE -ne 0) { throw "publishing on $ReleaseHost failed (see output above)" }
+    Remove-Item $Stage -Recurse -Force
+    Write-Host "Release $Version is live: https://myria.myria-games.duckdns.org/" -ForegroundColor Green
+}
+
+# ── 7. (Optional) GitHub Releases - bridge for clients <= 0.2.21 ─────────────
+if (-not $PublishGitHub) {
+    Write-Host "`nDone. Released $Version on the game server." -ForegroundColor Green
     exit 0
 }
 
@@ -300,4 +555,4 @@ if ($WinServerZip -or $LinuxServerZip) {
     Publish-GitHubRelease -Repo $ServerRepo -Tag $Tag -Title "Alpha $Version" -Assets $ServerAssets
 }
 
-Write-Host "`nDone. Released $Tag on $WpfRepo$(if ($WinServerZip -or $LinuxServerZip) { " and $ServerRepo" })." -ForegroundColor Green
+Write-Host "`nDone. Released $Tag on $(if ($Publish) { "the game server, " })$WpfRepo$(if ($WinServerZip -or $LinuxServerZip) { " and $ServerRepo" })." -ForegroundColor Green

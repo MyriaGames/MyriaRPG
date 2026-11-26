@@ -34,7 +34,7 @@ tests. No linting configuration exists in this repo.
 
 Two projects make up this solution:
 
-- **Myria.Wpf** — WPF desktop app (net8.0-windows, WinExe). Contains all UI, ViewModels, and app services.
+- **Myria.Wpf** — WPF desktop app (net10.0-windows, WinExe). Contains all UI, ViewModels, and app services.
 - **MyriaLib** — Class library (net8.0) referenced by Myria.Wpf. Contains all game entities, core game logic, and data models.
 
 Game data (JSON) lives in `Data/common/` (monsters, items, NPCs, quests, rooms, cities, etc.) and locale strings in `Data/locales/` (EN/DE).

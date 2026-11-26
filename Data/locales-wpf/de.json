@@ -181,7 +181,7 @@
   "pg.settings.game.description": "Serververbindung und Aktualisierungsverhalten konfigurieren.",
   "pg.settings.game.server_section": "Serververbindung",
   "pg.settings.server.address": "Serveradresse",
-  "pg.settings.server.hint": "Adresse des Servers eingeben, z. B. http://myria.duckdns.org:5000. Leer lassen, um den lokalen Standardserver zu verwenden.",
+  "pg.settings.server.hint": "Leer lassen, um auf dem offiziellen Myria-Server zu spielen. Für einen anderen Server dessen Auth-Adresse eingeben, z. B. myria.example.org/auth oder localhost:5050.",
   "pg.settings.game.update_section": "Automatische Updates",
   "pg.settings.game.autoupdate": "Updates beim Start automatisch herunterladen und installieren",
   "pg.settings.version": "Version",

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Must match Myria.Wpf's own TFM: a net8.0 test project cannot reference a
+         net8.0-windows WPF project. UseWPF is needed for the System.Windows types the
+         helpers under test touch (ICommand, and Ink/Media types in neighbouring code). -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <!-- Myria.Wpf is a WinExe; referencing it from a test project is supported and gives access
+       to its utilities, services and converters without duplicating any of them. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Myria.Wpf.csproj" />
+  </ItemGroup>
+
+  <!-- Item rarity ordering and display names resolve through Myria.Lib.Core's registries, which
+       are populated from this content. Linked from the canonical copy, as every other project
+       in the solution does. -->
+  <ItemGroup>
+    <Content Include="..\..\..\Myria.Lib\Myria.Lib.Core\Data\common\**\*.json" LinkBase="Data\common\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\Myria.Lib\Myria.Lib.Core\Data\locales\**\*.json" LinkBase="Data\locales\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

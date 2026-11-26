@@ -20,7 +20,7 @@
 
 .EXAMPLE
     .\fuzz_test.ps1 -DurationSeconds 600 -BuildFirst
-    .\fuzz_test.ps1 -ExePath "bin\Release\net8.0-windows\Myria.Wpf.exe"
+    .\fuzz_test.ps1 -ExePath "bin\Release\net10.0-windows\Myria.Wpf.exe"
 #>
 param(
     [int]$DurationSeconds = 60,
@@ -130,8 +130,8 @@ if ($BuildFirst) {
 # ── Locate executable ─────────────────────────────────────────────────────────
 if (-not $ExePath) {
     $ExePath = @(
-        "$ScriptDir\bin\Debug\net8.0-windows\Myria.Wpf.exe",
-        "$ScriptDir\bin\Release\net8.0-windows\Myria.Wpf.exe"
+        "$ScriptDir\bin\Debug\net10.0-windows\Myria.Wpf.exe",
+        "$ScriptDir\bin\Release\net10.0-windows\Myria.Wpf.exe"
     ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 }
 if (-not $ExePath -or -not (Test-Path $ExePath)) {

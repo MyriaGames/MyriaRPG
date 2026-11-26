@@ -1,4 +1,5 @@
 using Myria.Lib.Core.Entities.NPCs;
+using Myria.Lib.Core.Services.Manager;
 using Myria.Lib.Core.Entities.Characters;
 using Myria.Lib.Core.Services;
 using Myria.Lib.Core.Systems.Enums;
@@ -133,10 +134,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.NpcInteraction
             {
                 if (!_character.ActiveQuests.Any(q => q.Id == _quest.Id))
                 {
-                    var clone = _quest.Clone();
-                    clone.Status = clone.IsTalkOnly ? QuestStatus.Completed : QuestStatus.InProgress;
-                    clone.GrantAcceptItems(_character);
-                    _character.ActiveQuests.Add(clone);
+                    QuestManager.StartQuest(_character, _quest);   // also counts items already carried
                 }
             }
 
