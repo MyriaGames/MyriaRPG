@@ -65,18 +65,22 @@ namespace Myria.Wpf.Services
         // address independently via TrustedServerCertStore: the first successful connection to
         // a given host:port remembers its certificate's thumbprint, and every later connection
         // to that same host:port must present that exact certificate again. A real CA-issued
-        // cert still validates the usual way and never reaches this path at all.
+        // cert validates the usual way - and from then on that host never falls back to TOFU;
+        // the official server never does at all (security review 2026-11-26, A04 F1).
         private static HttpMessageHandler CreatePinnedHandler() => new HttpClientHandler
         {
             ServerCertificateCustomValidationCallback = (request, cert, _, errors) =>
             {
-                if (errors == System.Net.Security.SslPolicyErrors.None) return true;
-                if (cert is null || request.RequestUri is null) return false;
-                var thumbprint = cert.GetCertHashString(HashAlgorithmName.SHA256);
-                return Myria.Lib.Core.Utils.TrustedServerCertStore.TrustOnFirstUse(
-                    request.RequestUri.Authority, thumbprint);
+                if (request.RequestUri is null) return false;
+                return Myria.Lib.Core.Utils.TrustedServerCertStore.IsAcceptable(
+                    request.RequestUri.Authority, request.RequestUri.Host,
+                    cert?.GetCertHashString(HashAlgorithmName.SHA256), errors, CaOnlyHosts);
             }
         };
+
+        /// <summary>Hosts with a publicly trusted certificate: an untrusted certificate for them is
+        /// always an attack, never a self-hosted server.</summary>
+        public static readonly IReadOnlyList<string> CaOnlyHosts = [new Uri(DefaultAuthBaseUrl).Host];
 
         /// <summary>Used by GameHubService so the SignalR connection trusts the same pinned
         /// certificate as every other request instead of falling back to default validation.</summary>
