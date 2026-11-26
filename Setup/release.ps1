@@ -22,6 +22,10 @@ Usage:
   .\release.ps1 -Publish -NotesEn "- Fixed X" -NotesDe "- X behoben"   # with changelog text
   .\release.ps1 -Publish -PublishGitHub          # bridge release: game server AND GitHub
   .\release.ps1 -Publish -SkipServer             # WPF client only, no server zips
+  .\release.ps1 -AllowUnreleasedCode              # local test build of uncommitted code (never with -Publish)
+
+Every repo (Wpf, Lib, Realm, Auth) must be committed and on origin/main; BUILDINFO.txt (commits, SDK,
+runtime) is written next to the installer and shipped inside the signed SHA256SUMS (security review A11 F3).
 #>
 
 param(
@@ -44,6 +48,9 @@ param(
     # patch (or its channel is out of support). Override only consciously, e.g. offline.
     [switch]$AllowVulnerable,
     [switch]$AllowOutdatedRuntime,
+    # Provenance (A11 F3): every repo must be committed and on origin/main. Test builds only, never with -Publish.
+    [switch]$AllowUnreleasedCode,
+    [string]$LibPath = "$PSScriptRoot\..\..\Myria.Lib",
     # SSH key that signs SHA256SUMS of every release; servers verify it (update-production.sh).
     # Never leaves this PC. Created on the first run (security review 2026-11-26, A08 F2).
     [string]$ReleaseSigningKey = "$HOME\.ssh\myria_release_signing"
@@ -226,6 +233,7 @@ function Test-RuntimeIsCurrent {
     # The runtime packs a self-contained publish uses = what this SDK bundles (respects global.json).
     Push-Location $RepoRoot
     try { $sdkVersion = (& dotnet --version).Trim() } finally { Pop-Location }
+    $script:BuildSdk = $sdkVersion
     $sdkLine = & dotnet --list-sdks | Where-Object { $_ -like "$sdkVersion *" } | Select-Object -First 1
     $sdkDir = Join-Path ($sdkLine -replace '^.*\[(.*)\]$', '$1') $sdkVersion
     $bundled = Get-Content (Join-Path $sdkDir "Microsoft.NETCoreSdk.BundledVersions.props") -Raw
@@ -236,6 +244,7 @@ function Test-RuntimeIsCurrent {
         $pattern = 'KnownFrameworkReference Include="Microsoft.NETCore.App"\s+TargetFramework="net' + [regex]::Escape($ch) + '"[^>]*?LatestRuntimeFrameworkVersion="([^"]+)"'
         if ($bundled -notmatch $pattern) { $problems += "SDK $sdkVersion has no runtime pack for net$ch"; continue }
         $have = $Matches[1]; $latest = $entry.'latest-runtime'
+        $script:BuildRuntime = (@($script:BuildRuntime, "net$ch $have") | Where-Object { $_ }) -join ", "
         if ([version]$have -lt [version]$latest) {
             $problems += "SDK $sdkVersion bundles .NET runtime $have, but $latest is out (security fixes) - update the .NET SDK on this PC first (winget upgrade Microsoft.DotNet.SDK.$($sdkVersion.Split('.')[0]))"
         } else {
@@ -260,6 +269,33 @@ if ($outdated.Count -gt 0) {
     if (-not $AllowOutdatedRuntime) { Write-Host "Stopping (re-run with -AllowOutdatedRuntime only if you know why)." -ForegroundColor Red; exit 1 }
     Write-Host "  -AllowOutdatedRuntime: continuing anyway." -ForegroundColor Yellow
 }
+
+# ── 1c. Provenance: build only committed, pushed code; record what went in (A11 F3) ──
+. (Join-Path $PSScriptRoot "ReleaseChecks.ps1")
+$ReleaseRepos = @($RepoRoot, $LibPath)
+if (-not $SkipServer) { $ReleaseRepos += $ServerProjectPath; $ReleaseRepos += $AuthServerProjectPath }
+Write-Host "Checking that every repo is committed and on origin/main..." -ForegroundColor Cyan
+$RepoStates = @($ReleaseRepos | ForEach-Object { Get-RepoReleaseState -Path $_ })
+$unreleased = @($RepoStates | Where-Object { $_.Problems.Count -gt 0 })
+foreach ($s in $RepoStates) {
+    if ($s.Problems.Count -eq 0) { Write-Host ("  {0,-20} {1}" -f $s.Name, $s.Commit.Substring(0, 7)) -ForegroundColor Green }
+    else { $s.Problems | ForEach-Object { Write-Host ("  {0,-20} {1}" -f $s.Name, $_) -ForegroundColor Red } }
+}
+if ($unreleased.Count -gt 0) {
+    if (-not $AllowUnreleasedCode) {
+        Write-Host "Stopping: commit and push to main first (-AllowUnreleasedCode only for test builds, never for -Publish)." -ForegroundColor Red
+        exit 1
+    }
+    if ($Publish -or $PublishGitHub) {
+        Write-Host "Stopping: -AllowUnreleasedCode can't be combined with publishing." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "  -AllowUnreleasedCode: test build, marked as such in BUILDINFO." -ForegroundColor Yellow
+}
+$BuildInfoPath = Join-Path $PSScriptRoot "BUILDINFO_$Version.txt"
+[System.IO.File]::WriteAllText($BuildInfoPath,
+    (New-BuildInfo -Version $Version -States $RepoStates -Sdk $script:BuildSdk -Runtime $script:BuildRuntime -UnreleasedCode:($unreleased.Count -gt 0)),
+    (New-Object System.Text.UTF8Encoding $false))
 
 function Invoke-Sign {
     param([string]$FilePath)
@@ -431,6 +467,9 @@ if ($Publish) {
         $fileEntries += [ordered]@{ kind = $f.Kind; name = $name; sha256 = $hash; size = (Get-Item $f.Path).Length }
         $sumLines += "$hash  $name"
     }
+    # What this release was built from - listed in SHA256SUMS, so covered by the release signature (A11 F3).
+    Copy-Item $BuildInfoPath (Join-Path $Stage "BUILDINFO.txt")
+    $sumLines += "$((Get-FileHash -Algorithm SHA256 -Path $BuildInfoPath).Hash.ToLowerInvariant())  BUILDINFO.txt"
     $notes = [ordered]@{}
     if ($NotesEn) { $notes.en = $NotesEn }
     if ($NotesDe) { $notes.de = $NotesDe }
