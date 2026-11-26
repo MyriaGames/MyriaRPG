@@ -9,14 +9,35 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         protected override async Task ExecuteMove(Room targetRoom)
         {
             bool ok = await GameHubService.JoinRoomAsync(targetRoom.Id);
+            if (!ok && targetRoom.IsDungeonRoom)
+                WriteLog(Localization.T("dungeon.locked"));   // the server's per-party run said no
             if (ok)
             {
+                NoteDungeonExit(currentRoom, targetRoom);
                 ApplyRoomMove(targetRoom);
                 Myria.Lib.Core.Systems.GameEvents.FireRoomEntered(character, targetRoom);
             }
         }
 
         protected override Task ExecuteGather() => StartGatheringServerAsync();
+
+        // v0.3 dungeons: the run lives on the server (per party) - ask it what's left here.
+        private int _dungeonVersion;
+
+        protected override void RefreshDungeonState()
+        {
+            int version = ++_dungeonVersion;
+            if (!currentRoom.IsDungeonRoom) { DungeonStatus = string.Empty; return; }
+            _ = RefreshDungeonStateAsync(version, currentRoom.Id);
+        }
+
+        private async Task RefreshDungeonStateAsync(int version, int roomId)
+        {
+            var state = await GameHubService.GetDungeonStateAsync();
+            if (version != _dungeonVersion || state is null || state.RoomId != roomId) return;
+            HasMonsters = !state.Cleared;
+            DungeonStatus = DungeonStatusText(state.Remaining.Select(m => m.Name));
+        }
 
         protected override void StartFight()
         {
@@ -75,6 +96,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             // like a working fight, which is why fixing the server side alone didn't help.
             switch (result?.Reason)
             {
+                case "room_cleared":
+                    ViewModel_PageRoom.WriteLog(Localization.T("dungeon.room_cleared"));
+                    RefreshDungeonState();
+                    break;
                 case "no_monsters":
                 case "already_in_combat":
                     break; // the server already sent a ChatMessage explaining why

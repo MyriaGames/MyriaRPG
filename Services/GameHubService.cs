@@ -256,6 +256,14 @@ namespace Myria.Wpf.Services
             return false;
         }
 
+        /// <summary>v0.3: the caller's dungeon run from their current room (null outside dungeons).</summary>
+        public static async Task<DungeonRoomState?> GetDungeonStateAsync()
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<DungeonRoomState?>("GetDungeonState"); } catch { }
+            return null;
+        }
+
         public static async Task SendMessageAsync(string message, string channel = "room", string? target = null)
         {
             if (_connection?.State == HubConnectionState.Connected)

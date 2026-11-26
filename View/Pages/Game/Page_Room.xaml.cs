@@ -15,6 +15,8 @@ namespace Myria.Wpf.View.Pages.Game
                 ? (ViewModel_PageRoom)new ViewModel_PageRoomMultiplayer()
                 : new ViewModel_PageRoom();
             DataContext = vm;
+            // The page is cached between navigations (e.g. to a fight and back): refresh on every show.
+            Loaded += (_, _) => vm.OnPageShown();
 
             vm.Log.CollectionChanged += (_, _) =>
             {

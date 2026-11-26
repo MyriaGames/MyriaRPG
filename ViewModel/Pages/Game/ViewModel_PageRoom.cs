@@ -20,6 +20,7 @@ using System.Windows.Input;
 using Myria.Lib.Core.Services.Builder;
 using Myria.Lib.Core.Services.Manager;
 using Myria.Lib.Core.Systems.Enums;
+using Myria.Lib.Core.Systems.Dungeons;
 
 namespace Myria.Wpf.ViewModel.Pages.Game
 {
@@ -157,6 +158,21 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         public bool HasEast { get => _hasEast; set { _hasEast = value; OnPropertyChanged(); } }
         public bool HasSouth { get => _hasSouth; set { _hasSouth = value; OnPropertyChanged(); } }
         public bool HasWest { get => _hasWest; set { _hasWest = value; OnPropertyChanged(); } }
+
+        // v0.3 dungeons: what's left in this room of the run (or that it's cleared); empty elsewhere.
+        private string _dungeonStatus = string.Empty;
+        public string DungeonStatus
+        {
+            get => _dungeonStatus;
+            protected set
+            {
+                _dungeonStatus = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DungeonStatusVisibility));
+            }
+        }
+        public System.Windows.Visibility DungeonStatusVisibility =>
+            string.IsNullOrEmpty(_dungeonStatus) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
 
         public System.Windows.Visibility BtnFightVisibility { get => btnFightVisibility; set { btnFightVisibility = value; OnPropertyChanged(); } }
         public System.Windows.Visibility BtnGatherVisibility { get => btnGatherVisibility; set { btnGatherVisibility = value; OnPropertyChanged(); } }
@@ -553,8 +569,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         protected void RefreshRoomFlags()
         {
             GetDirections();
-            HasMonsters = currentRoom.HasMonsters && !currentRoom.IsCleared
-                         && (currentRoom.Monsters.Count > 0 || currentRoom.CurrentMonsters.Count > 0);
+            HasMonsters = currentRoom.HasMonsters && currentRoom.Monsters.Count > 0;
+            RefreshDungeonState();
             bool hasSpots = currentRoom.GatheringSpots != null && currentRoom.GatheringSpots.Count > 0;
             if (ServerApiService.Token != null && GameHubService.IsConnected)
                 CanGather = currentRoom.GathersRemaining > 0 && hasSpots;
@@ -566,6 +582,38 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             HasNpcs = currentRoom.Npcs != null && currentRoom.Npcs.Count > 0;
             RefreshGuildEntry();
             OnRoomFlagsRefreshed();
+        }
+
+        /// <summary>Called whenever the page is shown again (e.g. back from a fight) - the cached page
+        /// would otherwise keep showing the room as it was before.</summary>
+        public void OnPageShown() => RefreshRoomFlags();
+
+        /// <summary>Dungeon rooms: Fight only while the run still has monsters here, plus a status line.
+        /// Offline from the local run; multiplayer asks the server (its run is per party).</summary>
+        protected virtual void RefreshDungeonState()
+        {
+            LocalDungeonRuns.NoteLocation(currentRoom);
+            if (LocalDungeonRuns.For(currentRoom) is not { } run) { DungeonStatus = string.Empty; return; }
+            var remaining = run.Remaining(currentRoom);
+            HasMonsters = remaining.Count > 0;
+            DungeonStatus = DungeonStatusText(remaining.Select(m => m.Name));
+        }
+
+        /// <summary>"Still here: 2× Grotto Crab, Drowned Maka Maka" - or that the room is cleared.</summary>
+        protected static string DungeonStatusText(IEnumerable<string> monsterNames)
+        {
+            var groups = monsterNames.GroupBy(n => n).Select(g => (g.Count() > 1 ? $"{g.Count()}× " : "") + Localization.T(g.Key)).ToList();
+            return groups.Count == 0
+                ? Localization.T("dungeon.room_cleared")
+                : Localization.T("dungeon.remaining", string.Join(", ", groups));
+        }
+
+        /// <summary>Log line when a move takes the player out of a dungeon (its run resets).</summary>
+        protected static void NoteDungeonExit(Room from, Room to)
+        {
+            var left = DungeonRules.DungeonIdOf(from);
+            if (left is not null && DungeonRules.DungeonIdOf(to) != left)
+                WriteLog(Localization.T("dungeon.left"));
         }
 
         private void RefreshGuildEntry()
@@ -610,10 +658,18 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             var character = UserAccountService.CurrentCharacter;
 
             List<Monster> monsters;
-            if (currentRoom.CurrentMonsters.Count > 0)
+            GroupCombatEncounter? dungeonFight = null;
+            var run = LocalDungeonRuns.For(currentRoom);
+            if (run is not null)
             {
-                // Dungeon room: use spawned instances directly
-                monsters = currentRoom.CurrentMonsters.Take(maxMonsters).ToList();
+                // Dungeon room: the next pack of the local run's monsters for this room.
+                monsters = run.NextPack(currentRoom, maxMonsters, () => dungeonFight is null || !dungeonFight.IsFinished);
+                if (monsters.Count == 0)
+                {
+                    WriteLog(Localization.T("dungeon.room_cleared"));
+                    RefreshRoomFlags();
+                    return;
+                }
             }
             else if (currentRoom.Monsters.Count > 0)
             {
@@ -630,7 +686,14 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                     { MonsterService.GetMonsterById(1).Clone() };
             }
 
-            ViewModel_PageFight.PendingLocalEncounter = new GroupCombatEncounter(new[] { character }, monsters);
+            var encounter = new GroupCombatEncounter(new[] { character }, monsters);
+            if (run is not null)
+            {
+                dungeonFight = encounter;
+                int roomId = currentRoom.Id;
+                encounter.MonsterKilled += (_, e) => { if (e.Monster is not null) run.RecordKill(roomId, e.Monster); };
+            }
+            ViewModel_PageFight.PendingLocalEncounter = encounter;
 
             ViewModel_PageFight.PendingGroupCombat = new Myria.Lib.Core.Models.Dto.StartGroupCombatResult(
                 Success: true,
@@ -656,6 +719,12 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         protected virtual async Task ExecuteMove(Room targetRoom)
         {
             if (!RoomService.CanEnterRoom(targetRoom, character)) return;
+            if (!LocalDungeonRuns.CanMove(currentRoom, targetRoom))
+            {
+                WriteLog(Localization.T("dungeon.locked"));
+                return;
+            }
+            NoteDungeonExit(currentRoom, targetRoom);
             ApplyRoomMove(targetRoom);
             _ = GameHubService.JoinRoomAsync(currentRoom.Id);
             GameEvents.FireRoomEntered(character, targetRoom);
