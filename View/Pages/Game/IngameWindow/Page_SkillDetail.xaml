@@ -204,7 +204,7 @@
                            Margin="0,4,0,0"
                            Visibility="{Binding NoUpgradeOptions, Converter={StaticResource BoolToVis}}"/>
 
-                <Button Content="{Binding RespecCost, StringFormat='Respec ({0} gold)'}"
+                <Button Content="{Binding RespecCost, StringFormat='Respec ({0})'}"
                         Style="{StaticResource SkillUpgradeButton}"
                         IsEnabled="{Binding HasPurchasedUpgrades}"
                         Command="{Binding RespecCommand}"

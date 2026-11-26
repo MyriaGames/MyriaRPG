@@ -88,7 +88,8 @@ namespace Myria.Wpf.ViewModel.Windows
         public int UnspentPoints => _progress?.UnspentPoints ?? 0;
         public bool HasUnspentPoints => UnspentPoints > 0;
         public bool HasPurchasedUpgrades => _progress?.PurchasedUpgradeIds.Count > 0;
-        public long RespecCost => SkillLevelingService.RespecCostGold;
+        // Formatted with the game's own money display (the cost is in bronze, not gold).
+        public string RespecCost => new Myria.Lib.Core.Entities.Characters.Money(SkillLevelingService.RespecCostBronze).ToString();
 
         public ObservableCollection<UpgradeOptionVm> UpgradeOptions { get; } = new();
         public bool HasUpgradeOptions => UpgradeOptions.Count > 0;
@@ -162,7 +163,7 @@ namespace Myria.Wpf.ViewModel.Windows
             }
             else
             {
-                ok = _character.Money.TrySpend(SkillLevelingService.RespecCostGold);
+                ok = _character.Money.TrySpend(SkillLevelingService.RespecCostBronze);
                 if (ok)
                 {
                     SkillLevelingService.Respec(_character, _baseSkill.Id);
