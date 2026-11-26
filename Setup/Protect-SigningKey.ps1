@@ -19,7 +19,7 @@ Usage:  .\Protect-SigningKey.ps1 [-PfxPath <path>]
 param(
     [string]$PfxPath = "D:\Myria Games\Myria.RPG\Myria.Wpf\Setup\certs\MyriaRPGSigning.pfx",
     [string]$CertSubject = "CN=MyriaRPG Alpha, O=Rhyen",
-    # The thumbprint the client pins (Services/AuthenticodeVerifier.cs) - the key must stay the same.
+    # The thumbprint the client pins (Services/UpdateService.cs, TrustedSignerThumbprint) - the key must stay the same.
     [string]$PinnedThumbprint = "602147A12B2E604A306C769A28A041B3322AE89B"
 )
 
