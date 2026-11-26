@@ -1,7 +1,7 @@
 <#
 Builds one alpha release end-to-end:
   publish WPF client (self-contained, single-file) -> sign exe -> build installer -> sign installer
-  publish MyriaServer/MyriaAuthServer for win-x64 + linux-x64 (self-contained) -> zip each
+  publish MyriaClassicRealm/MyriaAuthServer for win-x64 + linux-x64 (self-contained) -> zip each
   -> (optionally) publish the release on the game's own server (-Publish): uploaded over SSH,
      checksums verified there, then made live at https://myria.myria-games.duckdns.org/downloads/
      (website download, client auto-update via latest.json, server auto-update via
@@ -11,7 +11,7 @@ Builds one alpha release end-to-end:
 
 Requires: New-SigningCert.ps1 already run once (cert present in Cert:\CurrentUser\My),
 Inno Setup 6 installed, SSH key login to the release server for -Publish, and the GitHub CLI
-(`gh`, authenticated) for -PublishGitHub. Myria.Server.Realm and Myria.Server.Auth are published
+(`gh`, authenticated) for -PublishGitHub. Myria.Server.ClassicRealm and Myria.Server.Auth are published
 straight out of this same Myria solution. Signing uses the cert directly from the Windows cert
 store by thumbprint - no .pfx password is ever needed or asked for here. The client's
 UpdateService pins this certificate's thumbprint and refuses installers signed by anything else.
@@ -29,7 +29,8 @@ runtime) is written next to the installer and shipped inside the signed SHA256SU
 #>
 
 param(
-    [string]$ServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Realm",
+    # The WPF/Console realm (renamed from Myria.Server.Realm in v0.3; the checkout folder may still carry the old name).
+    [string]$ServerProjectPath = $(if (Test-Path "$PSScriptRoot\..\..\Myria.Server.ClassicRealm") { "$PSScriptRoot\..\..\Myria.Server.ClassicRealm" } else { "$PSScriptRoot\..\..\Myria.Server.Realm" }),
     [string]$AuthServerProjectPath = "$PSScriptRoot\..\..\Myria.Server.Auth",
     [string]$CertSubject = "CN=MyriaRPG Alpha, O=Rhyen",
     [string]$ReleaseHost = "admin@192.168.1.1",                   # SSH target of the release server
@@ -132,7 +133,7 @@ if (-not $IsccPath) {
 Write-Host "Using Inno Setup compiler: $IsccPath"
 
 if (-not $SkipServer -and -not (Test-Path $ServerProjectPath)) {
-    Write-Host "Myria.Server.Realm project not found at $ServerProjectPath - re-run with -ServerProjectPath or -SkipServer." -ForegroundColor Red
+    Write-Host "Myria.Server.ClassicRealm project not found at $ServerProjectPath - re-run with -ServerProjectPath or -SkipServer." -ForegroundColor Red
     exit 1
 }
 
@@ -196,7 +197,7 @@ Write-Host "Building MyriaRPG alpha $Version" -ForegroundColor Cyan
 # 0.2.24 shipped .NET 8.0.30 long after 8.0.31-8.0.33 were out; this stops that from happening silently.
 $ShippedProjects = @($CsprojPath)
 if (-not $SkipServer) {
-    $ShippedProjects += (Join-Path $ServerProjectPath "Myria.Server.Realm.csproj")
+    $ShippedProjects += (Join-Path $ServerProjectPath "Myria.Server.ClassicRealm.csproj")
     $ShippedProjects += (Join-Path $AuthServerProjectPath "Myria.Server.Auth.csproj")
 }
 
@@ -346,31 +347,31 @@ $VersionedInstallerName = "MyriaRPG_Setup_$Version.exe"
 $VersionedInstallerPath = Join-Path $PSScriptRoot $VersionedInstallerName
 Copy-Item $InstallerExe $VersionedInstallerPath -Force
 
-# ── 5b. Publish MyriaServer for win-x64 + linux-x64 and zip each ────────────
+# ── 5b. Publish MyriaClassicRealm for win-x64 + linux-x64 and zip each ────────────
 $WinServerZip = $null
 $LinuxServerZip = $null
 if (-not $SkipServer) {
-    Write-Host "`nPublishing MyriaServer (win-x64)..." -ForegroundColor Cyan
+    Write-Host "`nPublishing MyriaClassicRealm (win-x64)..." -ForegroundColor Cyan
     $WinServerOut   = Join-Path $ServerProjectPath "bin\publish-win-x64"
     $LinuxServerOut = Join-Path $ServerProjectPath "bin\publish-linux-x64"
     Remove-Item $WinServerOut, $LinuxServerOut -Recurse -Force -ErrorAction SilentlyContinue
 
     Push-Location $ServerProjectPath
     try {
-        dotnet publish Myria.Server.Realm.csproj -c Release -r win-x64 --self-contained true -o $WinServerOut
+        dotnet publish Myria.Server.ClassicRealm.csproj -c Release -r win-x64 --self-contained true -o $WinServerOut
         if ($LASTEXITCODE -ne 0) { throw "dotnet publish (win-x64 server) failed" }
 
-        Write-Host "`nPublishing MyriaServer (linux-x64)..." -ForegroundColor Cyan
-        dotnet publish Myria.Server.Realm.csproj -c Release -r linux-x64 --self-contained true -o $LinuxServerOut
+        Write-Host "`nPublishing MyriaClassicRealm (linux-x64)..." -ForegroundColor Cyan
+        dotnet publish Myria.Server.ClassicRealm.csproj -c Release -r linux-x64 --self-contained true -o $LinuxServerOut
         if ($LASTEXITCODE -ne 0) { throw "dotnet publish (linux-x64 server) failed" }
     } finally {
         Pop-Location
     }
 
     # MyriaAuthServer is published into an "auth" subfolder of each server output so its
-    # files (notably appsettings.json) don't collide with MyriaServer's own — linux-x64's
+    # files (notably appsettings.json) don't collide with MyriaClassicRealm's own — linux-x64's
     # run-production.sh starts both together from this exact layout (./auth/MyriaAuthServer
-    # alongside ./MyriaServer).
+    # alongside ./MyriaClassicRealm).
     Write-Host "`nPublishing MyriaAuthServer (win-x64)..." -ForegroundColor Cyan
     Push-Location $AuthServerProjectPath
     try {
@@ -391,8 +392,8 @@ if (-not $SkipServer) {
         [System.IO.File]::WriteAllBytes((Join-Path $out "release-signers"), $signersBytes)
     }
 
-    $WinServerZip   = Join-Path $PSScriptRoot "MyriaServer_win-x64_$Version.zip"
-    $LinuxServerZip = Join-Path $PSScriptRoot "MyriaServer_linux-x64_$Version.zip"
+    $WinServerZip   = Join-Path $PSScriptRoot "MyriaClassicRealm_win-x64_$Version.zip"
+    $LinuxServerZip = Join-Path $PSScriptRoot "MyriaClassicRealm_linux-x64_$Version.zip"
     if (Test-Path $WinServerZip)   { Remove-Item $WinServerZip -Force }
     if (Test-Path $LinuxServerZip) { Remove-Item $LinuxServerZip -Force }
 

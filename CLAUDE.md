@@ -25,7 +25,7 @@ dotnet test ../Myria.slnx
 dotnet test Myria.Wpf.Tests
 ```
 
-Five xUnit projects: `Myria.Lib.Tests`, `Myria.Server.Auth.Tests`, `Myria.Server.Realm.Tests`,
+Five xUnit projects: `Myria.Lib.Tests`, `Myria.Server.Auth.Tests`, `Myria.Server.ClassicRealm.Tests`,
 `Myria.Console.Tests`, `Myria.Wpf.Tests`. See [TESTING.md](../TESTING.md) at the repo root for
 what each covers, what is deliberately not covered, and the conventions to follow when adding
 tests. No linting configuration exists in this repo.
