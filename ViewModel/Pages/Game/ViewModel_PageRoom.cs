@@ -515,9 +515,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             {
                 string key = result?.Reason switch
                 {
-                    "depleted" => "log.gather.depleted",
-                    "no_tool"  => "log.gather.no_tool_generic",
-                    _          => "log.gather.fail"
+                    "depleted"      => "log.gather.depleted",
+                    "no_tool"       => "log.gather.no_tool_generic",
+                    "skill_too_low" => "log.gather.skill_too_low",
+                    _               => "log.gather.fail"
                 };
                 WriteLog(Localization.T(key));
                 if (result?.Reason == "depleted")
@@ -555,6 +556,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 {
                     GatherResult.Depleted => "log.gather.depleted",
                     GatherResult.NoTool   => "log.gather.no_tool_generic",
+                    GatherResult.SkillTooLow => "log.gather.skill_too_low",
                     _                     => "log.gather.fail"
                 };
                 WriteLog(Localization.T(key));
