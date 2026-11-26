@@ -18,6 +18,9 @@ function Get-RepoReleaseState {
         [string]$Branch = "main",
         [switch]$NoFetch
     )
+    # Windows PowerShell 5.1 turns any git output on stderr into a terminating error under 'Stop' (the
+    # caller's setting); exit codes are what this function decides on.
+    $ErrorActionPreference = 'Continue'
     $state = [pscustomobject]@{
         Name = Split-Path (Resolve-Path $Path) -Leaf; Path = (Resolve-Path $Path).Path
         Commit = ""; Branch = ""; Problems = [System.Collections.Generic.List[string]]::new()

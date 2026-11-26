@@ -11,13 +11,13 @@ function Check([string]$name, [bool]$ok) {
     if ($ok) { Write-Host "  ok    $name" -ForegroundColor Green }
     else     { Write-Host "  FAIL  $name" -ForegroundColor Red; $script:failures++ }
 }
-function G { param([string]$repo) & git -C $repo @args 2>&1 | Out-Null; if ($LASTEXITCODE -ne 0) { throw "git $args failed" } }
+function G { param([string]$repo) $ErrorActionPreference = "Continue"; & git -C $repo @args 2>&1 | Out-Null; if ($LASTEXITCODE -ne 0) { throw "git $args failed" } }
 
 try {
     New-Item -ItemType Directory -Path $root | Out-Null
     $origin = Join-Path $root "origin.git"; $work = Join-Path $root "work"
     & git init -q --bare -b main $origin
-    & git clone -q $origin $work 2>&1 | Out-Null
+    & { $ErrorActionPreference = "Continue"; & git clone -q $origin $work 2>&1 | Out-Null }
     G $work config user.email "test@example.invalid"; G $work config user.name "test"; G $work config commit.gpgsign false
     Set-Content (Join-Path $work "a.cs") "class A {}"
     G $work add -A; G $work commit -q -m one; G $work push -q origin main
