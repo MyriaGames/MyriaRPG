@@ -445,7 +445,11 @@ namespace Myria.Wpf.Services
                     LastClassPenaltyApplied = dto.LastClassPenaltyApplied,
                     LastClassChanged        = dto.LastClassChanged,
                     ActiveJobId             = dto.ActiveJobId,
-                    LastJobChanged          = dto.LastJobChanged
+                    LastJobChanged          = dto.LastJobChanged,
+                    PvpRating               = dto.PvpRating,
+                    PvpCurrency             = dto.PvpCurrency,
+                    PvpWins                 = dto.PvpWins,
+                    PvpLosses               = dto.PvpLosses
                 };
 
                 character.CurrentRoom = RoomService.AllRooms.FirstOrDefault(r => r.Id == dto.CurrentRoomId);
@@ -877,6 +881,12 @@ namespace Myria.Wpf.Services
             public DateTime LastClassChanged        { get; set; }
             public string?  ActiveJobId             { get; set; }
             public DateTime LastJobChanged          { get; set; }
+            // PvP standing: read on load only. This DTO is also sent on save, where the server ignores
+            // these (its SaveCharacterRequest has no PvP fields - PvP stats are server-authoritative).
+            public int      PvpRating               { get; set; } = Myria.Lib.Core.Services.PvpRatingService.StartingRating;
+            public long     PvpCurrency             { get; set; }
+            public int      PvpWins                 { get; set; }
+            public int      PvpLosses               { get; set; }
 
             public List<InventoryItemDto>   InventoryItems      { get; set; } = new();
             public List<string>             SkillIds            { get; set; } = new();

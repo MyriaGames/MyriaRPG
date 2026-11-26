@@ -89,6 +89,64 @@
         <!-- Room image -->
         <Image Source="{Binding ImageSource}" Stretch="Fill"/>
 
+        <!-- ── PvP arena: challenge list (only in IsPvpRoom rooms, online) ── -->
+        <Border Grid.Row="0"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="16" Width="340" MaxHeight="380"
+                Background="{DynamicResource Brush.MainPanelGradient}"
+                BorderBrush="{DynamicResource Brush.Gold}" BorderThickness="1" CornerRadius="2"
+                Padding="12,10"
+                Effect="{StaticResource Effect.PanelShadow}"
+                Visibility="{Binding IsPvpRoom, Converter={StaticResource BoolToVis}}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="{Binding TblPvpTitle}"
+                           FontFamily="{StaticResource Font.Body}" FontSize="15" FontWeight="Bold"
+                           Foreground="{DynamicResource Brush.GoldSoft}"/>
+                <TextBlock DockPanel.Dock="Top" Text="{Binding PvpStatsText}"
+                           FontFamily="{StaticResource Font.Body}" FontSize="11"
+                           Foreground="{DynamicResource Brush.Foreground}" Opacity="0.8"
+                           Margin="0,2,0,8" TextWrapping="Wrap"/>
+                <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+                    <Button DockPanel.Dock="Right" Content="{Binding TblPvpRefresh}"
+                            Command="{Binding RefreshPvpTargetsCommand}"
+                            Style="{StaticResource RoomActionButton}" Padding="8,2" FontSize="11"/>
+                    <TextBlock Text="{Binding TblPvpChallenge}"
+                               FontFamily="{StaticResource Font.Body}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Brush.GoldSoft}" VerticalAlignment="Center"/>
+                </DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="{Binding TblPvpNone}"
+                           FontFamily="{StaticResource Font.Body}" FontSize="12" FontStyle="Italic"
+                           Foreground="{DynamicResource Brush.Foreground}" Opacity="0.6"
+                           Visibility="{Binding HasNoPvpTargets, Converter={StaticResource BoolToVis}}"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding PvpTargets}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,6" Padding="8,6"
+                                        Background="{DynamicResource Brush.PanelDark}"
+                                        BorderBrush="#AA9B6A2E" BorderThickness="1" CornerRadius="2">
+                                    <DockPanel>
+                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                            <Button Content="{Binding BtnDuel}" Command="{Binding DuelCommand}"
+                                                    Style="{StaticResource RoomActionButton}" Padding="8,2" FontSize="11"
+                                                    Margin="6,0,0,0"/>
+                                            <Button Content="{Binding BtnPartyFight}" Command="{Binding PartyFightCommand}"
+                                                    Style="{StaticResource RoomActionButton}" Padding="8,2" FontSize="11"
+                                                    Margin="6,0,0,0"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Line}" TextTrimming="CharacterEllipsis"
+                                                   FontFamily="{StaticResource Font.Body}" FontSize="12"
+                                                   Foreground="{DynamicResource Brush.Foreground}"
+                                                   VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
         <!-- ── Bottom info panel ── -->
         <Border Grid.Row="1"
                 Background="{DynamicResource Brush.MainPanelGradient}"

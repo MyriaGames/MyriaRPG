@@ -40,6 +40,11 @@ namespace Myria.Wpf.Services
         public static event Action<GroupCombatSnapshot>?    GroupCombatFinished;
         public static event Action<int, string>?            CharacterRespawned;   // roomId, roomName
 
+        // PvP events (v0.3) - every participant gets these; each client works out its own side by name.
+        public static event Action<PvpSnapshot>? PvpStarted;
+        public static event Action<PvpSnapshot>? PvpUpdated;
+        public static event Action<PvpSnapshot>? PvpFinished;
+
         // Shop events
         public static event Action<List<string>>?          RoomShopsReceived;    // owner names, sent on room join
         public static event Action<string>?                ShopOpened;           // ownerName
@@ -158,6 +163,10 @@ namespace Myria.Wpf.Services
 
             _connection.On<GroupCombatSnapshot>("GroupCombatFinished", snap =>
                 Dispatch(() => GroupCombatFinished?.Invoke(snap)));
+
+            _connection.On<PvpSnapshot>("PvpStarted",  snap => Dispatch(() => PvpStarted?.Invoke(snap)));
+            _connection.On<PvpSnapshot>("PvpUpdated",  snap => Dispatch(() => PvpUpdated?.Invoke(snap)));
+            _connection.On<PvpSnapshot>("PvpFinished", snap => Dispatch(() => PvpFinished?.Invoke(snap)));
 
             _connection.On<int, string>("CharacterRespawned", (roomId, roomName) =>
                 Dispatch(() => CharacterRespawned?.Invoke(roomId, roomName)));
@@ -375,6 +384,57 @@ namespace Myria.Wpf.Services
             if (_connection?.State == HubConnectionState.Connected)
                 try { return await _connection.InvokeAsync<GroupCombatSnapshot>("GroupCharacterUseItem", itemId); } catch { }
             return null;
+        }
+
+        // ── PvP (v0.3) ───────────────────────────────────────────────────────
+
+        public static async Task<List<PvpTargetInfo>> GetPvpTargetsAsync()
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<List<PvpTargetInfo>>("GetPvpTargets"); } catch { }
+            return new();
+        }
+
+        public static async Task<StartPvpResult?> StartPvpFightAsync(string targetName, bool partyFight)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<StartPvpResult>("StartPvpFight", targetName, partyFight); } catch { }
+            return null;
+        }
+
+        public static async Task<PvpSnapshot?> PvpAttackAsync(int opponentIndex)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<PvpSnapshot?>("PvpAttack", opponentIndex); } catch { }
+            return null;
+        }
+
+        public static async Task<PvpSnapshot?> PvpCastSkillAsync(string skillId, int targetIndex)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<PvpSnapshot?>("PvpCastSkill", skillId, targetIndex); } catch { }
+            return null;
+        }
+
+        public static async Task<PvpSnapshot?> PvpUseItemAsync(string itemId)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<PvpSnapshot?>("PvpUseItem", itemId); } catch { }
+            return null;
+        }
+
+        public static async Task PvpFleeAsync()
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { await _connection.InvokeAsync("PvpFlee"); } catch { }
+        }
+
+        /// <summary>Asks the server to skip the current turn if it has stalled past the timeout
+        /// (the server decides; harmless to call early).</summary>
+        public static async Task PvpSkipStalledTurnAsync()
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { await _connection.InvokeAsync<bool>("PvpSkipStalledTurn"); } catch { }
         }
 
         /// <summary>On-demand resync for a group fight - null means the server doesn't think the

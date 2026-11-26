@@ -14,9 +14,11 @@ namespace Myria.Wpf.View.Pages.Game
         public Page_Fight()
         {
             InitializeComponent();
-            _vm = GameHubService.IsConnected
-                ? (ViewModel_PageFight)new ViewModel_PageFightMultiplayer()
-                : new ViewModel_PageFight();
+            _vm = ViewModel_PageFightPvp.Pending != null
+                ? new ViewModel_PageFightPvp()
+                : GameHubService.IsConnected
+                    ? new ViewModel_PageFightMultiplayer()
+                    : new ViewModel_PageFight();
             DataContext = _vm;
             Current = this;
 

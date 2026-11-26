@@ -28,6 +28,40 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             _ = StartFightServerAsync(soloOnly: false);
         }
 
+        // ── PvP arena (v0.3) ─────────────────────────────────────────────────
+
+        private static readonly HashSet<string> KnownPvpReasons = new()
+        {
+            "not_pvp_room", "target_not_here", "target_busy", "same_party", "already_in_combat", "player_dead",
+        };
+
+        protected override void OnRoomFlagsRefreshed()
+        {
+            IsPvpRoom = currentRoom.IsPvpRoom && GameHubService.IsConnected;
+            if (IsPvpRoom) _ = RefreshPvpAsync();
+            else { PvpTargets.Clear(); OnPropertyChanged(nameof(HasNoPvpTargets)); }
+        }
+
+        protected override async Task RefreshPvpAsync()
+        {
+            PvpStatsText = Localization.T("pvp.stats", character.PvpRating, character.PvpCurrency, character.PvpWins, character.PvpLosses);
+            var targets = await GameHubService.GetPvpTargetsAsync();
+            PvpTargets.Clear();
+            foreach (var t in targets)
+                PvpTargets.Add(new Model.PvpTargetVm(t, (name, party) => _ = ChallengeAsync(name, party)));
+            OnPropertyChanged(nameof(HasNoPvpTargets));
+        }
+
+        private async Task ChallengeAsync(string targetName, bool partyFight)
+        {
+            var result = await GameHubService.StartPvpFightAsync(targetName, partyFight);
+            if (result?.Success == true) return; // PvpStarted pulls every participant into the fight page
+
+            string reason = result?.Reason is { } r && KnownPvpReasons.Contains(r) ? r : "failed";
+            ViewModel_PageRoom.WriteLog(Localization.T("pvp.reason." + reason));
+            await RefreshPvpAsync();
+        }
+
         private async Task StartFightServerAsync(bool soloOnly)
         {
             var result = await GameHubService.StartGroupCombatAsync(character.CurrentRoom.Id, soloOnly);

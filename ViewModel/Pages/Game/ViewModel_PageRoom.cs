@@ -227,6 +227,24 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         public ICommand OpenNpcsCommand { get; }
         public ICommand TalkCommand { get; }
         public ICommand StartGatheringCommand { get; }
+
+        // ── PvP arena panel (v0.3) - multiplayer only, filled by ViewModel_PageRoomMultiplayer ──
+        public ObservableCollection<PvpTargetVm> PvpTargets { get; } = new();
+        private bool _isPvpRoom;
+        public bool IsPvpRoom { get => _isPvpRoom; protected set { _isPvpRoom = value; OnPropertyChanged(); } }
+        public bool HasNoPvpTargets => PvpTargets.Count == 0;
+        private string _pvpStatsText = "";
+        public string PvpStatsText { get => _pvpStatsText; protected set { _pvpStatsText = value; OnPropertyChanged(); } }
+        public string TblPvpTitle     => Localization.T("pvp.title");
+        public string TblPvpChallenge => Localization.T("pvp.challenge_header");
+        public string TblPvpNone      => Localization.T("pvp.none");
+        public string TblPvpRefresh   => Localization.T("pvp.refresh");
+        public ICommand RefreshPvpTargetsCommand { get; }
+
+        /// <summary>Called at the end of every RefreshRoomFlags (room entered/reloaded). Offline
+        /// there's no PvP, so the base just keeps the arena panel hidden.</summary>
+        protected virtual void OnRoomFlagsRefreshed() => IsPvpRoom = false;
+        protected virtual Task RefreshPvpAsync() => Task.CompletedTask;
         public ICommand EnterGuildCommand { get; }
 
         public ViewModel_PageRoom()
@@ -253,6 +271,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             StartGroupFightLocalCommand = new RelayCommand(StartGroupFightLocal);
             TalkCommand = new RelayCommand(TalkNpc);
             StartGatheringCommand = new RelayCommand(StartGathering);
+            RefreshPvpTargetsCommand = new RelayCommand(() => _ = RefreshPvpAsync());
             EnterGuildCommand = new RelayCommand(EnterGuild);
 
             currentRoom = RoomService.GetRoomById(character.CurrentRoom.Id);
@@ -546,6 +565,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             }
             HasNpcs = currentRoom.Npcs != null && currentRoom.Npcs.Count > 0;
             RefreshGuildEntry();
+            OnRoomFlagsRefreshed();
         }
 
         private void RefreshGuildEntry()

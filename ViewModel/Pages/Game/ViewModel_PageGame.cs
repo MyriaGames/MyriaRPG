@@ -584,6 +584,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 GameHubService.ShopOpened              += OnShopOpened;
                 GameHubService.ShopClosed              += OnShopClosed;
                 GameHubService.GroupCombatStarted      += OnGroupCombatStarted;
+                GameHubService.PvpStarted              += OnPvpStarted;
 
                 RefreshFriendNames();
 
@@ -633,6 +634,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             GameHubService.ShopOpened              -= OnShopOpened;
             GameHubService.ShopClosed              -= OnShopClosed;
             GameHubService.GroupCombatStarted      -= OnGroupCombatStarted;
+            GameHubService.PvpStarted              -= OnPvpStarted;
         }
 
         private async Task ConnectThenNavigateToRoomAsync()
@@ -830,6 +832,15 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         private void OnGroupCombatStarted(Myria.Lib.Core.Models.Dto.StartGroupCombatResult result)
         {
             ViewModel_PageFight.PendingGroupCombat = result;
+            Navigation.Current.Navigate(NavigationFrameType.Game, new Page_Fight());
+            Navigation.Current.SetFightState(true);
+        }
+
+        // Every PvP participant gets PvpStarted (the challenger and everyone challenged) - there's no
+        // accept step, so this is what pulls each of them into the fight page.
+        private void OnPvpStarted(Myria.Lib.Core.Models.Dto.PvpSnapshot snap)
+        {
+            ViewModel_PageFightPvp.Pending = snap;
             Navigation.Current.Navigate(NavigationFrameType.Game, new Page_Fight());
             Navigation.Current.SetFightState(true);
         }
