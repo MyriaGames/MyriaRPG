@@ -310,6 +310,31 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
         public Brush ClassColor { get => _classColor; private set => SetProperty(ref _classColor, value); }
         public bool HasClassInfo { get => _hasClassInfo; private set => SetProperty(ref _hasClassInfo, value); }
 
+        /// <summary>A set piece's set: name, how many pieces are worn, and each tier's skill bonuses
+        /// (reached tiers highlighted).</summary>
+        private void AddSetLines(Item item, Myria.Lib.Core.Entities.Characters.Character? character)
+        {
+            if (item is not EquipmentItem || Myria.Lib.Core.Services.Regestries.ItemSetRegistry.SetOf(item.Id) is not { } set) return;
+            int worn = character is null ? 0 : Myria.Lib.Core.Services.Regestries.ItemSetRegistry.EquippedPieces(character, set);
+            ItemStats.Add(new StatLineViewModel(Localization.T("pg.inventory.set.header", Localization.T(set.Name), worn, set.Items.Count > 3 ? 3 : set.Items.Count), s_classMuted));
+            foreach (var tier in set.Tiers.OrderBy(t => t.Pieces))
+            {
+                // Only the bonuses for skills this character has (a set covers every class).
+                var bonuses = tier.Bonuses.Where(b => character is null || character.Skills.Any(s => s.Id == b.SkillId)).ToList();
+                if (bonuses.Count == 0) continue;
+                var brush = worn >= tier.Pieces ? s_classCompatible : s_classMuted;
+                foreach (var b in bonuses)
+                {
+                    string skill = Myria.Lib.Core.Services.Builder.SkillFactory.GetSkill(b.SkillId)?.Name ?? b.SkillId;
+                    var parts = new List<string>();
+                    if (b.Power != 0) parts.Add(Localization.T("pg.inventory.set.power", Math.Round(b.Power * 100)));
+                    if (b.ManaCost != 0) parts.Add(Localization.T("pg.inventory.set.mana", Math.Round(-b.ManaCost * 100)));
+                    if (b.Cooldown != 0) parts.Add(Localization.T("pg.inventory.set.cooldown", -b.Cooldown));
+                    ItemStats.Add(new StatLineViewModel(Localization.T("pg.inventory.set.tier", tier.Pieces, skill, string.Join(", ", parts)), brush));
+                }
+            }
+        }
+
         public void SetItem(Item item, Myria.Lib.Core.Entities.Characters.Character? character = null)
         {
             _itemNameKey = item.Name;
@@ -321,6 +346,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
             ItemRarity = $"{Localization.T("pg.inventory.tooltip.rarity")}: {item.Rarity}";
             RarityColor = GetRarityBrush(item.Rarity);
             PopulateStatLines(item, character);
+            AddSetLines(item, character);
 
             if (item is EquipmentItem equip && equip.AllowedClasses.Count > 0)
             {
@@ -338,6 +364,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
 
         /// <summary>One (stat, hovered-value, isPercent) descriptor per equipment bonus, in the same
         /// order the tooltip has always shown them.</summary>
+        // (see AddSetLines below for gear-set bonuses)
         private static readonly (string LabelKey, Func<EquipmentItem, float> Value, bool IsPercent)[] s_equipStats =
         {
             ("atk",      i => i.BonusATK,      false),
