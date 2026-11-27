@@ -542,9 +542,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             if (result.ItemId != null && ItemFactory.GetItemName(result.ItemId) is { } itemName)
                 WriteLog(Localization.T("log.gather.success", result.Amount, Localization.T(itemName)));
 
-            if (!string.IsNullOrEmpty(result.JobId))
-                JobManager.GrantSkillXp(character, result.JobId, result.SkillXpGained);
-
+            // (Job XP came with the same push - granting it here too showed it doubled.)
             currentRoom.GathersRemaining = result.RemainingGathers;
             RefreshRoomFlags();
         }
