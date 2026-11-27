@@ -1179,7 +1179,21 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             character.LeveledUp += OnXpUpdateEvent;
             character.HealthChanged += (s, e) => { Refresh(); };
             character.ManaChanged += (s, e) => { Refresh(); };
+            GameHubService.CharacterUpdated += _ => Refresh();
+            // Lasting buffs run out on the real clock: re-check max HP/MP and the buff list each minute.
+            _buffTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
+            _buffTimer.Tick += (s, e) => { UserAccountService.CurrentCharacter.PruneLastingBuffs(); Refresh(); };
+            _buffTimer.Start();
         }
+
+        private readonly System.Windows.Threading.DispatcherTimer _buffTimer;
+
+        /// <summary>Active lasting buffs (v0.3) for the HP/MP tooltip; empty without any.</summary>
+        public string LastingBuffsText => string.Join("\n", UserAccountService.CurrentCharacter.LastingBuffs
+            .Where(b => b.IsActive)
+            .Select(b => Myria.Lib.Core.Systems.Localization.T("buff.lasting.remaining", b.Name, (b.HpPercent * 100).ToString("0.#"),
+                (b.MpPercent * 100).ToString("0.#"), Math.Max(1, (int)Math.Ceiling(b.Remaining.TotalMinutes)))));
+        public bool HasLastingBuffs => UserAccountService.CurrentCharacter.LastingBuffs.Any(b => b.IsActive);
         private void OnXpUpdateEvent(object? sender, EventArgs e)
         {
             Refresh();
@@ -1194,6 +1208,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             instance.XpToNext++;
             instance.XpPercent++;
             instance.Level++;
+            instance.OnPropertyChanged(nameof(LastingBuffsText));
+            instance.OnPropertyChanged(nameof(HasLastingBuffs));
         }
         public void Set(string name, int level, long currentXp, long xpToNext, int hp, int maxHp, int mana, int maxMana)
         {

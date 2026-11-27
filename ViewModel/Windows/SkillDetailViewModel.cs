@@ -37,6 +37,13 @@ namespace Myria.Wpf.ViewModel.Windows
 
             SpendPointCommand = new RelayCommand<UpgradeOptionVm?>(SpendPoint);
             RespecCommand = new RelayCommand(Respec);
+            CastCommand = new RelayCommand(Cast);
+
+            // Out-of-combat targets: yourself first, then everyone in the room (party or not).
+            CastTargets.Add(_character.Name);
+            foreach (var name in GameHubService.RoomCharacterNames.OrderBy(n => n, StringComparer.OrdinalIgnoreCase))
+                if (!string.Equals(name, _character.Name, StringComparison.OrdinalIgnoreCase)) CastTargets.Add(name);
+            _selectedCastTarget = _character.Name;
 
             Refresh();
         }
@@ -98,6 +105,50 @@ namespace Myria.Wpf.ViewModel.Windows
         public ICommand SpendPointCommand { get; }
         public ICommand RespecCommand { get; }
 
+        // ── Out-of-combat cast (v0.3 lasting buffs, e.g. the Druid's Verdant Vigor) ──
+        public bool CanCastOutOfCombat => _baseSkill?.LastingBuff != null;
+        public string LastingBuffText
+        {
+            get
+            {
+                var s = _baseSkill == null ? null : SkillLevelingService.ResolveEffectiveSkill(_character, _baseSkill);
+                if (s?.LastingBuff is not { } b) return "";
+                return $"+{b.HpPercent * s.ScalingFactor * 100:0.#}% max HP, +{b.MpPercent * s.ScalingFactor * 100:0.#}% max MP for {b.DurationMinutes} minutes";
+            }
+        }
+        public ObservableCollection<string> CastTargets { get; } = new();
+        private string? _selectedCastTarget;
+        public string? SelectedCastTarget { get => _selectedCastTarget; set { _selectedCastTarget = value; OnPropertyChanged(); } }
+        private string _castStatus = "";
+        public string CastStatus { get => _castStatus; set { _castStatus = value; OnPropertyChanged(); } }
+        public ICommand CastCommand { get; }
+
+        private async void Cast()
+        {
+            if (_baseSkill?.LastingBuff == null) return;
+            var skill = SkillLevelingService.ResolveEffectiveSkill(_character, _baseSkill);
+            string target = SelectedCastTarget ?? _character.Name;
+
+            if (!GameHubService.IsConnected)
+            {
+                // Offline play: only yourself is around.
+                var buff = LastingBuffService.TryCast(_character, skill, _character, out var error);
+                if (buff != null) CharacterService.SaveCharacter(UserAccountService.CurrentUser, _character);
+                CastStatus = buff != null
+                    ? Localization.T("skill.cast.done", _character.Name, _character.Name, skill.Name, skill.LastingBuff!.DurationMinutes)
+                    : Localization.T(error ?? "skill.cast.notOutOfCombat");
+                Refresh();
+                return;
+            }
+
+            var result = await GameHubService.CastSkillOutOfCombatAsync(_baseSkill.Id,
+                string.Equals(target, _character.Name, StringComparison.OrdinalIgnoreCase) ? null : target);
+            CastStatus = result.Success
+                ? Localization.T("skill.cast.done", _character.Name, target, skill.Name, skill.LastingBuff!.DurationMinutes)
+                : Localization.T(result.Reason ?? "skill.cast.notOutOfCombat");
+            Refresh();
+        }
+
         private void Refresh()
         {
             _effectiveSkill = _baseSkill != null
@@ -109,6 +160,7 @@ namespace Myria.Wpf.ViewModel.Windows
             OnPropertyChanged(nameof(TimingText));
             OnPropertyChanged(nameof(ScalingText));
             OnPropertyChanged(nameof(HasEffects));
+            OnPropertyChanged(nameof(LastingBuffText));
 
             UpgradeOptions.Clear();
             if (_baseSkill == null) return;

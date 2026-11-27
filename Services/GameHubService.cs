@@ -118,13 +118,13 @@ namespace Myria.Wpf.Services
                 Dispatch(() => TradeCancelled?.Invoke(reason)));
 
             _connection.On<string>("CharacterEntered", name =>
-                Dispatch(() => CharacterEntered?.Invoke(name)));
+                Dispatch(() => { _roomCharacters.Add(name); CharacterEntered?.Invoke(name); }));
 
             _connection.On<string>("CharacterLeft", name =>
-                Dispatch(() => CharacterLeft?.Invoke(name)));
+                Dispatch(() => { _roomCharacters.Remove(name); CharacterLeft?.Invoke(name); }));
 
             _connection.On<List<string>>("RoomCharacters", players =>
-                Dispatch(() => RoomCharactersReceived?.Invoke(players)));
+                Dispatch(() => { _roomCharacters = new HashSet<string>(players, StringComparer.OrdinalIgnoreCase); RoomCharactersReceived?.Invoke(players); }));
 
             _connection.On<string>("CharacterGathering", name =>
                 Dispatch(() => CharacterGathering?.Invoke(name)));
@@ -147,10 +147,10 @@ namespace Myria.Wpf.Services
             _connection.On<string>("PartyLootMaster", lootMaster =>
                 Dispatch(() => PartyLootMasterChanged?.Invoke(lootMaster)));
             _connection.On<List<string>, string?>("PartyUpdated", (members, leader) =>
-                Dispatch(() => PartyUpdated?.Invoke(members, leader)));
+                Dispatch(() => { PartyMemberNames = members; PartyUpdated?.Invoke(members, leader); }));
 
             _connection.On("PartyDisbanded", () =>
-                Dispatch(() => PartyDisbanded?.Invoke()));
+                Dispatch(() => { PartyMemberNames = new List<string>(); PartyDisbanded?.Invoke(); }));
 
             _connection.On("KickedFromParty", () =>
                 Dispatch(() => KickedFromParty?.Invoke()));
@@ -716,6 +716,23 @@ namespace Myria.Wpf.Services
             if (_connection?.State == HubConnectionState.Connected)
                 try { return await _connection.InvokeAsync<bool>("SpendSkillPoint", skillId, upgradeId); } catch { }
             return false;
+        }
+
+        private static HashSet<string> _roomCharacters = new(StringComparer.OrdinalIgnoreCase);
+        /// <summary>Other characters in your current room (RoomCharacters/CharacterEntered/CharacterLeft pushes).</summary>
+        public static IReadOnlyCollection<string> RoomCharacterNames => _roomCharacters;
+
+        /// <summary>The party's members (character names, yourself included) from the last PartyUpdated
+        /// push; empty when not in a party.</summary>
+        public static IReadOnlyList<string> PartyMemberNames { get; private set; } = new List<string>();
+
+        /// <summary>Casts a lasting-buff skill (the Druid's Verdant Vigor) outside a fight on yourself
+        /// (target null) or anyone in the same room. The result comes with a CharacterUpdated push.</summary>
+        public static async Task<CastSkillResult> CastSkillOutOfCombatAsync(string skillId, string? targetName)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<CastSkillResult>("CastSkillOutOfCombat", skillId, targetName); } catch { }
+            return new CastSkillResult(false, "Not connected", 0, null);
         }
 
         public static async Task<bool> RespecSkillAsync(string skillId)

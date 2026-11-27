@@ -81,6 +81,30 @@
                        Foreground="{DynamicResource Brush.Foreground}"
                        LineHeight="22"/>
 
+            <!-- v0.3 lasting buff (Verdant Vigor): castable outside fights on yourself or a party member here. -->
+            <StackPanel Visibility="{Binding CanCastOutOfCombat, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="Lasting buff"
+                           FontWeight="SemiBold"
+                           FontFamily="{StaticResource Font.Body}"
+                           FontSize="13"
+                           Foreground="{DynamicResource Brush.SecondaryText}"
+                           Margin="0,16,0,6"/>
+                <TextBlock Text="{Binding LastingBuffText}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Brush.Foreground}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <ComboBox ItemsSource="{Binding CastTargets}"
+                              SelectedItem="{Binding SelectedCastTarget}"
+                              MinWidth="140" VerticalAlignment="Center"/>
+                    <Button Content="Cast"
+                            Style="{StaticResource SkillUpgradeButton}"
+                            Command="{Binding CastCommand}"
+                            Margin="8,0,0,0"/>
+                </StackPanel>
+                <TextBlock Text="{Binding CastStatus}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Brush.SecondaryText}"
+                           Margin="0,6,0,0"/>
+            </StackPanel>
+
             <!-- What the skill actually does in combat (poison, stun, lifesteal, etc.) - separate
                  from Description, which is just flavor text. Omitted entirely for skills with no
                  data-driven Effects (most damage/heal-only skills). -->

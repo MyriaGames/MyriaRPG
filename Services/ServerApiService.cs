@@ -450,7 +450,8 @@ namespace Myria.Wpf.Services
                     PvpCurrency             = dto.PvpCurrency,
                     PvpWins                 = dto.PvpWins,
                     PvpLosses               = dto.PvpLosses,
-                    AdventurersGuildMember  = dto.AdventurersGuildMember
+                    AdventurersGuildMember  = dto.AdventurersGuildMember,
+                    LastingBuffs            = Myria.Lib.Core.Services.LastingBuffService.FromSnapshots(dto.LastingBuffs)
                 };
 
                 character.CurrentRoom = RoomService.AllRooms.FirstOrDefault(r => r.Id == dto.CurrentRoomId);
@@ -902,6 +903,8 @@ namespace Myria.Wpf.Services
             public int      PvpLosses               { get; set; }
             // v0.3 quest rework (read on load; the server ignores these on save)
             public bool     AdventurersGuildMember  { get; set; }
+            // v0.3 lasting buffs (read on load; server-authoritative, the server ignores them on save)
+            public List<Myria.Lib.Core.Models.Dto.LastingBuffSnapshot> LastingBuffs { get; set; } = new();
             public List<Myria.Lib.Core.Models.Dto.DynamicQuestDto> DynamicQuests { get; set; } = new();
 
             public List<InventoryItemDto>   InventoryItems      { get; set; } = new();
