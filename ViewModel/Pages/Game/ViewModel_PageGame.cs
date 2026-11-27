@@ -149,6 +149,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         public string TblPartyClearLootMaster { get => _tblPartyClearLootMaster; set { _tblPartyClearLootMaster = value; OnPropertyChanged(); } }
         [LocalizedKey("pg.game.party.lootmaster.tooltip")]
         public string TblPartyLootMasterTip { get => _tblPartyLootMasterTip; set { _tblPartyLootMasterTip = value; OnPropertyChanged(); } }
+        private string _tblAllyTargetTip = string.Empty;
+        [LocalizedKey("pg.game.fight.allyTarget.tooltip")]
+        public string TblAllyTargetTip { get => _tblAllyTargetTip; set { _tblAllyTargetTip = value; OnPropertyChanged(); } }
 
         [LocalizedKey("pg.game.party.kick")]
         public string TblPartyKickLabel
@@ -463,6 +466,29 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         public ICommand KickFromPartyCommand       { get; }
         public ICommand TransferPartyLeaderCommand { get; }
         public ICommand MakeLootMasterCommand      { get; }
+        /// <summary>In a fight: picks the ally for single-target ally skills (null = yourself).</summary>
+        public ICommand SelectAllyCommand          { get; }
+
+        private bool _isSelfAllyTarget;
+        /// <summary>In a fight: single-target ally skills land on yourself (the default).</summary>
+        public bool IsSelfAllyTarget
+        {
+            get => _isSelfAllyTarget;
+            private set { _isSelfAllyTarget = value; OnPropertyChanged(); }
+        }
+
+        private void SyncAllyTarget()
+        {
+            var fight = CurrentFight;
+            string? picked = fight?.SelectedAllyName;
+            bool any = false;
+            foreach (var m in PartyMembers)
+            {
+                m.IsAllyTarget = fight != null && picked != null && string.Equals(m.Username, picked, StringComparison.OrdinalIgnoreCase);
+                any |= m.IsAllyTarget;
+            }
+            IsSelfAllyTarget = fight != null && !any;
+        }
         public ICommand ClearLootMasterCommand     { get; }
         public ICommand WhisperMemberCommand       { get; }
         public ICommand SendFriendRequestCommand    { get; }
@@ -496,6 +522,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         {
             if (e.PropertyName == nameof(ViewModel_PageFight.CurrentTurnCharacterName))
                 SyncPartyTurnIndicators();
+            else if (e.PropertyName == nameof(ViewModel_PageFight.SelectedAllyName))
+                SyncAllyTarget();
         }
 
         private void SyncPartyTurnIndicators()
@@ -515,6 +543,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             CurrentFight = isInFight ? ViewModel_PageFight.ActiveFight : null;
             if (!isInFight)
                 foreach (var m in PartyMembers) m.IsCurrentTurn = false;
+            SyncAllyTarget();
         }
 
         public ViewModel_PageGame()
@@ -556,6 +585,11 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             KickFromPartyCommand         = new RelayCommand<string>(name => _ = GameHubService.KickFromPartyAsync(name));
             TransferPartyLeaderCommand   = new RelayCommand<string>(name => _ = GameHubService.TransferPartyLeaderAsync(name));
             MakeLootMasterCommand        = new RelayCommand<string>(name => _ = GameHubService.SetPartyLootMasterAsync(name));
+            SelectAllyCommand            = new RelayCommand<string>(name =>
+            {
+                if (CurrentFight is not { } fight) return;
+                fight.SelectedAllyName = string.IsNullOrEmpty(name) ? null : name;
+            });
             ClearLootMasterCommand       = new RelayCommand<string>(name => _ = GameHubService.SetPartyLootMasterAsync(null));
             WhisperMemberCommand         = new RelayCommand<string>(name => StartWhisper(name));
             SendFriendRequestCommand     = new RelayCommand<string>(name => _ = ServerApiService.SendFriendRequestAsync(name));
@@ -881,6 +915,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         // accept step, so this is what pulls each of them into the fight page.
         private void OnPvpStarted(Myria.Lib.Core.Models.Dto.PvpSnapshot snap)
         {
+            // Also sent after a reconnect mid-fight (v0.3): the page still open from before the
+            // drop must stop listening before the fresh one takes over.
+            (ViewModel_PageFight.ActiveFight as ViewModel_PageFightPvp)?.Detach();
             ViewModel_PageFightPvp.Pending = snap;
             Navigation.Current.Navigate(NavigationFrameType.Game, new Page_Fight());
             Navigation.Current.SetFightState(true);

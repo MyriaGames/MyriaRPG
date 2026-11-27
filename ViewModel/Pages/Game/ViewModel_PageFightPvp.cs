@@ -132,6 +132,16 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             Close();
         }
 
+        /// <summary>A reconnect put this character back into the fight (a fresh PvpStarted): this
+        /// page's view model stops listening; the new page takes over.</summary>
+        public void Detach()
+        {
+            _finished = true;
+            _stallTimer.Stop();
+            GameHubService.PvpUpdated  -= OnPvpUpdated;
+            GameHubService.PvpFinished -= OnPvpFinished;
+        }
+
         private void Close()
         {
             _finished = true;
@@ -151,11 +161,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         protected override Task CastSkillAsync(FightSkillVm? vm)
         {
             if (vm == null) return Task.CompletedTask;
-            // Enemy-targeted skills aim at the selected opponent; ally-targeted ones at yourself
-            // (there's no ally picker on this page yet), as an index into your own side.
-            int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly
-                ? Math.Max(0, GroupCharacters.IndexOf(GroupCharacters.FirstOrDefault(c => IsMe(c.RawName))!))
-                : _selectedMonsterIndex;
+            // Enemy-targeted skills aim at the selected opponent; ally-targeted ones at the ally
+            // picked in the HUD (yourself by default), as an index into your own side.
+            int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? AllyTargetIndex() : _selectedMonsterIndex;
             return SendAsync(() => GameHubService.PvpCastSkillAsync(vm.Skill.Id ?? vm.Skill.Name, targetIdx));
         }
 

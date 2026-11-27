@@ -89,6 +89,14 @@ namespace Myria.Wpf.Model
             set { _isCurrentTurn = value; OnPropertyChanged(); }
         }
 
+        private bool _isAllyTarget;
+        /// <summary>In a fight: single-target ally skills land on this member.</summary>
+        public bool IsAllyTarget
+        {
+            get => _isAllyTarget;
+            set { _isAllyTarget = value; OnPropertyChanged(); }
+        }
+
         public string HpDisplay   => $"{Hp}/{MaxHp}";
         public string ManaDisplay => $"{Mana}/{MaxMana}";
     }

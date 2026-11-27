@@ -73,6 +73,29 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         // Called when SelectedMonsterIndex changes — override in multiplayer to sync server fields.
         protected virtual void OnMonsterSelected(GroupCombatantVm m) { }
 
+        private string? _selectedAllyName;
+        /// <summary>
+        /// The ally that single-target ally skills (heals, buffs) land on in group and PvP fights -
+        /// picked by clicking a party card or your own card in the HUD. Null = yourself.
+        /// </summary>
+        public string? SelectedAllyName
+        {
+            get => _selectedAllyName;
+            set { _selectedAllyName = value; OnPropertyChanged(); }
+        }
+
+        /// <summary>Index of the picked ally in <see cref="GroupCharacters"/> (your own side) - the
+        /// target index the encounters expect for SingleAlly skills. Falls back to yourself when
+        /// nobody is picked or the picked ally is down or gone.</summary>
+        protected int AllyTargetIndex()
+        {
+            int Find(string? name) => name == null ? -1 : GroupCharacters.IndexOf(GroupCharacters.FirstOrDefault(c =>
+                c.IsAlive && string.Equals(c.RawName, name, StringComparison.OrdinalIgnoreCase))!);
+            int i = Find(_selectedAllyName);
+            if (i < 0) i = Find(UserAccountService.CurrentCharacter.Name);
+            return Math.Max(0, i);
+        }
+
         public string CurrentTurnCharacterName
         {
             get => _currentTurnCharacterName;
@@ -503,7 +526,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             if (_isGroupCombat && _isLocalGroupCombat && _groupEncounter != null)
             {
-                int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? 0 : _selectedMonsterIndex;
+                int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? AllyTargetIndex() : _selectedMonsterIndex;
                 var lp = UserAccountService.CurrentCharacter;
                 _groupEncounter.CharacterCastSkill(lp.Name, vm.Skill, targetIdx);
                 SyncFromGroupEncounter();

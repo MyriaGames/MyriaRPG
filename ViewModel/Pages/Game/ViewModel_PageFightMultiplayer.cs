@@ -454,7 +454,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             if (_isGroupCombat && _isLocalGroupCombat && _groupEncounter != null)
             {
-                int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? 0 : _selectedMonsterIndex;
+                int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? AllyTargetIndex() : _selectedMonsterIndex;
                 var lp = UserAccountService.CurrentCharacter;
                 _groupEncounter.CharacterCastSkill(lp.Name, vm.Skill, targetIdx);
                 SyncFromGroupEncounter();
@@ -472,7 +472,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             if (_isGroupCombat)
             {
-                int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? 0 : _selectedMonsterIndex;
+                int targetIdx = vm.Skill.Target == SkillTarget.SingleAlly ? AllyTargetIndex() : _selectedMonsterIndex;
                 _canActServer = false;
                 var snap = await GameHubService.GroupCharacterCastSkillAsync(vm.Skill.Id ?? vm.Skill.Name, targetIdx);
                 if (snap == null || snap.Characters.Count == 0)

@@ -21,8 +21,11 @@
         <!-- TOP-LEFT: self character card + party member cards + invite banner -->
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,20,0,0">
 
-            <!-- Self character HUD -->
+            <!-- Self character HUD (left click in a fight: ally skills target yourself) -->
             <Grid Width="500" Height="68" Tag="{Binding}">
+                <Grid.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding SelectAllyCommand}"/>
+                </Grid.InputBindings>
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Style.Triggers>
@@ -240,6 +243,12 @@
                 <TextBlock Text="◆" Foreground="{DynamicResource Brush.Gold}" FontSize="9"
                            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"/>
 
+                <!-- Ally target marker (combat only) -->
+                <TextBlock Text="✚" Foreground="#7FD67F" FontSize="12" FontWeight="Bold"
+                           HorizontalAlignment="Left" VerticalAlignment="Top" Margin="72,0,0,0"
+                           ToolTip="{Binding TblAllyTargetTip}"
+                           Visibility="{Binding IsSelfAllyTarget, Converter={StaticResource BoolToVis}}"/>
+
                 <!-- Turn indicator (combat only) -->
                 <TextBlock Text="▶" Foreground="#FFD700" FontSize="11" FontWeight="Bold"
                            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="59,0,0,0"
@@ -262,6 +271,12 @@
                                 Padding="8,4"
                                 Effect="{StaticResource Effect.HudShadow}"
                                 Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}">
+                            <Border.InputBindings>
+                                <!-- In a fight: single-target ally skills land on this member -->
+                                <MouseBinding MouseAction="LeftClick"
+                                              Command="{Binding DataContext.SelectAllyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                              CommandParameter="{Binding Username}"/>
+                            </Border.InputBindings>
                             <Border.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="{Binding PlacementTarget.Tag.TblWhisperLabel,         RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -311,6 +326,11 @@
                                                Foreground="#FFD700" FontSize="9" FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                Visibility="{Binding IsCurrentTurn, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBlock Text="✚ "
+                                               Foreground="#7FD67F" FontSize="10" FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               ToolTip="{Binding DataContext.TblAllyTargetTip, RelativeSource={RelativeSource AncestorType=Page}}"
+                                               Visibility="{Binding IsAllyTarget, Converter={StaticResource BoolToVis}}"/>
                                     <TextBlock Text="★ "
                                                Foreground="{DynamicResource Brush.Gold}"
                                                FontSize="8"

@@ -323,6 +323,7 @@
   "pg.game.party.lootmaster.make": "Make loot master",
   "pg.game.party.lootmaster.clear": "Take back loot master",
   "pg.game.party.lootmaster.tooltip": "Loot master: receives all loot from the party’s dungeon fights",
+  "pg.game.fight.allyTarget.tooltip": "Ally target: your single-target heals and buffs land here (click a party card or your own card to change)",
   "pg.game.party.leave": "Leave Party",
   "pg.game.party.group_fight": "Group Fight",
   "pg.game.party.invite_from": "Party invite from {0}",
