@@ -150,6 +150,16 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             _canActServer = IsMyTurn;
         }
 
+        /// <summary>A refused action's reason (no mana, silenced, cooldown...) - the server sends the
+        /// log lines of a rejection back in an otherwise empty snapshot.</summary>
+        private void ShowRejection(GroupCombatSnapshot? snap)
+        {
+            if (snap is null) return;
+            foreach (var msg in snap.LogEntries)
+                LogLines.Add(LogLineVm.From(msg.Key,
+                    Localization.T(msg.Key, LocalizationText.LocalizeMonsterArgs(msg.Args.Cast<object>()))));
+        }
+
         protected override void OnGroupCombatUpdated(GroupCombatSnapshot snap)
         {
             base.OnGroupCombatUpdated(snap);
@@ -416,7 +426,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 _canActServer = false;
                 var snap = await GameHubService.GroupCharacterAttackAsync(_selectedMonsterIndex);
                 if (snap == null || snap.Characters.Count == 0)
+                {
+                    ShowRejection(snap);
                     await ResyncGroupCombatStateAsync();
+                }
                 return;
             }
 
@@ -463,7 +476,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 _canActServer = false;
                 var snap = await GameHubService.GroupCharacterCastSkillAsync(vm.Skill.Id ?? vm.Skill.Name, targetIdx);
                 if (snap == null || snap.Characters.Count == 0)
+                {
+                    ShowRejection(snap);
                     await ResyncGroupCombatStateAsync();
+                }
                 return;
             }
 
@@ -492,7 +508,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 RaiseAll();
                 var snap = await GameHubService.GroupCharacterUseItemAsync(vm.ItemId);
                 if (snap == null || snap.Characters.Count == 0)
+                {
+                    ShowRejection(snap);
                     await ResyncGroupCombatStateAsync();
+                }
                 return;
             }
 

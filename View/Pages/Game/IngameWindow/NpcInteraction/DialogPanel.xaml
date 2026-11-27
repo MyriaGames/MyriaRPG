@@ -17,18 +17,20 @@
             Effect="{StaticResource Effect.PanelShadow}">
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Dialog text -->
-            <TextBlock Text="{Binding DialogText}"
-                       Foreground="{DynamicResource Brush.Foreground}"
-                       FontFamily="{StaticResource Font.Body}"
-                       FontSize="14"
-                       TextWrapping="Wrap"
-                       VerticalAlignment="Top"/>
+            <!-- Dialog text (scrolls itself if an NPC says a lot) -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="140">
+                <TextBlock Text="{Binding DialogText}"
+                           Foreground="{DynamicResource Brush.Foreground}"
+                           FontFamily="{StaticResource Font.Body}"
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Top"/>
+            </ScrollViewer>
 
             <!-- Divider -->
             <Rectangle Grid.Row="1"
@@ -37,9 +39,9 @@
                        Opacity="0.3"
                        Margin="0,10,0,10"/>
 
-            <!-- Service buttons -->
-            <ItemsControl Grid.Row="2"
-                          ItemsSource="{Binding ServiceOptions}">
+            <!-- Service buttons: scroll when there are more than fit (e.g. many bounties) -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding ServiceOptions}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
@@ -52,16 +54,38 @@
                                 Style="{StaticResource NpcDialogButton}"
                                 Margin="6"
                                 MinWidth="160">
-                            <StackPanel>
+                            <StackPanel MaxWidth="280">
                                 <TextBlock Text="{Binding Text}"
                                            FontFamily="{StaticResource Font.Body}"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource Brush.GoldSoft}"/>
+                                <!-- What this option is about (a bounty's target and reward, a quest's
+                                     name) - several buttons can share the same label. -->
+                                <TextBlock Text="{Binding Description}"
+                                           FontFamily="{StaticResource Font.Body}"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           Margin="0,2,0,0"
+                                           Foreground="{DynamicResource Brush.SecondaryText}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <Trigger Property="Text" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </Trigger>
+                                                <Trigger Property="Text" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </StackPanel>
                         </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            </ScrollViewer>
         </Grid>
     </Border>
 </Page>

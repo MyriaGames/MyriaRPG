@@ -8,9 +8,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
     {
         protected override async Task ExecuteMove(Room targetRoom)
         {
+            if (!MeetsRoomRequirement(targetRoom)) return;
             bool ok = await GameHubService.JoinRoomAsync(targetRoom.Id);
-            if (!ok && targetRoom.IsDungeonRoom)
-                WriteLog(Localization.T("dungeon.locked"));   // the server's per-party run said no
+            if (!ok)   // requirements were met, so it's the dungeon run (or e.g. a party requirement)
+                WriteLog(Localization.T(targetRoom.IsDungeonRoom ? "dungeon.locked" : "room.locked"));
             if (ok)
             {
                 NoteDungeonExit(currentRoom, targetRoom);

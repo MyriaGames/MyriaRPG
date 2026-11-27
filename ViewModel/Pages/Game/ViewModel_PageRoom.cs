@@ -425,6 +425,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         }
         private void OnItemReceived(object? sender, ItemReceivedEventArgs e)
         {
+            if (_gatherInFlight) return;   // reported as "You gathered ..." instead
             WriteLog(Localization.T("log.item.received", e.Amount, Localization.T(e.Item.Name)));
         }
         private void OnItemRemoved(object? sender, ItemReceivedEventArgs e)
@@ -508,9 +509,16 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             return Task.CompletedTask;
         }
 
+        // While a gather request is in flight, the server's inventory push (which arrives before the
+        // answer) adds the item - its generic "received" line would duplicate "You gathered ...".
+        private bool _gatherInFlight;
+
         protected async Task StartGatheringServerAsync()
         {
-            var result = await GameHubService.GatherAsync(currentRoom.Id);
+            Myria.Lib.Core.Models.Dto.GatherActionResult? result;
+            _gatherInFlight = true;
+            try { result = await GameHubService.GatherAsync(currentRoom.Id); }
+            finally { _gatherInFlight = false; }
             if (result == null || !result.Success)
             {
                 string key = result?.Reason switch
@@ -529,12 +537,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 return;
             }
 
-            if (result.ItemId != null && ItemFactory.TryCreateItem(result.ItemId, out var item))
-            {
-                item.StackSize = result.Amount;
-                character.Inventory.AddItem(item, character, "gather");
-                WriteLog(Localization.T("log.gather.success", result.Amount, Localization.T(item.Name)));
-            }
+            // The server's inventory push already added the item (adding it here too doubled it until
+            // the next sync, and logged it three times) - only report it.
+            if (result.ItemId != null && ItemFactory.GetItemName(result.ItemId) is { } itemName)
+                WriteLog(Localization.T("log.gather.success", result.Amount, Localization.T(itemName)));
 
             if (!string.IsNullOrEmpty(result.JobId))
                 JobManager.GrantSkillXp(character, result.JobId, result.SkillXpGained);
@@ -718,8 +724,26 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             _ = ExecuteMove(currentRoom.Exits[dir.ToLower()]);
         }
 
+        /// <summary>The room's own requirements (level, quest), checked before moving - with the
+        /// reason in the log. (Offline a refused move used to do nothing at all, and online a level-
+        /// gated dungeon entrance showed "clear this room first".)</summary>
+        protected bool MeetsRoomRequirement(Room targetRoom)
+        {
+            switch (targetRoom.RequirementType)
+            {
+                case RoomRequirementType.Level when character.Level < targetRoom.AccessLevel:
+                    WriteLog(Localization.T("room.locked.level", targetRoom.AccessLevel));
+                    return false;
+                case RoomRequirementType.Quest when !RoomService.CanEnterRoom(targetRoom, character):
+                    WriteLog(Localization.T("room.locked.quest"));
+                    return false;
+            }
+            return true;
+        }
+
         protected virtual async Task ExecuteMove(Room targetRoom)
         {
+            if (!MeetsRoomRequirement(targetRoom)) return;
             if (!RoomService.CanEnterRoom(targetRoom, character)) return;
             if (!LocalDungeonRuns.CanMove(currentRoom, targetRoom))
             {

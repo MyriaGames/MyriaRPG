@@ -107,7 +107,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
 
         protected virtual void ExecuteEquip(EquipmentItem equipment)
         {
-            _character.Inventory.SwapEquipment(equipment.Id, _character);
+            _character.Inventory.SwapEquipment(equipment, _character, out _);
             RefreshEquipmentSlots();
         }
 

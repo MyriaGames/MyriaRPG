@@ -144,7 +144,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
 
         protected virtual void ExecuteEquip(EquipmentItem equipment)
         {
-            _character.Inventory.SwapEquipment(equipment.Id, _character);
+            _character.Inventory.SwapEquipment(equipment, _character, out _);
             RefreshInventory();
         }
 
@@ -415,7 +415,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
 
             if (item is ConsumableItem consumable)
             {
-                if (consumable.HealAmount > 0)
+                if (consumable.HealPercent > 0)
+                    ItemStats.Add(new StatLineViewModel($"{Localization.T("pg.inventory.stat.heal")}: {consumable.HealPercent:0.#}%", DefaultStatBrush));
+                else if (consumable.HealAmount > 0)
                     ItemStats.Add(new StatLineViewModel($"{Localization.T("pg.inventory.stat.heal")}: {consumable.HealAmount}", DefaultStatBrush));
                 if (consumable.ManaRestore > 0)
                     ItemStats.Add(new StatLineViewModel($"{Localization.T("pg.inventory.stat.mana")}: {consumable.ManaRestore}", DefaultStatBrush));

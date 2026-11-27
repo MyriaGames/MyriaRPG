@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR.Client;
+using Myria.Lib.Core.Entities.Items;
 using Myria.Lib.Core.Models.Dto;
 using Myria.Lib.Core.Services;
 using Myria.Wpf.Model;
@@ -590,6 +591,24 @@ namespace Myria.Wpf.Services
         {
             if (_connection?.State == HubConnectionState.Connected)
                 try { return await _connection.InvokeAsync<EquipItemResult>("EquipItem", itemId); } catch (Exception ex) { return new EquipItemResult(false, ex.Message); }
+            return new EquipItemResult(false, "Not connected.");
+        }
+
+        /// <summary>Upgrades exactly this item (id + upgrade state), not just the first with its id.</summary>
+        public static async Task<UpgradeActionResult?> UpgradeAsync(string npcId, EquipmentItem item)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<UpgradeActionResult>("UpgradeInstance", npcId, item.Id, item.UpgradeLevel, item.CraftQuality); }
+                catch { }
+            return null;
+        }
+
+        /// <summary>Equips exactly this item (id + upgrade state), not just the first with its id.</summary>
+        public static async Task<EquipItemResult> EquipItemAsync(EquipmentItem item)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { return await _connection.InvokeAsync<EquipItemResult>("EquipItemInstance", item.Id, item.UpgradeLevel, item.CraftQuality); }
+                catch (Exception ex) { return new EquipItemResult(false, ex.Message); }
             return new EquipItemResult(false, "Not connected.");
         }
 
