@@ -733,7 +733,7 @@
                 Padding="10,8"
                 MinWidth="170"
                 Effect="{StaticResource Effect.HudShadow}"
-                Visibility="{Binding HasRoomCharacters, Converter={StaticResource BoolToVis}}">
+                Visibility="{Binding ShowRoomCharacters, Converter={StaticResource BoolToVis}}">
             <StackPanel>
 
                 <!-- Header -->
@@ -805,7 +805,8 @@
                 MinWidth="170"
                 Margin="0,8,0,0"
                 MaxHeight="180"
-                Effect="{StaticResource Effect.HudShadow}">
+                Effect="{StaticResource Effect.HudShadow}"
+                Visibility="{Binding ShowShopsPanel, Converter={StaticResource BoolToVis}}">
             <StackPanel>
                 <Grid Margin="0,0,0,6">
                     <Grid.ColumnDefinitions>

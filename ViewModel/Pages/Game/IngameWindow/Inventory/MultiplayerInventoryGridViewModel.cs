@@ -15,8 +15,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
 
         private async Task EquipAsync(EquipmentItem equipment)
         {
-            var result = await GameHubService.EquipItemAsync(equipment.Id);
-            if (result.Success) base.ExecuteEquip(equipment);
+            var result = await GameHubService.EquipItemAsync(equipment);
+            // Success: the server's CharacterUpdated push (sent before this call returns) has
+            // already applied the result - doing it again locally applied it twice.
+            if (result.Success) RefreshInventory();
             else ShowNotification(result.Reason ?? "Could not equip item.");
         }
 
@@ -28,7 +30,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
         private async Task UseAsync(ConsumableItem consumable)
         {
             bool ok = await GameHubService.UseItemAsync(consumable.Id);
-            if (ok) base.ExecuteUse(consumable);
+            // Success: the server's CharacterUpdated push (sent before this call returns) has
+            // already applied the result - doing it again locally applied it twice.
+            if (ok) RefreshInventory();
         }
 
         protected override void SellAmount(InventoryItemViewModel itemViewModel, int amount)
@@ -40,8 +44,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
         private async Task SellAsync(InventoryItemViewModel itemViewModel, int amount)
         {
             var result = await GameHubService.SellItemToNpcAsync(itemViewModel.Item.Id, amount);
+            // Success: the server's CharacterUpdated push (sent before this call returns) has
+            // already applied the result - doing it again locally applied it twice.
             if (result != null && result.Success)
-                base.SellAmount(itemViewModel, amount);
+                RefreshInventory();
             else
                 ShowNotification(result?.Reason ?? "Could not sell item.");
         }

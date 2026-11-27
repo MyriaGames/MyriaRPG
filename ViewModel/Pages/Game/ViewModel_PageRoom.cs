@@ -390,6 +390,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         }
         private void OnItemReceived(object? sender, ItemReceivedEventArgs e)
         {
+            if (_gatherInFlight) return;   // reported as "You gathered ..." instead
             WriteLog(Localization.T("log.item.received", e.Amount, Localization.T(e.Item.Name)));
         }
         private void OnItemRemoved(object? sender, ItemReceivedEventArgs e)
@@ -473,9 +474,14 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             return Task.CompletedTask;
         }
 
+        private bool _gatherInFlight;
+
         protected async Task StartGatheringServerAsync()
         {
-            var result = await GameHubService.GatherAsync(currentRoom.Id);
+            Myria.Lib.Core.Models.Dto.GatherActionResult? result;
+            _gatherInFlight = true;
+            try { result = await GameHubService.GatherAsync(currentRoom.Id); }
+            finally { _gatherInFlight = false; }
             if (result == null || !result.Success)
             {
                 string key = result?.Reason switch
@@ -493,16 +499,12 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 return;
             }
 
+            // The server's inventory push already added the item (adding it here too doubled it until
+            // the next sync, and logged it three times) - only report it.
             if (result.ItemId != null && ItemFactory.TryCreateItem(result.ItemId, out var item))
-            {
-                item.StackSize = result.Amount;
-                character.Inventory.AddItem(item, character, "gather");
                 WriteLog(Localization.T("log.gather.success", result.Amount, Localization.T(item.Name)));
-            }
 
-            if (!string.IsNullOrEmpty(result.JobId))
-                JobManager.GrantSkillXp(character, result.JobId, result.SkillXpGained);
-
+            // (Job XP came with the same push - granting it here too showed it doubled.)
             currentRoom.GathersRemaining = result.RemainingGathers;
             RefreshRoomFlags();
         }

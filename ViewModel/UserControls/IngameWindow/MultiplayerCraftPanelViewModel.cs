@@ -26,26 +26,8 @@ namespace Myria.Wpf.ViewModel.UserControls.IngameWindow
                 return;
             }
 
-            foreach (var ing in SelectedRecipe.Ingredients)
-            {
-                int remaining = ing.Amount * Quantity;
-                foreach (var stack in _character.Inventory.Items.Where(i => i.Id == ing.Id).ToList())
-                {
-                    if (remaining <= 0) break;
-                    int take = Math.Min(stack.StackSize, remaining);
-                    stack.StackSize -= take;
-                    remaining -= take;
-                    if (stack.StackSize <= 0) _character.Inventory.RemoveItem(stack);
-                }
-            }
-
-            if (result.ItemId != null && ItemFactory.TryCreateItem(result.ItemId, out var output))
-            {
-                output.StackSize = result.Amount;
-                _character.Inventory.AddItem(output, _character);
-            }
-            if (!string.IsNullOrEmpty(result.JobId))
-                JobManager.GrantSkillXp(_character, result.JobId, result.SkillXpGained);
+            // The server's CharacterUpdated push (sent before this call returns) already brought the
+            // inventory and job XP up to date - applying the result again here did it twice.
 
             StatusMessage = Localization.T("npc.craft.success", Quantity, SelectedRecipe.Name);
             UpdateMaxCraftable();

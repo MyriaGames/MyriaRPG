@@ -353,6 +353,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         // ── Room presence ────────────────────────────────────────────────────
         public ObservableCollection<RoomCharacterVm> RoomCharacters { get; } = new();
         public bool HasRoomCharacters => RoomCharacters.Count > 0;
+        /// <summary>The "Also here" panel: other players present, and not in a fight.</summary>
+        public bool ShowRoomCharacters => HasRoomCharacters && !IsInFight;
 
         // Shops open in the current room - kept separate from RoomCharacters because a shop kept
         // open by a Merchant's Seal is visible here even when its owner isn't physically present
@@ -360,6 +362,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         // and kept in sync afterwards via ShopOpened/ShopClosed.
         public ObservableCollection<string> RoomShopOwners { get; } = new();
         public bool HasRoomShops => RoomShopOwners.Count > 0;
+        /// <summary>The "Shops here" panel: only where a shop can be opened (city/village) or another
+        /// player's shop is open - and never during a fight.</summary>
+        public bool ShowShopsPanel => (IsCurrentRoomCity || HasRoomShops) && !IsInFight;
 
         // Player shops can only be opened in a city room - gates the "Open Shop" button in the
         // shops panel. Purely a client-side UX guard; GameHub.OpenShop enforces the same rule
@@ -368,7 +373,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         public bool IsCurrentRoomCity
         {
             get => _isCurrentRoomCity;
-            set { _isCurrentRoomCity = value; OnPropertyChanged(); }
+            set { _isCurrentRoomCity = value; OnPropertyChanged(); OnPropertyChanged(nameof(ShowShopsPanel)); }
         }
 
         // ── Friends (cached for the player-interaction context menus) ───────
@@ -495,6 +500,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             IsInFight = isInFight;
             OnPropertyChanged(nameof(IsInFight));
             OnPropertyChanged(nameof(IsNotInFight));
+            OnPropertyChanged(nameof(ShowRoomCharacters));
+            OnPropertyChanged(nameof(ShowShopsPanel));
             CurrentFight = isInFight ? ViewModel_PageFight.ActiveFight : null;
             if (!isInFight)
                 foreach (var m in PartyMembers) m.IsCurrentTurn = false;
@@ -558,8 +565,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             character.Inventory.ItemReceived += (s, e) => RefreshQuestBadge();
             RefreshQuestBadge();
 
-            RoomCharacters.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasRoomCharacters));
-            RoomShopOwners.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasRoomShops));
+            RoomCharacters.CollectionChanged += (_, _) => { OnPropertyChanged(nameof(HasRoomCharacters)); OnPropertyChanged(nameof(ShowRoomCharacters)); };
+            RoomShopOwners.CollectionChanged += (_, _) => { OnPropertyChanged(nameof(HasRoomShops)); OnPropertyChanged(nameof(ShowShopsPanel)); };
 
             if (IsChatAvailable)
             {

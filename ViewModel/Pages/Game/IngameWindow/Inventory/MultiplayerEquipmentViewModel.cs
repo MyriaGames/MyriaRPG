@@ -16,8 +16,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
 
         private async Task EquipAsync(EquipmentItem equipment)
         {
-            var result = await GameHubService.EquipItemAsync(equipment.Id);
-            if (result.Success) base.ExecuteEquip(equipment);
+            var result = await GameHubService.EquipItemAsync(equipment);
+            // Success: the server's CharacterUpdated push (sent before this call returns) has
+            // already applied the result - doing it again locally applied it twice.
+            if (result.Success) RefreshEquipmentSlots();
             else ShowNotification(result.Reason ?? "Could not equip item.");
         }
 
@@ -29,7 +31,9 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow.Inventory
         private async Task UnequipAsync(EquipmentItem item, string slotType)
         {
             bool ok = await GameHubService.UnequipItemAsync(slotType);
-            if (ok) base.ExecuteUnequip(item, slotType);
+            // Success: the server's CharacterUpdated push (sent before this call returns) has
+            // already applied the result - doing it again locally applied it twice.
+            if (ok) RefreshEquipmentSlots();
         }
     }
 }

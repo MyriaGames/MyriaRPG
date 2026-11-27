@@ -16,36 +16,19 @@ namespace Myria.Wpf.ViewModel.UserControls.IngameWindow
         {
             if (SelectedEquipment == null) return;
             string currentId = SelectedEquipment.Id;
+            var item = SelectedEquipment.Item;
 
-            var result = await GameHubService.UpgradeAsync(_npc.Id, currentId);
+            var result = item is not null
+                ? await GameHubService.UpgradeAsync(_npc.Id, item)
+                : await GameHubService.UpgradeAsync(_npc.Id, currentId);
             if (result == null || !result.Success)
             {
                 StatusMessage = Localization.T("npc.upgrade.fail");
                 return;
             }
 
-            string matId  = SelectedEquipment.UpgradeMaterialId;
-            int remaining = SelectedEquipment.UpgradeMaterialCount;
-            foreach (var stack in _character.Inventory.Items.Where(i => i.Id == matId).ToList())
-            {
-                if (remaining <= 0) break;
-                int take = Math.Min(stack.StackSize, remaining);
-                stack.StackSize -= take;
-                remaining -= take;
-                if (stack.StackSize <= 0) _character.Inventory.RemoveItem(stack);
-            }
-
-            var eq = SelectedEquipment.Item;
-            if (eq != null)
-            {
-                string jobId  = _npc.MasterJobId ?? "blacksmith";
-                float quality = (float)JobXpService.GetSkillMultiplierFromXp(JobManager.GetOrAdd(_character, jobId).SkillXp);
-                if (quality > eq.CraftQuality) eq.CraftQuality = quality;
-                eq.TryUpgrade(_character);
-            }
-
-            if (!string.IsNullOrEmpty(result.JobId))
-                JobManager.GrantSkillXp(_character, result.JobId, result.SkillXpGained);
+            // The server's CharacterUpdated push (sent before this call returns) already brought the
+            // inventory and job XP up to date - applying the result again here did it twice.
 
             StatusMessage = Localization.T("npc.action.upgrade.ok", ResolveItemName(result.ItemId ?? ""), result.UpgradeLevel);
             LoadUpgradable(currentId);
