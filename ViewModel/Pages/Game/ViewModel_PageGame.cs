@@ -142,6 +142,14 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             set {  _tblPartyPromote = value;  OnPropertyChanged(); }
         }
 
+        private string _tblPartyMakeLootMaster = string.Empty, _tblPartyClearLootMaster = string.Empty, _tblPartyLootMasterTip = string.Empty;
+        [LocalizedKey("pg.game.party.lootmaster.make")]
+        public string TblPartyMakeLootMaster { get => _tblPartyMakeLootMaster; set { _tblPartyMakeLootMaster = value; OnPropertyChanged(); } }
+        [LocalizedKey("pg.game.party.lootmaster.clear")]
+        public string TblPartyClearLootMaster { get => _tblPartyClearLootMaster; set { _tblPartyClearLootMaster = value; OnPropertyChanged(); } }
+        [LocalizedKey("pg.game.party.lootmaster.tooltip")]
+        public string TblPartyLootMasterTip { get => _tblPartyLootMasterTip; set { _tblPartyLootMasterTip = value; OnPropertyChanged(); } }
+
         [LocalizedKey("pg.game.party.kick")]
         public string TblPartyKickLabel
         {
@@ -454,6 +462,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         public ICommand LeavePartyCommand          { get; }
         public ICommand KickFromPartyCommand       { get; }
         public ICommand TransferPartyLeaderCommand { get; }
+        public ICommand MakeLootMasterCommand      { get; }
+        public ICommand ClearLootMasterCommand     { get; }
         public ICommand WhisperMemberCommand       { get; }
         public ICommand SendFriendRequestCommand    { get; }
         public ICommand InviteToPartyFromRoomCommand { get; }
@@ -545,6 +555,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             LeavePartyCommand          = new RelayCommand(() => _ = GameHubService.LeavePartyAsync());
             KickFromPartyCommand         = new RelayCommand<string>(name => _ = GameHubService.KickFromPartyAsync(name));
             TransferPartyLeaderCommand   = new RelayCommand<string>(name => _ = GameHubService.TransferPartyLeaderAsync(name));
+            MakeLootMasterCommand        = new RelayCommand<string>(name => _ = GameHubService.SetPartyLootMasterAsync(name));
+            ClearLootMasterCommand       = new RelayCommand<string>(name => _ = GameHubService.SetPartyLootMasterAsync(null));
             WhisperMemberCommand         = new RelayCommand<string>(name => StartWhisper(name));
             SendFriendRequestCommand     = new RelayCommand<string>(name => _ = ServerApiService.SendFriendRequestAsync(name));
             InviteToPartyFromRoomCommand = new RelayCommand<string>(name => _ = GameHubService.InviteToPartyAsync(name));
@@ -580,6 +592,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 GameHubService.PartyUpdated            += OnPartyUpdated;
                 GameHubService.PartyDisbanded          += OnPartyDisbanded;
                 GameHubService.KickedFromParty         += OnKickedFromParty;
+                GameHubService.PartyLootMasterChanged  += OnPartyLootMasterChanged;
                 GameHubService.PartyMemberStatsUpdated += OnPartyMemberStats;
                 GameHubService.RoomCharactersReceived     += OnRoomCharacters;
                 GameHubService.CharacterEntered           += OnCharacterEntered;
@@ -630,6 +643,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             GameHubService.PartyUpdated            -= OnPartyUpdated;
             GameHubService.PartyDisbanded          -= OnPartyDisbanded;
             GameHubService.KickedFromParty         -= OnKickedFromParty;
+            GameHubService.PartyLootMasterChanged  -= OnPartyLootMasterChanged;
             GameHubService.PartyMemberStatsUpdated -= OnPartyMemberStats;
             GameHubService.RoomCharactersReceived     -= OnRoomCharacters;
             GameHubService.CharacterEntered           -= OnCharacterEntered;
@@ -732,6 +746,25 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             HasPendingInvite = true;
         }
 
+        private string? _lootMaster;
+
+        /// <summary>The party's loot master (v0.3) - gets all dungeon loot and hands it out by trade.</summary>
+        private void OnPartyLootMasterChanged(string lootMaster)
+        {
+            _lootMaster = lootMaster;
+            RefreshLootMaster();
+        }
+
+        private void RefreshLootMaster()
+        {
+            foreach (var vm in PartyMembers)
+            {
+                vm.IsLootMaster       = vm.Username == _lootMaster;
+                vm.CanMakeLootMaster  = IsPartyLeader && !vm.IsLootMaster;
+                vm.CanClearLootMaster = IsPartyLeader && vm.IsLootMaster;
+            }
+        }
+
         private void OnPartyUpdated(List<string> members, string? leader)
         {
             var self = UserAccountService.CurrentCharacter.Name;
@@ -758,6 +791,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
                 vm.IsLeader         = vm.Username == leader;
                 vm.ShowLeaderActions = IsPartyLeader && !vm.IsLeader;
             }
+            RefreshLootMaster();
 
             IsInParty        = PartyMembers.Count > 0;
             HasPendingInvite = false;

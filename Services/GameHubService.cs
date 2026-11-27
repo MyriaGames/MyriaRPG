@@ -60,6 +60,7 @@ namespace Myria.Wpf.Services
 
         // Party events
         public static event Action<string, string>? PartyInviteReceived;                           // fromUsername, partyId
+        public static event Action<string>? PartyLootMasterChanged;                               // loot master's name
         public static event Action<List<string>, string?>? PartyUpdated;                           // members, leaderUsername
         public static event Action? PartyDisbanded;
         public static event Action? KickedFromParty;
@@ -143,6 +144,8 @@ namespace Myria.Wpf.Services
             _connection.On<string, string>("PartyInvite", (from, partyId) =>
                 Dispatch(() => PartyInviteReceived?.Invoke(from, partyId)));
 
+            _connection.On<string>("PartyLootMaster", lootMaster =>
+                Dispatch(() => PartyLootMasterChanged?.Invoke(lootMaster)));
             _connection.On<List<string>, string?>("PartyUpdated", (members, leader) =>
                 Dispatch(() => PartyUpdated?.Invoke(members, leader)));
 
@@ -351,6 +354,13 @@ namespace Myria.Wpf.Services
         {
             if (_connection?.State == HubConnectionState.Connected)
                 try { await _connection.InvokeAsync("KickFromParty", targetName); } catch { }
+        }
+
+        /// <summary>Leader only: make <paramref name="targetName"/> the loot master (null: back to the leader).</summary>
+        public static async Task SetPartyLootMasterAsync(string? targetName)
+        {
+            if (_connection?.State == HubConnectionState.Connected)
+                try { await _connection.InvokeAsync("SetPartyLootMaster", targetName); } catch { }
         }
 
         public static async Task TransferPartyLeaderAsync(string targetName)

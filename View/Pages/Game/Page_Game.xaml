@@ -281,6 +281,14 @@
                                               Command="{Binding PlacementTarget.Tag.TransferPartyLeaderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                               CommandParameter="{Binding PlacementTarget.DataContext.Username,  RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                               Visibility="{Binding PlacementTarget.DataContext.ShowLeaderActions, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                    <MenuItem Header="{Binding PlacementTarget.Tag.TblPartyMakeLootMaster, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Command="{Binding PlacementTarget.Tag.MakeLootMasterCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext.Username, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Visibility="{Binding PlacementTarget.DataContext.CanMakeLootMaster, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                    <MenuItem Header="{Binding PlacementTarget.Tag.TblPartyClearLootMaster, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Command="{Binding PlacementTarget.Tag.ClearLootMasterCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext.Username, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Visibility="{Binding PlacementTarget.DataContext.CanClearLootMaster, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
                                     <MenuItem Header="{Binding PlacementTarget.Tag.TblPartyKickLabel,      RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                               Command="{Binding PlacementTarget.Tag.KickFromPartyCommand,  RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                               CommandParameter="{Binding PlacementTarget.DataContext.Username, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -304,6 +312,12 @@
                                                FontSize="8"
                                                VerticalAlignment="Center"
                                                Visibility="{Binding IsLeader, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBlock Text="◆ "
+                                               Foreground="{DynamicResource Brush.GoldSoft}"
+                                               FontSize="8"
+                                               VerticalAlignment="Center"
+                                               ToolTip="{Binding DataContext.TblPartyLootMasterTip, RelativeSource={RelativeSource AncestorType=Page}}"
+                                               Visibility="{Binding IsLootMaster, Converter={StaticResource BoolToVis}}"/>
                                     <TextBlock Text="{Binding Username}"
                                                Foreground="{DynamicResource Brush.Foreground}"
                                                FontFamily="{StaticResource Font.Body}"

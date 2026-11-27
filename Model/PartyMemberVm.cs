@@ -56,6 +56,26 @@ namespace Myria.Wpf.Model
         }
 
         private bool _showLeaderActions;
+        private bool _isLootMaster;
+        /// <summary>Gets the party's dungeon loot.</summary>
+        public bool IsLootMaster
+        {
+            get => _isLootMaster;
+            set { _isLootMaster = value; OnPropertyChanged(); }
+        }
+
+        private bool _canMakeLootMaster, _canClearLootMaster;
+        public bool CanMakeLootMaster
+        {
+            get => _canMakeLootMaster;
+            set { _canMakeLootMaster = value; OnPropertyChanged(); }
+        }
+        public bool CanClearLootMaster
+        {
+            get => _canClearLootMaster;
+            set { _canClearLootMaster = value; OnPropertyChanged(); }
+        }
+
         public bool ShowLeaderActions
         {
             get => _showLeaderActions;
