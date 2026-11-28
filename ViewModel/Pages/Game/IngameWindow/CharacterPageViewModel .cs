@@ -296,8 +296,8 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
         public long XpCurrent { get; set; }
         public long XpToNextLevel { get; set; }  // total needed for current->next
 
-        public string XpProgressText => $"{XpCurrent:N0} / {XpToNextLevel:N0}  ({XpPercent:0}%)";
-        public double XpPercent => Math.Clamp(XpToNextLevel > 0 ? (XpCurrent * 100.0) / XpToNextLevel : 0, 0, 100);
+        public string XpProgressText => _character.IsAtLevelCap ? "MAX" : $"{XpCurrent:N0} / {XpToNextLevel:N0}  ({XpPercent:0}%)";
+        public double XpPercent => _character.IsAtLevelCap ? 100 : Math.Clamp(XpToNextLevel > 0 ? (XpCurrent * 100.0) / XpToNextLevel : 0, 0, 100);
 
         public string ClassLevelLabel => Localization.T("pg.class.level", ClassManager.GetClassLevel(_character, _character.Class).ToString());
         public double ClassXpFraction => ClassXpService.GetProgressFraction(ClassManager.GetClassXp(_character, _character.Class));
@@ -365,7 +365,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game.IngameWindow
             _character = character;
             CharacterName = character.Name;
             Level = character.Level;
-            XpCurrent = character.Experience;
+            XpCurrent = character.IsAtLevelCap ? character.ExpForNextLvl : character.Experience;   // full bar at the cap
             XpToNextLevel = character.ExpForNextLvl;
             CharClass = Localization.T($"class.{character.Class}");
 

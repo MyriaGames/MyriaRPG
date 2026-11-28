@@ -1175,7 +1175,10 @@ namespace Myria.Wpf.ViewModel.Pages.Game
             get => xpPercent;
             set
             {
-                xpPercent = (int)Math.Round(100.0 * CurrentXp / Math.Max(1, XpToNext));
+                // v0.3 level cap: a capped character earns no XP - show a full bar.
+                xpPercent = UserAccountService.CurrentCharacter?.IsAtLevelCap == true
+                    ? 100
+                    : (int)Math.Round(100.0 * CurrentXp / Math.Max(1, XpToNext));
                 OnPropertyChanged();
             }
 

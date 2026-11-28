@@ -599,7 +599,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
         protected virtual void RefreshDungeonState()
         {
             LocalDungeonRuns.NoteLocation(currentRoom);
-            if (LocalDungeonRuns.For(currentRoom) is not { } run) { DungeonStatus = string.Empty; return; }
+            if (LocalDungeonRuns.For(currentRoom, UserAccountService.CurrentCharacter?.Level) is not { } run) { DungeonStatus = string.Empty; return; }
             var remaining = run.Remaining(currentRoom);
             HasMonsters = remaining.Count > 0;
             DungeonStatus = DungeonStatusText(remaining.Select(m => m.Name));
@@ -665,7 +665,7 @@ namespace Myria.Wpf.ViewModel.Pages.Game
 
             List<Monster> monsters;
             GroupCombatEncounter? dungeonFight = null;
-            var run = LocalDungeonRuns.For(currentRoom);
+            var run = LocalDungeonRuns.For(currentRoom, character?.Level);
             if (run is not null)
             {
                 // Dungeon room: the next pack of the local run's monsters for this room.
